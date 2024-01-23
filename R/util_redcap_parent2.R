@@ -74,12 +74,16 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   spsrq_data <- data[, grepl('record_id', names(data)) | grepl('spsrq', names(data))]
   spsrq_data <- spsrq_data[, !(names(spsrq_data) %in% c('spsrq_missingcheck'))]
   names(spsrq_data)[1] <- 'participant_id'
-  spsrq_json <- NA
+  
+  spsrq_scores <- dataprepr::score_hfe(spsrq_data, score_base = TRUE, id = 'participant_id')
+  spsrq_json <- json_spsrq()
   
   ## CBQ Data
   cbq_data <- data[, grepl('record_id', names(data)) | grepl('cbq', names(data))]
   cbq_data <- cbq_data[, !(names(cbq_data) %in% c('cbq_missingcheck'))]
   names(cbq_data)[1] <- 'participant_id'
+  
+  cbq_scores <- dataprepr::score_hfe(cbq_data, score_base = TRUE, id = 'participant_id')
   cbq_json <- NA
   
   ## PWLB Data

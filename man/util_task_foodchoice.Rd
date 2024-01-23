@@ -5,16 +5,19 @@
 \title{util_task_foodchoice: Process raw data from the Food Choice Task}
 \usage{
 util_task_foodchoice(
-  sub = sub,
-  data_path = data_path,
+  sub_str,
+  ses,
+  base_wd,
   overwrite = FALSE,
   return_data = FALSE
 )
 }
 \arguments{
-\item{sub}{participant number}
+\item{sub_str}{participant string (i.e., sub_###) as character}
 
-\item{data_path}{data_path absolute path to untouched raw task data file}
+\item{ses}{session name (i.e., 'baseline', 'followup')}
+
+\item{base_wd}{absolute path to the data directory}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
 
@@ -24,7 +27,7 @@ util_task_foodchoice(
 If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 }
 \description{
-This function 1) copies data from raw_untouched and saves it in sourcedata and then 2) cleans data to save in BIDS format in rawdata
+This function cleans data to save in BIDS format in rawdata
 }
 \details{
 To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
@@ -32,7 +35,7 @@ To use this function, the correct path must be used. The path must be the full p
 \examples{
 
 # process task data for the Food Choice Task
-foodchoice_task_pardat <- util_task_foodchoice(data_path, return = TRUE)
+foodchoice_task_pardat <- util_task_foodchoice(sub_str, ses, data_path, return = TRUE)
 
 \dontrun{
 }

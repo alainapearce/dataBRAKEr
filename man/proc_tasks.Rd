@@ -4,26 +4,15 @@
 \alias{proc_tasks}
 \title{proc_tasks: Process raw data from all computer tasks used in Study BRAKE}
 \usage{
-proc_tasks(
-  sub = sub,
-  data_path = data_path,
-  overwrite = FALSE,
-  return_data = FALSE
-)
+proc_tasks(data_path, overwrite = FALSE)
 }
 \arguments{
-\item{sub}{participant number}
-
-\item{data_path}{data_path absolute path to the raw_untouched directory}
+\item{data_path}{full data path to untouched_raw directory}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
-
-\item{return_data}{logical indicating if data should be returned. Default = FALSE}
 }
 \value{
-If return_data is set to TRUE, will return a list including:
- 1) clean raw datasets meta-data for each task
- 2) processed derivative datasets with meta-data for each task
+data.frame for each task with status for each processing step
 }
 \description{
 This function calls task scripts that:
@@ -37,7 +26,7 @@ To use this function, the correct path must be used. The path must be the full p
 \examples{
 
 # process task data for the Food Choice Task
-proc_tasks_pardat <- proc_tasks(sub = 1, data_path, return = TRUE)
+proc_tasks_pardat <- proc_tasks(data_path, overwrite)
 
 \dontrun{
 }
