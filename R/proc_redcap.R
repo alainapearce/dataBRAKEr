@@ -58,6 +58,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   slash_loc <- unlist(gregexpr(slash, visit_data_path))
 
   # set paths for other directories
+  base_wd <- substr(visit_data_path, 1, tail(slash_loc, 4))
   bids_wd <- substr(visit_data_path, 1, tail(slash_loc, 3))
   phenotype_wd <- paste0(bids_wd, slash, 'phenotype', slash)
   
@@ -83,10 +84,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     stop ('entered data_de_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
   }
   
+  
+  
+  
   #### Load and organize visit data ####
   redcap_visit_data <- read.csv(visit_data_path, header = TRUE)
-  redcap_de_data <- read.csv(data_de_path, header = TRUE)
-  
+
   
   # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){
@@ -129,6 +132,48 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   parent_v1_data <- util_redcap_parent1(parent_visit_1_arm_1, prepost_v1_data$demo[c('participant_id', 'v1_date')])
   child_v2_data <- util_redcap_child2(child_visit_2_arm_1)
   parent_v2_data <- util_redcap_parent2(parent_visit_2_arm_1)
+  
+  #### Load and organize double-entry data ####
+  redcap_de_data <- read.csv(data_de_path, header = TRUE)
+  
+  # all validated so can just take reviewer 1 data
+  redcap_de_data <- redcap_de_data[grepl('--1', redcap_de_data[['record_id']]), ]
+  
+  ## interview quick work
+  bod_pod_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('bodpod', names(redcap_de_data))]
+  names(bod_pod_data)[1] <- 'participant_id'
+  bod_pod_data$participant_id <- sub('--1', '', bod_pod_data$participant_id)
+  bod_pod_data$participant_id <- sub('^00|^0', '', bod_pod_data$participant_id)
+  bod_pod_data <- bod_pod_data[bod_pod_data$participant_id != '6-2', ]
+  
+  interview_dat <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
+  interview_dat <- merge(interview_dat, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
+  interview_dat <- merge(interview_dat, bod_pod_data, by = 'participant_id')
+  interview_dat <- merge(interview_dat, parent_v2_data$hfe_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, parent_v1_data$cfq_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, parent_v2_data$ffbs_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, parent_v1_data$ffq_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, parent_v1_data$efcr_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, parent_v1_data$cebq_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, child_v2_data$loc_data$data, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, child_v1_data$sleep_wk_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  interview_dat <- merge(interview_dat, parent_v2_data$cshq_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  
+  write.csv(interview_dat, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'interview_pilot_data.csv'), row.names = FALSE)
+  
+  # export data
+  
+  ## interview data
+  write.table(child_v1_data[['otherdata']][['fnirs_cap']], paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-baseline_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE)
+  
+  ## fNIRS - raw_untouched
+  write.table(child_v1_data[['otherdata']][['fnirs_cap']], paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-baseline_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE)
+  
+  
+  
+  
+  
   
   # merge
   participant_data <- merge(prepost_v1_data$prepost_data$data, prepost_v2_data$data, by = 'participant_id')

@@ -153,6 +153,6 @@ json_sleeplog <- function() {
     print('Sleep Log JSON file may be invalid')
   }
   
-  return(brief_json)
+  return(sleeplog_json)
   
 }

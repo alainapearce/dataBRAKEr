@@ -48,7 +48,7 @@ util_redcap_child2 <- function(data, return_data = TRUE) {
   loc_data <- data[, grepl('record_id', names(data)) | grepl('loc', names(data))]
   loc_data <- loc_data[, !grepl('wasi', names(loc_data))]
   names(loc_data)[1] <- 'participant_id'
-  loc_json <- json_loc()
+  #loc_json <- json_loc()
   
   ## SIC data
   sic_data <- data[, grepl('record_id', names(data)) | grepl('sic', names(data))]
@@ -61,7 +61,7 @@ util_redcap_child2 <- function(data, return_data = TRUE) {
   if (isTRUE(return_data)){
     return(list(
       child_visit2_data = list(data = child_visit2_data, meta = child_visit2_json),
-      loc_data = list(data = loc_data, meta = loc_json),
+      loc_data = list(data = loc_data)
       #sic_data = list(data = sic_data, meta = sic_json)
       ))
   }

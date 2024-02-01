@@ -71,12 +71,20 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   # copy files
   if (!file.exists(paste0(source_wd, sub_str, '_task-', task_str, '_events.tsv')) | isTRUE(overwrite)) {
     
-    #copy other files over
-    file.copy(from = paste0(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = paste0(source_wd, rename_files[!grepl('.csv', rename_files)]))
+    if (task_str != 'space'){
+      #copy other files over
+      file.copy(from = paste0(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = paste0(source_wd, rename_files[!grepl('.csv', rename_files)]))
+      
+      #change data file to .tsv
+      rename_tsv <- gsub('.csv', '.tsv', rename_files[grepl('.csv', rename_files)])
+      
+      dat <- read.csv(paste0(raw_untouched_path, raw_files[grepl('.csv', raw_files)]), header = TRUE)
+      write.table(dat, paste0(source_wd, rename_tsv), sep='\t', quote = FALSE, row.names = FALSE)
+
+    } else {
+      file.copy(from = paste0(raw_untouched_path, raw_files), to = paste0(source_wd, rename_files))
+    }
     
-    #change data file to .tsv
-    rename_tsv <- gsub('.csv', '.tsv', rename_files[grepl('.csv', rename_files)])
-    file.copy(from = paste0(raw_untouched_path, raw_files[grepl('.csv', raw_files)]), to = paste0(source_wd, rename_tsv))
     
     #return message
     if (isTRUE(overwrite)){

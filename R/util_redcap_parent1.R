@@ -120,13 +120,13 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   if (isTRUE(return_data)){
     return(list(
       demo_data = list(data = demo_data),
-      puberty_data = list(data = puberty_scored$bids_phenotype, meta = puberty_json),
-      cfq_data = list(data = cfq_scored$bids_phenotype, meta = cfq_json),
-      cebq_data = list(data = cebq_scored$bids_phenotype, meta = cebq_json), 
-      efcr_data = list(data = efcr_scored$bids_phenotype, meta = efcr_json), 
-      lbc_data = list(data = lbc_scored$bids_phenotype, meta = lbc_json), 
-      brief_data = list(data = brief_scored$bids_phenotype, meta = brief_json), 
-      ffq_data = list(data = ffq_scored$bids_phenotype, meta = ffq_json)))
+      puberty_data = list(data = puberty_scored, meta = puberty_json),
+      cfq_data = list(data = cfq_scored, meta = cfq_json),
+      cebq_data = list(data = cebq_scored, meta = cebq_json), 
+      efcr_data = list(data = efcr_scored, meta = efcr_json), 
+      lbc_data = list(data = lbc_scored, meta = lbc_json), 
+      brief_data = list(data = brief_scored, meta = brief_json), 
+      ffq_data = list(data = ffq_scored, meta = ffq_json)))
   }
 }
 

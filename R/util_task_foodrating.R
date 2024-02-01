@@ -54,7 +54,7 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, sub_str, '_ses-', ses, '_task-foodrating_events.tsv')
   
   #### Organize Data #####
-  dat <- read.csv(data_file, header = TRUE)
+  dat <- read.csv(data_file, sep = '\t', header = TRUE)
   
   # remove practice
   dat <- dat[!is.na(dat[['fix']]), ]
@@ -99,10 +99,8 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  write.csv(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodrating_events.tsv'), row.names = FALSE)
-  
   if (!file.exists(paste0(raw_wd, sub_str, '_task-foodrating_events.tsv')) | isTRUE(overwrite)) {
-    write.csv(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodrating_events.tsv'), row.names = FALSE)
+    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodrating_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE)
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')

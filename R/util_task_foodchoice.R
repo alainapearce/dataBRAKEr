@@ -50,11 +50,12 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   
   # get directory paths
   raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash)
+  
   data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, sub_str, '_ses-', ses, '_task-foodchoice_events.tsv')
   
   
   #### Organize Data #####
-  dat <- read.csv(data_file, header = TRUE)
+  dat <- read.csv(data_file, sep = '\t', header = TRUE)
   
   # get healthy eating rt
   healthy_rt <- dat[!is.na(dat[['healthyeating_key.rt']]), 'healthyeating_key.rt']
@@ -64,16 +65,21 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   
   # reduce columns and detect if has eye-tracking or not
   if ('etRecord.started' %in% names(dat)){
-    dat <- dat[c('participant', 'date', 'expName', 'condition', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trials.thisN', 'healthyeating_key.rt', 'trial_left_img.started', 'trial_right_img.started', 'choice_prompt.started', 'key_choice.started', 'choice_fix.started', 'left_img.started', 'right_img.started', 'etRecord.started', 'key_choice.keys', 'key_choice.rt', 'left_img.numLooks', 'left_img.timesOn', 'left_img.timesOff', 'right_img.numLooks', 'right_img.timesOn', 'right_img.timesOff', 'trial_fixprompt.started', 'tfix.started', 'trial_fixprompt.stopped', 'tfix.stopped', 'psychopyVersion', 'frameRate')]
+    eye_dat <- dat[c('participant', 'trials.thisN', 'left_img.started', 'right_img.started', 'etRecord.started', 'left_img.numLooks', 'left_img.timesOn', 'left_img.timesOff', 'right_img.numLooks', 'right_img.timesOn', 'right_img.timesOff')]
     
     # update names
-    names(dat) <- c('sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'left_roi_onset', 'right_roi_onset', 'et_record_onset', 'choice', 'choice_rt', 'left_looks', 'left_look_onsets', 'left_look_offsets', 'right_looks', 'right_look_onsets', 'right_look_offsets', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'psychopy_ver', 'frame_rate')
-  } else {
-    dat <- dat[c('participant', 'date', 'expName', 'condition', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trials.thisN', 'healthyeating_key.rt', 'trial_left_img.started', 'trial_right_img.started', 'choice_prompt.started', 'key_choice.started', 'choice_fix.started', 'key_choice.keys', 'key_choice.rt', 'trial_fixprompt.started', 'tfix.started', 'trial_fixprompt.stopped', 'tfix.stopped', 'psychopyVersion', 'frameRate')]
+    names(eye_dat) <- c('sub', 'trial', 'left_roi_onset', 'right_roi_onset', 'et_record_onset', 'left_looks', 'left_look_onsets', 'left_look_offsets', 'right_looks', 'right_look_onsets', 'right_look_offsets')
     
-    # update names
-    names(dat) <- c('sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'psychopy_ver', 'frame_rate')
+    # remove zero-base ordering
+    eye_dat[['trial']] <- eye_dat[['trial']] + 1
+    
   }
+  
+  # fNIRS/Beh data
+  dat <- dat[c('participant', 'date', 'expName', 'condition', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trials.thisN', 'healthyeating_key.rt', 'trial_left_img.started', 'trial_right_img.started', 'choice_prompt.started', 'key_choice.started', 'choice_fix.started', 'key_choice.keys', 'key_choice.rt', 'trial_fixprompt.started', 'tfix.started', 'trial_fixprompt.stopped', 'tfix.stopped', 'psychopyVersion', 'frameRate')]
+  
+  # update names
+  names(dat) <- c('sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'psychopy_ver', 'frame_rate')
   
   # add duration
   dat[['duration']] <- 2
@@ -98,12 +104,15 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   # add onset column - will be completed using Matlab during fNIRS processing
   dat[['onset']] <- NA
   
-  # re-order
+  #re-order columns
+  dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'choice_healthy', 'choice_tasty', 'choice_want', 'psychopy_ver', 'frame_rate')]
+  
+  # get long dataset with trial information
   if ('et_record_onset' %in% names(dat)) {
-    dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'left_roi_onset', 'right_roi_onset', 'et_record_onset', 'choice', 'choice_rt', 'left_looks', 'left_look_onsets', 'left_look_offsets', 'right_looks', 'right_look_onsets', 'right_look_offsets', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'choice_healthy', 'choice_tasty', 'choice_want', 'psychopy_ver', 'frame_rate')]
-  } else {
-    dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'choice_healthy', 'choice_tasty', 'choice_want', 'psychopy_ver', 'frame_rate')]
-  }
+    #eye_dat_long <- util_eyetrack_roi(eye_dat, roi_list = c('right', 'left'), return_data = TRUE)
+    #eye_dat <- merge(dat, eye_dat[c()])
+  } 
+    
   
   #### Save in rawdata #####
   
@@ -111,10 +120,8 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  write.csv(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_events.tsv'), row.names = FALSE)
-  
   if (!file.exists(paste0(raw_wd, sub_str, '_task-foodchioce_events.tsv')) | isTRUE(overwrite)) {
-    write.csv(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_events.tsv'), row.names = FALSE)
+    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE)
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')

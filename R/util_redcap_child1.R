@@ -43,6 +43,8 @@ util_redcap_child1 <- function(data, return_data = TRUE) {
   
   names(fnirs_cap) <- c('participant_id', 'fnris_frontback_cm', 'fnirs_ears_cm', 'fnirs_circ_cm', 'fnirs_capsize', 'fnirs_cap_notes')
   
+  
+  
   ## demo ####
   child_v1demo_data <- data[c('record_id', 'v1_general_notes', 'relationship', 'c_height1_cm', 'c_height2_cm', 'c_weight1_kg', 'c_weight2_kg', 'c_height_avg_cm', 'c_weight_avg_kg', 'c_bmi', 'c_bmi_pcent', 'c_weightstatus', 'p_height1_cm', 'p_height2_cm', 'p_weight1_kg', 'p_weight2_kg', 'p_height_avg_cm', 'p_weight_avg_kg', 'p_bmi', 'p_weightstatus', 'heightweight_notes')]
   
@@ -51,15 +53,21 @@ util_redcap_child1 <- function(data, return_data = TRUE) {
   ## household ####
   child_household_data <- data[c('record_id', 'p_height1_cm', 'p_height2_cm', 'p_weight1_kg', 'p_weight2_kg', 'p_height_avg_cm', 'p_weight_avg_kg', 'p_bmi', 'p_weightstatus', 'heightweight_notes')]
   
+  names(child_household_data)[1] <- 'participant_id'
+  
   ## task information ####
   task_info <- data[c('record_id', 'pre_shapegame_hungry', 'pre_shapegame_snack', 'shapegame_snack_notes', 'pre_shapegame_postsnack_ffcheck' , 'pre_shapegame_snack_hungry', 'pre_shapegame_snack2', 'shapegame_snack2_notes', 'pre_shapegame_postsnack2_ffcheck', 'post_shapegame_snack_note', 'shapegame_check', 'shape_game_snack', 'shapegame_prize_bags', 'shapegame_eye_check', 'shapegame_notes', 'pre_fnirs_ffcheck', 'pre_fnirs_hungry', 'pre_fnirs_snack', 'pre_fnris_snack_notes', 'pre_fnirs_postsnack_ffcheck', 'pre_fnirs_snack_hungry', 'pre_cams', 'foodrating_check', 'foodrating_fnirs_check', 'foodrating_notes', 'foodchoice_check', 'snack_won', 'foodchoice_fnirs_check', 'foodchoice_eye_check', 'foodchoice_notes', 'prost_cams')]
   
   names(task_info)[c(1, 6, 8, 10:12, 14, 21, 23:24, 26:29, 31)] <- c('participant_id', 'pre_shapegame_postsnack_hungry', 'pre_shapegame_snack2_notes', 'pre_shapegame_postsnack2_note', 'shapegame_complete', 'shapegame_candy', 'shapegame_eyetrack_good', 'foodrating_complete', 'foodrating_fnirs_good', 'foodrating_notes', 'foodchoice_complete', 'foodchoice_prize', 'foodchoice_fnirs_good', 'foodchoice_eyetrack_good', 'post_cams')
   
+  names(task_info)[1] <- 'participant_id'
+  
   ## meal information ####
   meal_info <- data[c('record_id', 'pre_liking_ff_time', 'pre_liking_ff_notes', 'vas_mac', 'vas_cknug', 'vas_grapes', 'vas_carrot', 'vas_water', 'pre_meal_ff_time', 'pre_meal_ff_notes', 'test_meal_book', 'test_meal_start_time', 'test_meal_end_time', 'test_meal_duration', 'test_meal_notes', 'post_meal_ff_time', 'toolbox_list_sorting_notes', 'pre_wanting_ff_time', 'pre_wanting_ff_notes', 'eah_liking_and_wanting_timestamp', 'vas_popcorn', 'want_popcorn', 'vas_pretzel', 'want_pretzel', 'vas_cornchip', 'want_cornchip', 'vas_cookie', 'want_cookie', 'vas_brownie', 'want_brownie', 'vas_starburst', 'want_starburst', 'vas_skittle', 'want_skittle', 'vas_chocolate', 'want_chocolate', 'vas_icecream', 'want_icecream', 'vas_eah_want_notes', 'eah_game_wanting_timestamp', 'want_markers', 'want_crayons', 'want_color_marvels', 'want_oonies_inflate', 'want_colorpencils', 'wan_activitybook', 'want_colorbook', 'want_legos', 'want_squeakee', 'want_dinosaurs', 'want_oonies', 'eah_game_wanting_notes', 'pre_eah_freddy_time', 'eah_start_time', 'eah_end_time', 'eah_notes', 'post_eah_ff_time', 'post_eah_ff_notes')]
   
   names(meal_info)[c(1, 11:15, 17:20, 39:40, 52, 54:55)] <- c('participant_id', 'meal_book', 'meal_start', 'meal_end', 'meal_duration', 'meal_notes', 'nih_listsort_notes', 'pre_want_ff_time', 'pre_want_ff_notes', 'eah_likewant_time', 'eah_likewant_notes', 'eah_game_want_time', 'eah_game_want_notes', 'eah_start', 'eah_end')
+  
+  names(meal_info)[1] <- 'participant_id'
   
   ## Sleep Week data ####
   sleep_data <- data[c('record_id', 'date_mon', 'date_tu', 'date_wed', 'date_th', 'date_fri', 'date_sat', 'date_sun', 'bedtime_mon', 'bedtime_tu', 'bedtime_wed', 'bedtime_th', 'bedtime_fri', 'bedtime_sat', 'bedtime_sun', 'attempt_mon', 'attempt_tu', 'attempt_wed', 'attempt_th', 'attempt_fri', 'attempt_sat', 'attempt_sun', 'asleep_mon', 'asleep_tu', 'asleep_wed', 'asleep_th', 'asleep_fri', 'asleep_sat', 'asleep_sun', 'times_mon', 'times_tu', 'times_wed', 'times_th', 'times_fri', 'times_sat', 'times_sun', 'waso_mon', 'waso_tu', 'waso_wed', 'waso_th', 'waso_fri', 'waso_sat', 'waso_sun', 'awake_mon', 'awake_tu', 'awake_wed', 'awake_th', 'awake_fri', 'awake_sat', 'awake_sun', 'out_on_mon', 'out_on_tu', 'out_on_wed', 'out_on_th', 'out_on_fri', 'out_on_sat', 'out_on_sun')]
@@ -70,19 +78,25 @@ util_redcap_child1 <- function(data, return_data = TRUE) {
   
   ## HFI data
   hfi_data <- data[, grepl('record_id', names(data)) | grepl('hfi', names(data))] 
-  hfi_data <- hfi_data[, !(names(hfi_data) %in% c('hfi_cheese_qcheck', 'hfi_dairy_qcheck', 'hfi_oils_qcheck', 'hfi_dressing_qcheck', 'hfi_cond_qcheck', 'hfi_veg_qcheck', 'hfi_fruit_qcheck', 'hfi_deli_qcheck', 'hfi_protein_qcheck', 'hfi_frozen_qcheck', 'hfi_quick_qcheck', 'hfi_bread_qcheck', 'hfi_dessert_qcheck', 'hfi_snacks_qcheck', 'hfi_cereal_qcheck', 'hfi_bev_qcheck', 'hfi_candy_qcheck', 'hfi_visible_qcheck', 'hfi_visible_fridge_qcheck'))]
+  hfi_data <- hfi_data[, !grepl('qcheck', names(hfi_data))]
   names(hfi_data)[1] <- 'participant_id'
   
   names(hfi_data) <- gsub('___', '', names(hfi_data))
   names(hfi_data) <- gsub('visible', 'accesible', names(hfi_data))
   
-  hfi_scored <- dataprepr::score_hfi(hfi_data)
-  hfi_json <- NA
+  #hfi_scored <- dataprepr::score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
+  hfi_scored <- score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
+  hfi_json <- json_hfi()
   
   if (isTRUE(return_data)){
-    return(list(fnirs_cap, child_v1demo_data, child_household_data, task_info, meal_info,
-      sleep_wk_data = list(data = sleep_wk_data, meta = child_sleep_json),
-      hfi_data = list(data = hfi_data, meta = hfi_json)))
+    return(list(
+      demo_data = list(child_v1demo_data = child_v1demo_data, 
+                       child_household_data = child_household_data),
+      otherdata = list(fnirs_cap = fnirs_cap, 
+                       task_info = task_info, 
+                       meal_info = meal_info),
+      sleep_wk_data = list(data = sleep_wk_scored, meta = child_sleep_json),
+      hfi_data = list(data = hfi_scored, meta = hfi_json)))
   }
 }
 

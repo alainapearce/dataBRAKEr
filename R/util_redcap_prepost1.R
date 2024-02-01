@@ -30,10 +30,10 @@ util_redcap_prepost1 <- function(data, return_data = TRUE) {
   
   if (isTRUE(data_arg)) {
     if (!is.data.frame(data)) {
-      stop("data must be a data.frame")
+      stop('data must be a data.frame')
     } 
   } else if (isFALSE(data_arg)) {
-    stop("data for REDCap event visit_1_prepost_arm_1 must be entered as a data.frame")
+    stop('data for REDCap event visit_1_prepost_arm_1 must be entered as a data.frame')
   }
   
   #reduce columns and update names
@@ -41,11 +41,20 @@ util_redcap_prepost1 <- function(data, return_data = TRUE) {
   ## restricted data
   restricted_data <- data[c('record_id', 'county_name', 'municipal_name', 'zipcode', 'census_track')]
   names(restricted_data)[1] <- 'participant_id'
+  
+  #demo_data <- score_demo_restricted(restricted_data, id = 'participant_id')
 
   ## demographics data
-  pre_v1demo_data <- data[c('record_id', 'sub_status', 'rural_ruca', 'rural_rucc', 'rural_uic', 'rural_county_pcent', 'school_nces_code', 'school_locale', 'foodrate_cond', 'v1pre_date', 'v1_dataorg_notes')]
+  pre_v1demo_data <- data[c('record_id', 'sub_status', 'rural_ruca', 'rural_rucc', 'rural_uic', 'rural_county_pcent', 'school_nces_code', 'school_locale', 'home_nces_code', 'home_locale', 'foodrate_cond', 'v1pre_date', 'v1_dataorg_notes')]
+  
   names(pre_v1demo_data)[1] <-'participant_id'
-  names(pre_v1demo_data)[c(2, 6:7, 10)] <- c('status', 'pcent_rural', 'school_code', 'v1_date')
+  names(pre_v1demo_data)[c(2, 6:7, 9, 12)] <- c('status', 'pcent_rural', 'school_code', 'home_code', 'v1_date')
+  
+  #code rurality
+  pre_v1demo_data[['school_rural']] <- ifelse(pre_v1demo_data[['school_code']] > 30, 'rural', 'metro')
+  pre_v1demo_data[['home_rural']] <- ifelse(pre_v1demo_data[['home_code']] > 30, 'rural', 'metro')
+  
+  pre_v1demo_data <- pre_v1demo_data[c(1:2, 12, 3:8, 14, 9:10, 15, 11, 13)]
 
   if (isTRUE(return_data)){
     return(list(restricted = restricted_data, demo = pre_v1demo_data))

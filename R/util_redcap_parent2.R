@@ -50,7 +50,7 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   bes_data <- bes_data[, !(names(bes_data) %in% c('bes_missingcheck'))]
   names(bes_data)[1] <- 'participant_id'
   
-  bes_scores <- dataprepr::score_bes(bes_data, score_base = TRUE, id = 'participant_id', pna = 4)
+  bes_scored <- dataprepr::score_bes(bes_data, score_base = TRUE, id = 'participant_id', pna = 4)
   bes_json <- json_bes()
   
   
@@ -59,7 +59,9 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   ffbs_data <- ffbs_data[, !(names(ffbs_data) %in% c('ffbs_missingcheck'))]
   names(ffbs_data)[1] <- 'participant_id'
   
-  ffbs_scores <- dataprepr::score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
+  #ffbs_scored <- dataprepr::score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
+  ffbs_scored <- score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
+  
   ffbs_json <- json_ffbs()
   
   ## HFE Data
@@ -67,7 +69,9 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   hfe_data <- hfe_data[, !(names(hfe_data) %in% c('hfe_fam_qcheck', 'hfe_track_qcheck', 'hfe_rules_qcheck', 'hfe_available_qcheck', 'hfe_like_qcheck', 'hfe_shop_qcheck', 'hfe_shoploc_qcheck', 'hfe_eatout_qcheck', 'hfe_eatout_qcheck2', 'hfe_neighborhood_qcheck', 'hfe_p1_qcheck', 'hfe_p2_qcheck', 'hfe_p3_qcheck', 'hfe_p4_qcheck', 'hfe_p5_qcheck', 'hfe_p6_qcheck'))]
   names(hfe_data)[1] <- 'participant_id'
   
-  hfe_scores <- dataprepr::score_hfe(hfe_data, score_base = TRUE, id = 'participant_id')
+  #hfe_scored <- dataprepr::score_nik_hfe(hfe_data, score_base = TRUE, id = 'participant_id')
+  hfe_scored <- score_nik_hfe(hfe_data, score_base = FALSE, id = 'participant_id')
+  
   hfe_json <- json_nki_hfe()
   
   ## SPSRQ Data
@@ -75,7 +79,7 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   spsrq_data <- spsrq_data[, !(names(spsrq_data) %in% c('spsrq_missingcheck'))]
   names(spsrq_data)[1] <- 'participant_id'
   
-  spsrq_scores <- dataprepr::score_hfe(spsrq_data, score_base = TRUE, id = 'participant_id')
+  spsrq_scored <- dataprepr::score_spsrq(spsrq_data, score_base = TRUE, id = 'participant_id')
   spsrq_json <- json_spsrq()
   
   ## CBQ Data
@@ -83,7 +87,7 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   cbq_data <- cbq_data[, !(names(cbq_data) %in% c('cbq_missingcheck'))]
   names(cbq_data)[1] <- 'participant_id'
   
-  cbq_scores <- dataprepr::score_hfe(cbq_data, score_base = TRUE, id = 'participant_id')
+  cbq_scores <- dataprepr::score_cbq(cbq_data, score_base = TRUE, id = 'participant_id')
   cbq_json <- NA
   
   ## PWLB Data
@@ -112,11 +116,11 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   
   if (isTRUE(return_data)){
     return(list(
-      cshq_data = list(data = cshq_data, meta = cshq_json),
-      bes_data = list(data = bes_data, meta = bes_json),
-      ffbs_data = list(data = ffbs_data, meta = ffbs_json),
-      hfe_data = list(data = hfe_data, meta = hfe_json), 
-      spsrq_data = list(data = spsrq_data, meta = spsrq_json), 
+      cshq_data = list(data = cshq_scored, meta = cshq_json),
+      bes_data = list(data = bes_scored, meta = bes_json),
+      ffbs_data = list(data = ffbs_scored, meta = ffbs_json),
+      hfe_data = list(data = hfe_scored, meta = hfe_json), 
+      spsrq_data = list(data = spsrq_scored, meta = spsrq_json), 
       cbq_data = list(data = cbq_data, meta = cbq_json), 
       pwlb_data = list(data = pwlb_data, meta = pwlb_json), 
       scpf_data = list(data = scpf_data, meta = scpf_json), 
