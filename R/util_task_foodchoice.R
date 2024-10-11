@@ -1,6 +1,6 @@
 #' util_task_foodchoice: Process raw data from the Food Choice Task
 #'
-#' This function cleans data to save in BIDS format in rawdata
+#' This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
@@ -51,11 +51,79 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   # get directory paths
   raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash)
   
-  data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, sub_str, '_ses-', ses, '_task-foodchoice_events.tsv')
+  data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, 'foodchoice', slash, sub_str, '_ses-', ses, '_task-foodchoice_events.tsv')
   
+  print(sub_str)
   
+  #check for '999'
+  if (!file.exists(data_file)){
+    data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, 'foodchoice', slash, sub_str, '_ses-', ses, '_task-foodchoice_events-999.tsv')
+
+    if (file.exists(data_file)){
+      alt_999 <- TRUE
+    } else {
+      return(paste0('foodchoice file does not exist in sourcedata for ', sub_str))
+    }
+  } else {
+    alt_999 <- FALSE
+  }
+    
   #### Organize Data #####
-  dat <- read.csv(data_file, sep = '\t', header = TRUE)
+  dat <- read.csv(data_file, sep = '\t', header = TRUE, na.strings = c('n/a', 'NA'))
+  
+  if (isTRUE(alt_999)){
+    foodrating_file <- paste0(base_wd, slash, 'raw_untouched', slash, 'foodrating_game', slash, sub_str, '_foodrating.csv')
+    dat_foodrating <- read.csv(foodrating_file, sep = ',', header = TRUE, na.strings = c('n/a', 'NA'))
+    
+    # update values for foodchoice
+    dat[['participant']] <- sub_str
+    
+    # separate ratings
+    dat_foodrating_health <- dat_foodrating[dat_foodrating[['condFile']] == 'health_stim.csv' & dat_foodrating[['condFile_prac']] == '', ]
+    dat_foodrating_taste <- dat_foodrating[dat_foodrating[['condFile']] == 'taste_stim.csv' & dat_foodrating[['condFile_prac']] == '', ]
+    dat_foodrating_want <- dat_foodrating[dat_foodrating[['condFile']] == 'want_stim.csv' & dat_foodrating[['condFile_prac']] == '', ]
+    
+    # copy health ratings over from food rating
+    dat[dat[['img1']] != '', 'img1_health'] <- sapply(dat[dat[['img1']] != '', 'img1'], function(x) ifelse(sum(dat_foodrating_health[['stimFile']] == x) == 1, dat_foodrating_health[dat_foodrating_health[['stimFile']] == x, 'rating'], dat[dat[['img1']] == x, 'img1_health']), simplify = TRUE, USE.NAMES = FALSE)
+    
+    dat[dat[['img2']] != '', 'img2_health'] <- sapply(dat[dat[['img2']] != '', 'img1'], function(x) ifelse(sum(dat_foodrating_health[['stimFile']] == x) == 1, dat_foodrating_health[dat_foodrating_health[['stimFile']] == x, 'rating'], dat[dat[['img2']] == x, 'img2_health']), simplify = TRUE, USE.NAMES = FALSE)
+    
+    # copy taste ratings over from food rating
+    dat[dat[['img1']] != '', 'img1_taste'] <- sapply(dat[dat[['img1']] != '', 'img1'], function(x) ifelse(sum(dat_foodrating_taste[['stimFile']] == x) == 1, dat_foodrating_taste[dat_foodrating_taste[['stimFile']] == x, 'rating'], dat[dat[['img1']] == x, 'img1_taste']), simplify = TRUE, USE.NAMES = FALSE)
+    
+    dat[dat[['img2']] != '', 'img2_taste'] <- sapply(dat[dat[['img2']] != '', 'img2'], function(x) ifelse(sum(dat_foodrating_taste[['stimFile']] == x) == 1, dat_foodrating_taste[dat_foodrating_taste[['stimFile']] == x, 'rating'], dat[dat[['img2']] == x, 'img2_taste']), simplify = TRUE, USE.NAMES = FALSE)
+    
+    # copy want ratings over from food rating
+    dat[dat[['img1']] != '', 'img1_want'] <- sapply(dat[dat[['img1']] != '', 'img1'], function(x) ifelse(sum(dat_foodrating_want[['stimFile']] == x) == 1, dat_foodrating_want[dat_foodrating_want[['stimFile']] == x, 'rating'], dat[dat[['img1']] == x, 'img1_want']), simplify = TRUE, USE.NAMES = FALSE)
+    
+    dat[dat[['img2']] != '', 'img2_want'] <- sapply(dat[dat[['img2']] != '', 'img2'], function(x) ifelse(sum(dat_foodrating_want[['stimFile']] == x) == 1, dat_foodrating_want[dat_foodrating_want[['stimFile']] == x, 'rating'], dat[dat[['img2']] == x, 'img2_want']), simplify = TRUE, USE.NAMES = FALSE)
+    
+    #get usable cutpoints
+    taste_cut <- round(mean(dat_foodrating_taste[['rating']]), digits = 1)
+    dat[['taste_cut']] <- taste_cut
+    
+    health_cut <- round(mean(dat_foodrating_health[['rating']]), digits = 1)
+    dat[['health_cut']] <- health_cut
+    
+    dat[['tastehealth_cond_img1']] <- ifelse(dat[['img1_taste']] > taste_cut, ifelse(dat[['img1_health']] > health_cut, 'tasty_healthy', 'tasty_unhealthy'), ifelse(dat[['img1_health']] > health_cut, 'nottasty_healthy', 'nottasty_unhealthy'))
+    
+    dat[['tastehealth_cond_img2']] <- ifelse(dat[['img2_taste']] > taste_cut, ifelse(dat[['img2_health']] > health_cut, 'tasty_healthy', 'tasty_unhealthy'), ifelse(dat[['img2_health']] > health_cut, 'nottasty_healthy', 'nottasty_unhealthy'))
+    
+    dat[['condition']] <- ifelse(dat[['tastehealth_cond_img1']] == 'tasty_unhealthy' & dat[['tastehealth_cond_img2']] == 'nottasty_healthy', 'mix_conflict', ifelse(
+      dat[['tastehealth_cond_img1']] == 'tasty_unhealthy' & dat[['tastehealth_cond_img2']] == 'tasty_healthy', 'tasty', ifelse(
+        dat[['tastehealth_cond_img1']] == 'tasty_unhealthy' & dat[['tastehealth_cond_img2']] == 'nottasty_unhealthy', 'unhealthy', ifelse(
+          dat[['tastehealth_cond_img1']] == 'tasty_healthy' & dat[['tastehealth_cond_img2']] == 'nottasty_healthy', 'healthy', ifelse(
+            dat[['tastehealth_cond_img1']] == 'nottasty_healthy' & dat[['tastehealth_cond_img2']] == 'nottasty_unhealthy', 'nottasty', ifelse(
+              dat[['tastehealth_cond_img1']] == 'tasty_healthy' & dat[['tastehealth_cond_img2']] == 'nottasty_unhealthy', 'mix_noconflict', ifelse(
+                dat[['tastehealth_cond_img2']] == 'tasty_unhealthy' & dat[['tastehealth_cond_img1']] == 'nottasty_healthy', 'mix_conflict', ifelse(
+                  dat[['tastehealth_cond_img2']] == 'tasty_unhealthy' & dat[['tastehealth_cond_img1']] == 'tasty_healthy', 'tasty', ifelse(
+                    dat[['tastehealth_cond_img2']] == 'tasty_unhealthy' & dat[['tastehealth_cond_img1']] == 'nottasty_unhealthy', 'unhealthy', ifelse(
+                      dat[['tastehealth_cond_img2']] == 'tasty_healthy' & dat[['tastehealth_cond_img1']] == 'nottasty_healthy', 'healthy', ifelse(
+                        dat[['tastehealth_cond_img2']] == 'nottasty_healthy' & dat[['tastehealth_cond_img1']] == 'nottasty_unhealthy', 'nottasty', ifelse(
+                          dat[['tastehealth_cond_img2']] == 'tasty_healthy' & dat[['tastehealth_cond_img1']] == 'nottasty_unhealthy', 'mix_noconflict', ifelse(
+                            dat[['tastehealth_cond_img1']] == dat[['tastehealth_cond_img2']], 'match', dat[['condition']])))))))))))))
+    
+  }
   
   # get healthy eating rt
   healthy_rt <- dat[!is.na(dat[['healthyeating_key.rt']]), 'healthyeating_key.rt']
@@ -65,6 +133,8 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   
   # reduce columns and detect if has eye-tracking or not
   if ('etRecord.started' %in% names(dat)){
+    eye_track = TRUE
+    
     eye_dat <- dat[c('participant', 'trials.thisN', 'left_img.started', 'right_img.started', 'etRecord.started', 'left_img.numLooks', 'left_img.timesOn', 'left_img.timesOff', 'right_img.numLooks', 'right_img.timesOn', 'right_img.timesOff')]
     
     # update names
@@ -73,13 +143,15 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     # remove zero-base ordering
     eye_dat[['trial']] <- eye_dat[['trial']] + 1
     
+  } else {
+    eye_track = FALSE
   }
   
   # fNIRS/Beh data
   dat <- dat[c('participant', 'date', 'expName', 'condition', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trials.thisN', 'healthyeating_key.rt', 'trial_left_img.started', 'trial_right_img.started', 'choice_prompt.started', 'key_choice.started', 'choice_fix.started', 'key_choice.keys', 'key_choice.rt', 'trial_fixprompt.started', 'tfix.started', 'trial_fixprompt.stopped', 'tfix.stopped', 'psychopyVersion', 'frameRate')]
   
   # update names
-  names(dat) <- c('sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'psychopy_ver', 'frame_rate')
+  names(dat) <- c('sub', 'date', 'exp_name', 'cond', 'left_img', 'right_img', 'fix', 'left_img_health', 'right_img_health', 'left_img_taste', 'right_img_taste', 'left_img_want', 'right_img_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'psychopy_ver', 'frame_rate')
   
   # add duration
   dat[['duration']] <- 2
@@ -95,22 +167,22 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   dat[['healthyeating_time']] <- healthy_rt
   
   # add in choice information
-  dat[['choice_healthy']] <- ifelse(dat[['choice']] == 'None', NA, ifelse(dat[['img1_health']] == dat[['img2_health']], 1, ifelse(dat[['img1_health']] > dat[['img2_health']], ifelse(dat[['choice']] == 1, 1, 0), ifelse(dat[['choice']] == 1, 0, 1))))
+  dat[['choice_healthy']] <- ifelse(dat[['choice']] == 'None', NA, ifelse(dat[['left_img_health']] == dat[['right_img_health']], 0, ifelse(dat[['left_img_health']] > dat[['right_img_health']], ifelse(dat[['choice']] == 1, 1, -1), ifelse(dat[['choice']] == 1, -1, 1))))
   
-  dat[['choice_tasty']] <- ifelse(dat[['choice']] == 'None', NA, ifelse(dat[['img1_taste']] == dat[['img2_taste']], 1, ifelse(dat[['img1_taste']] > dat[['img2_taste']], ifelse(dat[['choice']] == 1, 1, 0), ifelse(dat[['choice']] == 1, 0, 1))))
+  dat[['choice_tasty']] <- ifelse(dat[['choice']] == 'None', NA, ifelse(dat[['left_img_taste']] == dat[['right_img_taste']], 0, ifelse(dat[['left_img_taste']] > dat[['right_img_taste']], ifelse(dat[['choice']] == 1, 1, -1), ifelse(dat[['choice']] == 1, -1, 1))))
   
-  dat[['choice_want']] <- ifelse(dat[['choice']] == 'None', NA, ifelse(dat[['img1_want']] == dat[['img2_want']], 1, ifelse(dat[['img1_want']] > dat[['img2_want']], ifelse(dat[['choice']] == 1, 1, 0), ifelse(dat[['choice']] == 1, 0, 1))))
+  dat[['choice_want']] <- ifelse(dat[['choice']] == 'None', NA, ifelse(dat[['left_img_want']] == dat[['right_img_want']], 0, ifelse(dat[['left_img_want']] > dat[['right_img_want']], ifelse(dat[['choice']] == 1, 1, -1), ifelse(dat[['choice']] == 1, -1, 1))))
   
   # add onset column - will be completed using Matlab during fNIRS processing
-  dat[['onset']] <- NA
+  dat[['onset']] <- NaN
   
   #re-order columns
-  dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'cond', 'img1', 'img2', 'fix', 'img1_health', 'img2_health', 'img1_taste', 'img2_taste', 'img1_want', 'img2_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'choice_healthy', 'choice_tasty', 'choice_want', 'psychopy_ver', 'frame_rate')]
+  dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'cond', 'left_img', 'right_img', 'fix', 'left_img_health', 'right_img_health', 'left_img_taste', 'right_img_taste', 'left_img_want', 'right_img_want', 'taste_cut', 'health_cut', 'trial', 'healthyeating_time', 'left_img_onset', 'right_img_onset', 'choice_prompt_onset', 'key_choice_onset', 'choice_fix_onset', 'choice', 'choice_rt', 'trial_fixprompt_onset', 'tfix_onset', 'trial_fixprompt_offset', 'tfix_offset', 'choice_healthy', 'choice_tasty', 'choice_want', 'psychopy_ver', 'frame_rate')]
   
   # get long dataset with trial information
-  if ('et_record_onset' %in% names(dat)) {
-    #eye_dat_long <- util_eyetrack_roi(eye_dat, roi_list = c('right', 'left'), return_data = TRUE)
-    #eye_dat <- merge(dat, eye_dat[c()])
+  if (isTRUE(eye_track)) {
+    eye_dat_long <- util_eyetrack_roi(eye_dat, roi_list = c('right', 'left'), return_data = TRUE)
+    eye_dat_long <- merge(eye_dat_long, dat, by = 'trial')
   } 
     
   
@@ -121,7 +193,11 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   }
   
   if (!file.exists(paste0(raw_wd, sub_str, '_task-foodchioce_events.tsv')) | isTRUE(overwrite)) {
-    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE)
+    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+    
+    if (isTRUE(eye_track)) {
+      write.table(eye_dat_long, gzfile(paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_recording-eyetrack.tsv.gz')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+    } 
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')
@@ -130,12 +206,5 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     }
   } else {
     return('exists')
-  }
-  
-  if (isTRUE(return_data)){
-    foodchioce_json <- json_foodchioce()
-    
-    return(list( foodchioce_dat = dat,
-                 foodchioce_json = foodchioce_json))
   }
 }

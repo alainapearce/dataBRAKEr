@@ -59,8 +59,8 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   ffbs_data <- ffbs_data[, !(names(ffbs_data) %in% c('ffbs_missingcheck'))]
   names(ffbs_data)[1] <- 'participant_id'
   
-  #ffbs_scored <- dataprepr::score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
-  ffbs_scored <- score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
+  ffbs_scored <- dataprepr::score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
+  #ffbs_scored <- score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
   
   ffbs_json <- json_ffbs()
   

@@ -1,4 +1,4 @@
-#' util_task_foodrating: Process raw data from the Food Rating Task
+#' util_task_tastetest: Process raw data from the fNIRS Taste-Test Task
 #'
 #' This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
 #'
@@ -16,7 +16,7 @@
 #' @examples
 #'
 #' # process task data for the Food Choice Task
-#' foodrating_task_pardat <- util_task_foodrating(sub_str, ses, data_path, return = TRUE)
+#' tastetest_task_pardat <- util_task_tastetest(sub_str, ses, data_path, return = TRUE)
 #'
 #' \dontrun{
 #' }
@@ -24,7 +24,7 @@
 #'
 #' @export
 
-util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, return_data = FALSE) {
+util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return_data = FALSE) {
   
   #### 1. Set up/initial checks #####
   
@@ -46,12 +46,22 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     slash <- '/'
   } else {
     slash <- "\\"
-    print('The foodrating_task.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
+    print('The tastetest_task.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
   }
   
   # get directory paths
+  
+  # get version
+  if (grepl('post', sub_str)){
+    desc_str <- 'post'
+  } else {
+    desc_str <- 'pre'
+  }
+  
+  sub_str <- gsub(paste0('-', desc_str, '-meal'), '', sub_str)
+  
   raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash)
-  data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, 'foodrating', slash, sub_str, '_ses-', ses, '_task-foodrating_events.tsv')
+  data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, 'tastetest-', desc_str, 'meal', slash, sub_str, '_ses-', ses, '_task-tastetest_desc-', desc_str, 'meal_events.tsv')
   
   #### Organize Data #####
   dat <- read.csv(data_file, sep = '\t', header = TRUE, na.strings = c('n/a', 'NA'))
@@ -99,8 +109,8 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(paste0(raw_wd, sub_str, '_task-foodrating_events.tsv')) | isTRUE(overwrite)) {
-    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodrating_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  if (!file.exists(paste0(raw_wd, sub_str, '_task-tastetest_events.tsv')) | isTRUE(overwrite)) {
+    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-tastetest_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')

@@ -113,7 +113,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
 
   names(ffq_data)[1:44] <- c('participant_id', 'ffq_dairy1', 'ffq_dairy2', 'ffq_dairy3', 'ffq_dairy4', 'ffq_egg1', 'ffq_meat1', 'ffq_meat2', 'ffq_meat3', 'ffq_meat4', 'ffq_fish1', 'ffq_fish2', 'ffq_fish3', 'ffq_fish4', 'ffq_dairy5', 'ffq_veg1', 'ffq_veg2', 'ffq_potato1', 'ffq_legume1', 'ffq_potato2', 'ffq_fruit1', 'ffq_fruit2', 'ffq_nuts1', 'ffq_fruit3', 'ffq_fruit4', 'ffq_cereal1', 'ffq_cereal2', 'ffq_cereal3', 'ffq_cereal4', 'ffq_cereal5', 'ffq_cereal6', 'ffq_bakery1', 'ffq_bakery2', 'ffq_sweet1', 'ffq_sweet2', 'ffq_sweet3', 'ffq_bev1', 'ffq_bev2', 'ffq_fats1', 'ffq_fats2', 'ffq_fats3', 'ffq_fats4', 'ffq_dressing1', 'ffq_saltysnack1')
   
-  ffq_scored <- dataprepr::score_ffq_helix(ffq_data, score_base = FALSE, id = 'participant_id')
+  ffq_scored <- dataprepr::score_ffq_helix(ffq_data, score_base = TRUE, id = 'participant_id')
   ffq_json <- json_ffq_helix()
   
   ## compile and return data ####

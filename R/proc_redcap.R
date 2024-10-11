@@ -137,14 +137,56 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   redcap_de_data <- read.csv(data_de_path, header = TRUE)
   
   # all validated so can just take reviewer 1 data
-  redcap_de_data <- redcap_de_data[grepl('--1', redcap_de_data[['record_id']]), ]
+  redcap_de_data <- redcap_de_data[grepl('--2', redcap_de_data[['record_id']]), ]
   
   ## interview quick work
   bod_pod_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('bodpod', names(redcap_de_data))]
   names(bod_pod_data)[1] <- 'participant_id'
-  bod_pod_data$participant_id <- sub('--1', '', bod_pod_data$participant_id)
+  bod_pod_data$participant_id <- sub('--2', '', bod_pod_data$participant_id)
   bod_pod_data$participant_id <- sub('^00|^0', '', bod_pod_data$participant_id)
-  bod_pod_data <- bod_pod_data[bod_pod_data$participant_id != '6-2', ]
+  bod_pod_data <- bod_pod_data[bod_pod_data$participant_id != 'pilot-006', ]
+  
+  wasi_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('wasi', names(redcap_de_data))]
+  names(wasi_data)[1] <- 'participant_id'
+  wasi_data$participant_id <- sub('--2', '', wasi_data$participant_id)
+  wasi_data$participant_id <- sub('^00|^0', '', wasi_data$participant_id)
+  wasi_data <- wasi_data[wasi_data$participant_id != 'pilot-006', ]
+  
+  intake_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('_g', names(redcap_de_data)) | grepl('_kcal', names(redcap_de_data)) | grepl('meal', names(redcap_de_data))]
+  intake_data <- intake_data[, !grepl('cams', names(intake_data)) & !grepl('complete', names(intake_data))]
+  names(intake_data)[1] <- 'participant_id'
+  intake_data$participant_id <- sub('--2', '', intake_data$participant_id)
+  intake_data$participant_id <- sub('^00|^0', '', intake_data$participant_id)
+  intake_data <- intake_data[intake_data$participant_id != 'pilot-006', ]
+  
+  ## ure_dat -- wasi
+  ure_dat <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
+  ure_dat <- merge(ure_dat, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
+  ure_dat <- merge(ure_dat, bod_pod_data, by = 'participant_id')
+  ure_dat <- merge(ure_dat, wasi_data, by = 'participant_id', all = TRUE)
+  write.csv(ure_dat, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ure_pilot_data.csv'), row.names = FALSE)
+  
+  ## R01 pilot data -- intake
+  r01_dat <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
+  r01_dat <- merge(r01_dat, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
+  r01_dat <- merge(r01_dat, bod_pod_data, by = 'participant_id', all = TRUE)
+  r01_dat <- merge(r01_dat, wasi_data, by = 'participant_id', all = TRUE)
+  r01_dat <- merge(r01_dat, intake_data, by = 'participant_id', all = TRUE)
+  r01_dat <- merge(r01_dat, parent_v1_data$efcr_data$data$score_dat, by = 'participant_id', all = TRUE)
+  r01_dat <- merge(r01_dat, parent_v1_data$cebq_data$data$score_dat, by = 'participant_id', all = TRUE)
+  r01_dat <- merge(r01_dat, child_v2_data$loc_data$data, by = 'participant_id', all = TRUE)
+  write.csv(r01_dat, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'r01_pilot_data.csv'), row.names = FALSE)
+  
+  
+  ## ure_dat -- metabolites
+  ure_dat_metabolite <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
+  ure_dat_metabolite <- merge(ure_dat_metabolite, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
+  ure_dat_metabolite <- merge(ure_dat_metabolite, bod_pod_data, by = 'participant_id')
+  ure_dat_metabolite <- merge(ure_dat_metabolite, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  ure_dat_metabolite <- merge(ure_dat_metabolite, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all.x = TRUE)
+  
+  write.csv(ure_dat_metabolite, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ure_pilot_data_metabolite.csv'), row.names = FALSE)
+  
   
   interview_dat <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
   interview_dat <- merge(interview_dat, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')

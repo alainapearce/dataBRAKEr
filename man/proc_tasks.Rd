@@ -7,7 +7,7 @@
 proc_tasks(data_path, overwrite = FALSE)
 }
 \arguments{
-\item{data_path}{full data path to untouched_raw directory}
+\item{data_path}{full data path to raw_untouched directory}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
 }

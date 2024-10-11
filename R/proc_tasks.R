@@ -8,7 +8,7 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
 #'
-#' @param data_path full data path to untouched_raw directory
+#' @param data_path full data path to raw_untouched directory
 #' @inheritParams util_task_org_sourcedata
 #'
 #' @return data.frame for each task with status for each processing step
@@ -53,7 +53,11 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   slash_loc <- unlist(gregexpr('/', data_path))
   
   # set paths for other directories
-  base_wd <- substr(data_path, 1, tail(slash_loc, 1))
+  if (substr(data_path, nchar(data_path), nchar(data_path)) == slash){
+    base_wd <- substr(data_path, 1, tail(slash_loc, 2))
+  } else {
+    base_wd <- substr(data_path, 1, tail(slash_loc, 1))
+  }
   
   # Food Rating ####
   # get list of available subjects 
@@ -62,9 +66,6 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   
   #get list of subject IDs
   foodrating_list[['sub_str']] <- sapply(foodrating_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
-  
-  # change later - remove sub-006 and sub-046 until figured out
-  foodrating_list <- foodrating_list[!grepl('sub-006', foodrating_list[['sub_str']]), ]
   
   #organize data into BIDS sourcedata
   foodrating_list[['sourcedata_done']] <- sapply(foodrating_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'foodrating', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'nirs', overwrite = overwrite), simplify = TRUE)
@@ -89,14 +90,11 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   #valid choice-pairing assignment
   foodchoice_list[['choice_pairing']] <- sapply(foodchoice_list[['filename']], function(x) ifelse(grepl('999', x), '999', 'rating'), simplify = TRUE)
   
-  # change later - remove sub-006 and sub-046 until figured out
-  foodchoice_list <- foodchoice_list[!grepl('sub-006', foodchoice_list[['sub_str']]), ]
-  
   #organize data into BIDS sourcedata
   foodchoice_list[['sourcedata_done']] <- sapply(foodchoice_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'foodchoice', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'nirs', overwrite = overwrite), simplify = TRUE)
   
   #process raw data
-  foodchoice_list[foodchoice_list[['choice_pairing']] != '999', 'rawproc_done'] <- sapply(foodchoice_list[foodchoice_list[['choice_pairing']] != '999', 'sub_str'], function(x) util_task_foodchoice(sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
+  foodchoice_list['rawproc_done'] <- sapply(foodchoice_list[['sub_str']], function(x) util_task_foodchoice(sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
   
   #json 
   #foodchoice_json <- json_foodchoice()
@@ -115,6 +113,13 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   #organize data into BIDS sourcedata
   shape_list[['sourcedata_done']] <- sapply(shape_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'shape', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'beh', overwrite = overwrite), simplify = TRUE)
   
+  #process raw data
+  shape_list['rawproc_done'] <- sapply(shape_list[['sub_str']], function(x) util_task_shapegame(sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
+  
+  #get summary data -> produces derivative dataframe
+  shape_database <- util_group_shapegame(data_list = shape_list, ses = 'baseline', base_wd = base_wd, overwrite = TRUE)
+  
+  
   # Space Game ####
   # get list of available subjects 
   space_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'space_game', slash), pattern = '.mat'))
@@ -126,11 +131,63 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   #organize data into BIDS sourcedata
   space_list[['sourcedata_done']] <- sapply(space_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'space', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'beh', overwrite = overwrite), simplify = TRUE)
   
+  #process raw data
+  space_list['rawproc_done'] <- sapply(space_list[['sub_str']], function(x) util_task_spacegame(sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
+  
+  #get summary data -> produces derivative dataframe
+  space_database <- util_group_spacegame(data_list = space_list, ses = 'baseline', base_wd = base_wd, overwrite = TRUE)
+  
+  # NIH Toolbox - raw data ####
+  # get list of available subjects 
+  nih_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'nih_toolbox', slash), pattern = 'events.csv'))
+  names(nih_list) <- 'filename'
+  
+  nih_list_flanker <- as.data.frame(nih_list[grepl('flanker', nih_list[['filename']]), ])
+  nih_list_listsort <- as.data.frame(nih_list[grepl('listsort', nih_list[['filename']]), ])
+  
+  names(nih_list_flanker) <- 'flanker-dccs'
+  names(nih_list_listsort) <- 'listsort'
+  
+  #get list of subject IDs
+  nih_list_flanker[['sub_str']] <- sapply(nih_list_flanker[['flanker-dccs']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+  nih_list_listsort[['sub_str']] <- sapply(nih_list_listsort[['listsort']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+  
+  #merge to get 1 set of sub-str
+  nih_list <- merge(nih_list_listsort, nih_list_flanker, id = 'sub_str', all = TRUE)
+
+  # org
+  nih_list[['sourcedata_done']] <- sapply(nih_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'nih', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'beh', overwrite = overwrite), simplify = TRUE)
+  
+  #process raw data
+  listsort_data <- util_task_nihtoolbox(task = 'listsort', base_wd = base_wd, sub_str_list = nih_list[!is.na(nih_list[['listsort']]), 'sub_str'], overwrite = overwrite)
+  listsort_data <- as.data.frame(sapply(names(listsort_data), function(x) unlist(listsort_data[[x]]), simplify = TRUE))
+  write.csv(listsort_data, paste0(base_wd, 'bids', slash, 'sourcedata', slash, 'phenotype', slash, 'nih_listsort_data.csv'), row.names = FALSE)
+  
+  flanker_data <- util_task_nihtoolbox(task = 'flanker', base_wd = base_wd, sub_str_list = nih_list[!is.na(nih_list[['flanker-dccs']]), 'sub_str'], overwrite = overwrite)
+  flanker_data <- as.data.frame(sapply(names(flanker_data), function(x) unlist(flanker_data[[x]]), simplify = TRUE))
+  write.csv(flanker_data, paste0(base_wd, 'bids', slash, 'sourcedata', slash, 'phenotype', slash, 'nih_flanker_data.csv'), row.names = FALSE)
+  
+  dccs_data <- util_task_nihtoolbox(task = 'dccs', base_wd = base_wd, sub_str_list = nih_list[!is.na(nih_list[['flanker-dccs']]), 'sub_str'], overwrite = overwrite)
+  dccs_data <- as.data.frame(sapply(names(dccs_data), function(x) unlist(dccs_data[[x]]), simplify = TRUE))
+  write.csv(dccs_data, paste0(base_wd, 'bids', slash, 'sourcedata', slash, 'phenotype', slash, 'nih_dccs_data.csv'), row.names = FALSE)
   
   
+  # Food Taste-Test ####
+  # get list of available subjects 
+  tastetest_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'tastetest', slash), pattern = '.csv'))
+  names(tastetest_list) <- 'filename'
   
+  #get list of subject IDs
+  tastetest_list[['sub_str']] <- sapply(tastetest_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
   
+  #organize data into BIDS sourcedata
+  tastetest_list[['sourcedata_done']] <- sapply(tastetest_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'tastetest', sub_str = x, ses = 'followup', base_wd = base_wd, task_cat = 'nirs', overwrite = overwrite), simplify = TRUE)
   
+  #process raw data
+  tastetest_list[['rawproc_done']] <- sapply(tastetest_list[['sub_str']], function(x) util_task_tastetest(sub_str = x, ses = 'followup', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
+  
+  #json 
+  #foodrating_json <- json_foodrating()
   
   
   return(list( foodchoice_dat = dat,

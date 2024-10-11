@@ -9,9 +9,7 @@ util_eyetrack_roi(data, roi_list, return_data = FALSE)
 \arguments{
 \item{data}{a data.frame with roi-based eye-tracking}
 
-\item{roi_list}{a list with character string labels for each ROI (c('left', 'right'))}
-
-\item{return_data}{logical indicating if data should be returned. Default = FALSE}
+\item{roi_list}{a list with character string labels for each ROI (c('left', 'right')). These strings must be the prefix for variable names related to the rois (e.g., 'right_looks', 'right_look_onsets', 'right_look_offsets')}
 }
 \value{
 If return_data is set to TRUE, will return a long dataset with a row per ROI look
@@ -21,4 +19,14 @@ This function cleans ROI-based eye-tracking data from PscyhoPy for a single part
 }
 \details{
 To use this function, the data must include the following: trial number, number of looks per ROI for a trial, and the onset/offset times for each ROI look for a trial
+}
+\examples{
+
+# process eye-tracking data 
+eyetrack_roi_dat <- util_eyetrack_roi(data, roi_list = c('right', 'left'), return = TRUE)
+
+\dontrun{
+}
+
+
 }

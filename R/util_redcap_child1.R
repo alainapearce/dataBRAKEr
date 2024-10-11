@@ -84,8 +84,8 @@ util_redcap_child1 <- function(data, return_data = TRUE) {
   names(hfi_data) <- gsub('___', '', names(hfi_data))
   names(hfi_data) <- gsub('visible', 'accesible', names(hfi_data))
   
-  #hfi_scored <- dataprepr::score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
-  hfi_scored <- score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
+  hfi_scored <- dataprepr::score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
+  #hfi_scored <- score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
   hfi_json <- json_hfi()
   
   if (isTRUE(return_data)){
