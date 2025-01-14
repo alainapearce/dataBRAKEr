@@ -48,7 +48,7 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
     print('The util_group_spacegame.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
   }
   
-    
+  
   #### Summary Data Function #####
   
   beh_sum_spacegame <- function(dat_block){
@@ -63,46 +63,52 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
     
     score <- dat_block[nrow(dat_block), 'score']
     
-    ## missed trial
-    #indicate if: 1) previous trial was missed OR 2) trial was missed
-    dat_block[['miss_trial']] <- ifelse(dat_block[['missed_earth']] == 1 | dat_block[['missed_planet']] == 1, 1, 0)
-    
     ## reward rate
-    rr <- mean(dat_block[dat_block['miss_trial'] == 0, 'points'], na.rm = TRUE)
-    avg_reward <- mean(rowMeans(dat_block[dat_block['miss_trial'] == 0, c('rewards1', 'rewards2')]))
+    rr <- mean(dat_block[dat_block['missed'] == 0, 'points'], na.rm = TRUE)
+    avg_reward <- mean(rowMeans(dat_block[dat_block['missed'] == 0, c('rewards1', 'rewards2')]))
     rr_adj <- rr - avg_reward
     
     #by stake - high
-    rr_s5 <- mean(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 5, 'points'], na.rm = TRUE)
-    avg_reward_s5 <- mean(rowMeans(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')]))
+    rr_s5 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, 'points'], na.rm = TRUE)
+    avg_reward_s5 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')]))
     rr_adj_s5 <- rr_s5 - avg_reward_s5
     
     #by stake - low
-    rr_s1 <- mean(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 1, 'points'], na.rm = TRUE)
-    avg_reward_s1 <- mean(rowMeans(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')]))
+    rr_s1 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 1, 'points'], na.rm = TRUE)
+    avg_reward_s1 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')]))
     rr_adj_s1 <- rr_s1 - avg_reward_s1
     
     ## reward rate - Scaled
-    rr_scaled <- mean(dat_block[dat_block['miss_trial'] == 0, 'points']/9, na.rm = TRUE)
-    avg_reward_scaled <- mean(rowMeans(dat_block[dat_block['miss_trial'] == 0, c('rewards1', 'rewards2')])/9)
+    rr_scaled <- mean(dat_block[dat_block['missed'] == 0, 'points']/9, na.rm = TRUE)
+    avg_reward_scaled <- mean(rowMeans(dat_block[dat_block['missed'] == 0, c('rewards1', 'rewards2')])/9)
     rr_scaled_adj <- rr_scaled - avg_reward_scaled
     
     #by stake - high
-    rr_scaled_s5 <- mean(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 5, 'points']/9, na.rm = TRUE)
-    avg_reward_scaled_s5 <- mean(rowMeans(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')])/9)
+    rr_scaled_s5 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, 'points']/9, na.rm = TRUE)
+    avg_reward_scaled_s5 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')])/9)
     rr_scaled_adj_s5 <- rr_scaled_s5 - avg_reward_scaled_s5
     
     #by stake - low
-    rr_scaled_s1 <- mean(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 1, 'points']/9, na.rm = TRUE)
-    avg_reward_scaled_s1 <- mean(rowMeans(dat_block[dat_block['miss_trial'] == 0 & dat_block['stake'] == 1, c('rewards1', 'rewards2')])/9)
+    rr_scaled_s1 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 1, 'points']/9, na.rm = TRUE)
+    avg_reward_scaled_s1 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 1, c('rewards1', 'rewards2')])/9)
     rr_scaled_adj_s1 <- rr_scaled_s1 - avg_reward_scaled_s1
     
+    #stay probability
+    stay_prob <- sum(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1, 'stay_planet'], na.rm = TRUE)/nrow(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1, ])
     
-      beh_dat <- data.frame(rt_mean_earth, rt_median_earth, rt_mean_planet, rt_median_planet, n_timeout_earth, n_timeout_planet, rr, rr_adj, rr_s5, rr_adj_s5, rr_s1, rr_adj_s1, rr_scaled, rr_scaled_adj, rr_scaled_s5, rr_scaled_adj_s5, rr_scaled_s1, rr_scaled_adj_s1)
+    #by stake - high
+    stay_prob_s5 <- sum(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 5, 'stay_planet'], na.rm = TRUE)/nrow(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 5, ])
+    
+    #by stake - high
+    stay_prob_s1 <- sum(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 1, 'stay_planet'], na.rm = TRUE)/nrow(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 1, ])
+    
+    beh_dat <- data.frame(rt_mean_earth, rt_median_earth, rt_mean_planet, rt_median_planet, n_timeout_earth, n_timeout_planet, rr, rr_adj, rr_s5, rr_adj_s5, rr_s1, rr_adj_s1, rr_scaled, rr_scaled_adj, rr_scaled_s5, rr_scaled_adj_s5, rr_scaled_s1, rr_scaled_adj_s1, stay_prob, stay_prob_s5, stay_prob_s1)
     
     
     return(beh_dat)
   }
+  
+  
   
   #### Participant Summary Function #####
   
@@ -112,15 +118,17 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
     
     data_file <- paste0(raw_wd, sub_str, '_ses-', ses, '_task-spacegame_beh.tsv')
     
-    #print(sub_str)
+    print(sub_str)
     
     dat <- read.table(data_file, sep='\t', header = TRUE, na.strings = 'n/a')
+    
     
     if(format == 'wide'){
       sum_dat <- beh_sum_spacegame(dat)
       sum_dat$sub <- dat[1, 'sub']
       sum_dat$ses <- ses
-      sum_dat <- sum_dat[c(15:16, 1:14)]
+      sum_dat <- sum_dat[, c("sub", "ses", setdiff(names(sum_dat), c("sub", "ses")))] 
+  
     } else {
       #by block
       
@@ -128,10 +136,12 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
       sum_dat$sub <- dat[1, 'sub']
       sum_dat$ses <- ses
       sum_dat$block <- seq(1, nrow(sum_dat), 1)
-      sum_dat <- sum_dat[c(15:17, 1:14)]
+      sum_dat <- sum_dat[, c("sub", "ses", setdiff(names(sum_dat), c("sub", "ses")))] 
     }
     
-    return(as.data.frame(sum_dat))
+    return(list(
+      dm_groupdata <- as.data.frame(dat),
+      sum_dat <- as.data.frame(sum_dat)))
   }
   
   
@@ -149,7 +159,7 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
   if (!file.exists(paste0(deriv_wd, 'task-spacegame_beh.tsv')) | isTRUE(overwrite)) {
     
     # generate summary database
-    sum_database <- t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses = 'baseline', base_wd = base_wd, format = 'wide'), simplify = TRUE, USE.NAMES = TRUE))
+    gen_data <- t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses = 'baseline', base_wd = base_wd, format = 'wide'), simplify = TRUE, USE.NAMES = TRUE))
     
     write.table(sum_database, paste0(deriv_wd, 'task-spacegame_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
     

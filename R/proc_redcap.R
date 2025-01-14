@@ -153,7 +153,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   wasi_data <- wasi_data[wasi_data$participant_id != 'pilot-006', ]
   
   intake_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('_g', names(redcap_de_data)) | grepl('_kcal', names(redcap_de_data)) | grepl('meal', names(redcap_de_data))]
-  intake_data <- intake_data[, !grepl('cams', names(intake_data)) & !grepl('complete', names(intake_data))]
+  intake_data <- intake_data[, !grepl('cams', names(intake_data)) & !grepl('complete', names(intake_data)) & !grepl('tt', names(intake_data)) & !grepl('fnirs', names(intake_data)) & !grepl('bodpod', names(intake_data))]
   names(intake_data)[1] <- 'participant_id'
   intake_data$participant_id <- sub('--2', '', intake_data$participant_id)
   intake_data$participant_id <- sub('^00|^0', '', intake_data$participant_id)
@@ -188,6 +188,16 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.csv(ure_dat_metabolite, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ure_pilot_data_metabolite.csv'), row.names = FALSE)
   
   
+  ## dairy grant pilot data
+  dairy_pilot <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id', all = TRUE)
+  dairy_pilot <- merge(dairy_pilot, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id', all = TRUE)
+  dairy_pilot <- merge(dairy_pilot, parent_v1_data$brief_data$data$score_dat, by = 'participant_id', all = TRUE)
+  dairy_pilot <- merge(dairy_pilot, parent_v1_data$ffq_data$data$score_dat, by = 'participant_id', all = TRUE)
+  dairy_pilot <- merge(dairy_pilot, parent_v1_data$ffq_data$data$bids_phenotype[c(1, 3:4)], by = 'participant_id', all = TRUE)
+  dairy_pilot <- merge(dairy_pilot, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all = TRUE)
+  dairy_pilot <- merge(dairy_pilot, child_v1_data$hfi_data$data$bids_phenotype[c(1, 21:23)], by = 'participant_id', all = TRUE)
+  write.csv(dairy_pilot, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'dairy_pilot.csv'), row.names = FALSE)
+  
   interview_dat <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
   interview_dat <- merge(interview_dat, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
   interview_dat <- merge(interview_dat, bod_pod_data, by = 'participant_id')
@@ -203,6 +213,15 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   interview_dat <- merge(interview_dat, parent_v2_data$cshq_data$data$score_dat, by = 'participant_id', all.x = TRUE)
   
   write.csv(interview_dat, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'interview_pilot_data.csv'), row.names = FALSE)
+  
+  # nasa presentation
+  nasa_dat <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
+  nasa_dat <- merge(nasa_dat, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
+  nasa_dat <- merge(nasa_dat, bod_pod_data, by = 'participant_id')
+  nasa_dat <- merge(nasa_dat, intake_data, by = 'participant_id')
+  nasa_dat <- merge(nasa_dat, child_v2_data$loc_data$data, by = 'participant_id', all = TRUE)
+  nasa_dat <- merge(nasa_dat, parent_v1_data$cebq_data$data$score_dat, by = 'participant_id', all = TRUE)
+  write.csv(nasa_dat, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'nasa_pilot_data.csv'), row.names = FALSE)
   
   # export data
   

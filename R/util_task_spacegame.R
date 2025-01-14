@@ -88,7 +88,10 @@ util_task_spacegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   # get missed states
   dat[['missed_earth']] <- ifelse(dat[['timeout_earth']] == 1, 1, 0)
-  dat[['missed_planet']] <- ifelse(dat[['timeout_earth']] == 1 | dat[['timeout_planet']] == 1, 1, 0)
+  dat[['missed']] <- ifelse(dat[['timeout_earth']] == 1 | dat[['timeout_planet']] == 1, 1, 0)
+  
+  # reward dif
+  dat[['reward_dif']] <- abs(dat[['rewards1']] -  dat[['rewards2']])
   
   # get stay for planet by block
   # dat[dat[['block']] == 1, 'stay_planet'] <- sapply(dat[dat[['block']] == 1, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 1 & dat[['trial']] == x, 'state_planet'] == dat[dat[['block']] == 1 & dat[['trial']] == x-1, 'state_planet'], 1, 0)))
@@ -110,12 +113,19 @@ util_task_spacegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   
   # kool didn't consider blocks a reset
-  dat[['stay_planet']] <- sapply(dat[['trial']], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['trial']] == x, 'state_planet'] == dat[dat[['trial']] == x-1, 'state_planet'], 1, 0)))
   
-  dat[['earth_same']] <- sapply(dat[['trial']], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['trial']] == x, 'state_earth'] == dat[dat[['trial']] == x-1, 'state_earth'], 1, 0)))
+  #get info for trial-by-trail analyses (stay probabilities)
+  dat[['prev_reward_diff']] <- c(0, dat[2:nrow(dat), 'reward_dif'])
+  dat[['prev_points']] <- c(0, dat[2:nrow(dat), 'points'])
+  dat[['prev_stake']] <- c(0, dat[2:nrow(dat), 'stake'])
+  dat[['prev_missed']] <- c(0, dat[2:nrow(dat), 'missed'])
+  
+  dat[['stay_planet']] <- sapply(dat[['trial']], function(x) ifelse(x == 1, 0, ifelse(dat[dat[['trial']] == x, 'state_planet'] == dat[dat[['trial']] == x-1, 'state_planet'], 1, 0)))
+  
+  dat[['earth_same']] <- sapply(dat[['trial']], function(x) ifelse(x == 1, 0, ifelse(dat[dat[['trial']] == x, 'state_earth'] == dat[dat[['trial']] == x-1, 'state_earth'], 1, 0)))
   
   # re-order columns
-  dat <- dat[c('sub', 'date', 'block', 'trial', 'timeout_earth', 'timeout_planet', 'state_earth', 'state_planet', 'stim_left', 'stim_right', 'rt_earth', 'rt_planet', 'choice_earth', 'response', 'points', 'stake', 'score', 'rewards1', 'rewards2', 'missed_earth', 'missed_planet', 'earth_same', 'stay_planet')]
+  dat <- dat[c('sub', 'date', 'block', 'trial', 'timeout_earth', 'timeout_planet', 'state_earth', 'state_planet', 'stim_left', 'stim_right', 'rt_earth', 'rt_planet', 'choice_earth', 'response', 'points', 'stake', 'score', 'rewards1', 'rewards2', 'missed_earth', 'missed', 'prev_missed', 'prev_reward_diff', 'prev_points', 'prev_stake', 'earth_same', 'stay_planet')]
     
   #### Save in rawdata #####
   
