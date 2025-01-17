@@ -54,7 +54,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   #re-code sex to match demo_c_sex
   puberty_data[['sex']] <- ifelse(puberty_data[['sex']] == 0, 1, 0)
 
-  puberty_scored <- dataprepr::score_pds(puberty_data, score_base = FALSE, respondent = 'parent', male = 0, female = 1, id = 'participant_id')
+  puberty_scored <- dataprepr::score_pds(puberty_data, base_zero = FALSE, respondent = 'parent', male = 0, female = 1, id = 'participant_id')
   puberty_json <- json_pds()
   
   ## CFQ Data ####
@@ -62,7 +62,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   cfq_data <- cfq_data[, !(names(cfq_data) %in% c('cfq_resp_missingcheck', 'cfq_pwc_missingcheck', 'cfq_cwc_missingcheck', 'cfq_conc_missingcheck', 'cfq_presrest_missingcheck', 'cfq_mon_missingcheck'))]
   names(cfq_data)[1] <- 'participant_id'
   
-  cfq_scored <- dataprepr::score_cfq(cfq_data, score_base = TRUE, restriction_split = FALSE, id = 'participant_id')
+  cfq_scored <- dataprepr::score_cfq(cfq_data, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id')
   cfq_json <- json_cfq()
   
   ## CEBQ Data ####
@@ -70,7 +70,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   cebq_data <- cebq_data[, !(names(cebq_data) %in% c('cebq_missingcheck'))]
   names(cebq_data)[1] <- 'participant_id'
   
-  cebq_scored <- dataprepr::score_cebq(cebq_data, score_base = TRUE, id = 'participant_id')
+  cebq_scored <- dataprepr::score_cebq(cebq_data, base_zero = TRUE, id = 'participant_id')
   cebq_json <- json_cebq()
   
   ## EFCR Data ####
@@ -78,7 +78,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   efcr_data <- efcr_data[, !(names(efcr_data) %in% c('efcr_missingcheck'))]
   names(efcr_data)[1] <- 'participant_id'
   
-  efcr_scored <- dataprepr::score_efcr(efcr_data, score_base = FALSE, id = 'participant_id')
+  efcr_scored <- dataprepr::score_efcr(efcr_data, base_zero = FALSE, id = 'participant_id')
   efcr_json <- json_efcr()
   
   ## LBC Data  ####
@@ -86,7 +86,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   lbc_data <- lbc_data[, !(names(lbc_data) %in% c('lbc_missingcheck'))]
   names(lbc_data)[1] <- 'participant_id'
   
-  lbc_scored <- dataprepr::score_lbc(lbc_data, score_base = FALSE, id = 'participant_id')
+  lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = FALSE, id = 'participant_id')
   lbc_json <- json_lbc()
   
   ## BRIEF Data ####
@@ -104,7 +104,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   brief_data <- brief_data[c(1, 3, 68, 4:66)]
   names(brief_data)[2] <- 'sex'
 
-  brief_scored <- dataprepr::score_brief2(brief_data, age_var = 'age', sex_var = 'sex', score_base = FALSE, male = 0, female = 1, id = 'participant_id')
+  brief_scored <- dataprepr::score_brief2(brief_data, age_var = 'age', sex_var = 'sex', base_zero = FALSE, male = 0, female = 1, id = 'participant_id')
   brief_json <- json_brief2()
   
   ## FFQ Data ####
@@ -113,7 +113,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
 
   names(ffq_data)[1:44] <- c('participant_id', 'ffq_dairy1', 'ffq_dairy2', 'ffq_dairy3', 'ffq_dairy4', 'ffq_egg1', 'ffq_meat1', 'ffq_meat2', 'ffq_meat3', 'ffq_meat4', 'ffq_fish1', 'ffq_fish2', 'ffq_fish3', 'ffq_fish4', 'ffq_dairy5', 'ffq_veg1', 'ffq_veg2', 'ffq_potato1', 'ffq_legume1', 'ffq_potato2', 'ffq_fruit1', 'ffq_fruit2', 'ffq_nuts1', 'ffq_fruit3', 'ffq_fruit4', 'ffq_cereal1', 'ffq_cereal2', 'ffq_cereal3', 'ffq_cereal4', 'ffq_cereal5', 'ffq_cereal6', 'ffq_bakery1', 'ffq_bakery2', 'ffq_sweet1', 'ffq_sweet2', 'ffq_sweet3', 'ffq_bev1', 'ffq_bev2', 'ffq_fats1', 'ffq_fats2', 'ffq_fats3', 'ffq_fats4', 'ffq_dressing1', 'ffq_saltysnack1')
   
-  ffq_scored <- dataprepr::score_ffq_helix(ffq_data, score_base = TRUE, id = 'participant_id')
+  ffq_scored <- dataprepr::score_ffq_helix(ffq_data, base_zero = TRUE, id = 'participant_id')
   ffq_json <- json_ffq_helix()
   
   ## compile and return data ####

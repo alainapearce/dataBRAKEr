@@ -27,6 +27,8 @@ Imports:
     ggplot2,
     digest,
     reshape
+Remotes:
+    alainapearce/dataprepr
 Suggests: 
     knitr,
     rmarkdown,
