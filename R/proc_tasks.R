@@ -8,7 +8,7 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
 #'
-#' @param data_path full data path to raw_untouched directory
+#' @param data_path full path to raw_untouched data directory
 #' @inheritParams util_task_org_sourcedata
 #'
 #' @return data.frame for each task with status for each processing step
@@ -28,7 +28,7 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   
   #### 1. Set up/initial checks #####
   
-  # check that audit_data exist and is a data.frame
+  # check that data_path exist and is a data.frame
   path_arg <- methods::hasArg(data_path)
   
   if (isTRUE(path_arg)) {

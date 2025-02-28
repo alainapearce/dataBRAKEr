@@ -56,11 +56,13 @@ util_redcap_child1 <- function(data, return_data = TRUE) {
   names(child_household_data)[1] <- 'participant_id'
   
   ## task information ####
-  task_info <- data[c('record_id', 'pre_shapegame_hungry', 'pre_shapegame_snack', 'shapegame_snack_notes', 'pre_shapegame_postsnack_ffcheck' , 'pre_shapegame_snack_hungry', 'pre_shapegame_snack2', 'shapegame_snack2_notes', 'pre_shapegame_postsnack2_ffcheck', 'post_shapegame_snack_note', 'shapegame_check', 'shape_game_snack', 'shapegame_prize_bags', 'shapegame_eye_check', 'shapegame_notes', 'pre_fnirs_ffcheck', 'pre_fnirs_hungry', 'pre_fnirs_snack', 'pre_fnris_snack_notes', 'pre_fnirs_postsnack_ffcheck', 'pre_fnirs_snack_hungry', 'pre_cams', 'foodrating_check', 'foodrating_fnirs_check', 'foodrating_notes', 'foodchoice_check', 'snack_won', 'foodchoice_fnirs_check', 'foodchoice_eye_check', 'foodchoice_notes', 'prost_cams')]
+  shapegame_info <- data[c('record_id', 'pre_shapegame_hungry', 'pre_shapegame_snack', 'shapegame_snack_notes', 'pre_shapegame_postsnack_ffcheck' , 'pre_shapegame_snack_hungry', 'pre_shapegame_snack2', 'shapegame_snack2_notes', 'pre_shapegame_postsnack2_ffcheck', 'post_shapegame_snack_note', 'shapegame_check', 'shape_game_snack', 'shapegame_prize_bags', 'shapegame_eye_check', 'shapegame_notes')]
   
-  names(task_info)[c(1, 6, 8, 10:12, 14, 21, 23:24, 26:29, 31)] <- c('participant_id', 'pre_shapegame_postsnack_hungry', 'pre_shapegame_snack2_notes', 'pre_shapegame_postsnack2_note', 'shapegame_complete', 'shapegame_candy', 'shapegame_eyetrack_good', 'foodrating_complete', 'foodrating_fnirs_good', 'foodrating_notes', 'foodchoice_complete', 'foodchoice_prize', 'foodchoice_fnirs_good', 'foodchoice_eyetrack_good', 'post_cams')
+  names(shapegame_info)[c(1, 6, 8, 10:12, 14)] <- c('participant_id', 'pre_shapegame_postsnack_hungry', 'pre_shapegame_snack2_notes', 'pre_shapegame_postsnack2_note', 'shapegame_complete', 'shapegame_candy', 'shapegame_eyetrack_good')
   
-  names(task_info)[1] <- 'participant_id'
+  fnirs_info <- data[c('record_id', 'pre_fnirs_hungry', 'pre_fnirs_snack', 'pre_fnris_snack_notes', 'pre_fnirs_postsnack_ffcheck', 'pre_fnirs_snack_hungry', 'foodrating_check', 'foodrating_fnirs_check', 'foodrating_notes', 'foodchoice_check', 'snack_won', 'foodchoice_fnirs_check', 'foodchoice_eye_check', 'foodchoice_notes')]
+  
+  names(fnirs_info)[c(1, 7:8, 10:13)] <- c('participant_id', 'foodrating_complete', 'foodrating_fnirs_good', 'foodchoice_complete', 'foodchoice_prize', 'foodchoice_fnirs_good', 'foodchoice_eyetrack_good')
   
   ## meal information ####
   meal_info <- data[c('record_id', 'pre_liking_ff_time', 'pre_liking_ff_notes', 'vas_mac', 'vas_cknug', 'vas_grapes', 'vas_carrot', 'vas_water', 'pre_meal_ff_time', 'pre_meal_ff_notes', 'test_meal_book', 'test_meal_start_time', 'test_meal_end_time', 'test_meal_duration', 'test_meal_notes', 'post_meal_ff_time', 'toolbox_list_sorting_notes', 'pre_wanting_ff_time', 'pre_wanting_ff_notes', 'eah_liking_and_wanting_timestamp', 'vas_popcorn', 'want_popcorn', 'vas_pretzel', 'want_pretzel', 'vas_cornchip', 'want_cornchip', 'vas_cookie', 'want_cookie', 'vas_brownie', 'want_brownie', 'vas_starburst', 'want_starburst', 'vas_skittle', 'want_skittle', 'vas_chocolate', 'want_chocolate', 'vas_icecream', 'want_icecream', 'vas_eah_want_notes', 'eah_game_wanting_timestamp', 'want_markers', 'want_crayons', 'want_color_marvels', 'want_oonies_inflate', 'want_colorpencils', 'wan_activitybook', 'want_colorbook', 'want_legos', 'want_squeakee', 'want_dinosaurs', 'want_oonies', 'eah_game_wanting_notes', 'pre_eah_freddy_time', 'eah_start_time', 'eah_end_time', 'eah_notes', 'post_eah_ff_time', 'post_eah_ff_notes')]
@@ -76,7 +78,7 @@ util_redcap_child1 <- function(data, return_data = TRUE) {
   sleep_wk_scored <- dataprepr::score_sleeplog(sleep_data, id = 'participant_id', summer_start = '2023-06-06', summer_end = '2023-08-23')
   child_sleep_json <- json_sleeplog()
   
-  ## HFI data
+  ## HFI data ####
   hfi_data <- data[, grepl('record_id', names(data)) | grepl('hfi', names(data))] 
   hfi_data <- hfi_data[, !grepl('qcheck', names(hfi_data))]
   names(hfi_data)[1] <- 'participant_id'
@@ -90,11 +92,12 @@ util_redcap_child1 <- function(data, return_data = TRUE) {
   
   if (isTRUE(return_data)){
     return(list(
-      demo_data = list(child_v1demo_data = child_v1demo_data, 
-                       child_household_data = child_household_data),
-      otherdata = list(fnirs_cap = fnirs_cap, 
-                       task_info = task_info, 
-                       meal_info = meal_info),
+      anthro_data = child_v1demo_data, 
+      demo_data = child_household_data,
+      fnirs_cap = fnirs_cap, 
+      shapegame_info = shapegame_info, 
+      fnirs_info = fnirs_info,
+      meal_info = meal_info,
       sleep_wk_data = list(data = sleep_wk_scored, meta = child_sleep_json),
       hfi_data = list(data = hfi_scored, meta = hfi_json)))
   }

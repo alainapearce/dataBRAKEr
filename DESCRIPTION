@@ -26,7 +26,10 @@ Imports:
     readxl,
     ggplot2,
     digest,
-    reshape
+    reshape,
+    GGIR,
+    mMARCH.AC,
+    xlsx
 Remotes:
     alainapearce/dataprepr
 Suggests: 
@@ -38,4 +41,4 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2

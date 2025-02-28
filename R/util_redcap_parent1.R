@@ -62,7 +62,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   cfq_data <- cfq_data[, !(names(cfq_data) %in% c('cfq_resp_missingcheck', 'cfq_pwc_missingcheck', 'cfq_cwc_missingcheck', 'cfq_conc_missingcheck', 'cfq_presrest_missingcheck', 'cfq_mon_missingcheck'))]
   names(cfq_data)[1] <- 'participant_id'
   
-  cfq_scored <- dataprepr::score_cfq(cfq_data, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id')
+  cfq_scored <- dataprepr::score_cfq(cfq_data, pna = 5, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id')
   cfq_json <- json_cfq()
   
   ## CEBQ Data ####

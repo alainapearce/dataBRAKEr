@@ -1,0 +1,139 @@
+#' util_nirs_demo: Compile and save demographic information of interest for fNIRS analyses 
+#'
+#' This function extracts demographic information of interest for fNIRS analyses.
+#' 
+#' To use this function, util_redcap_*.R must be completed so all REDCap demographic information is available.
+#'
+#'
+#' @param v1_demo_homeloc demo data from generated from util_redcap_prepost1.R
+#' @param fnirs_info fnirs task information generated from util_redcap_child1.R
+#' @param anthro_data anthropometric data from visit 1 generated from util_redcap_child1.R
+#' @param demographics demographic data from visit 1 survey generated from util_redcap_parent1.R
+#' @param puberty parent-report puberty data visit 1 survey generated from util_redcap_parent1.R
+#' @param bodpod double-entered bodpod generated from util_redcap_de.R
+#' @param baseline_cams double-entered baseline CAMS generated from util_redcap_de.R
+#' @param followup_cams double-entered follow-up CAMS generated from util_redcap_de.R
+#' @param fullness_tastetest double-entered freddy fullness for taste-test generated from util_redcap_de.R
+#' @inheritParams util_redcap_prepost1
+#' 
+#' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
+#'
+#' @examples
+#'
+#' # process task data for the Food Choice Task
+#' nirs_demo <- util_nirs_demo(sub_str, ses, data_path, return = TRUE)
+#'
+#' \dontrun{
+#' }
+#'
+#'
+#' @export
+
+util_nirs_demo <- function(v1_demo_homeloc, fnirs_info, anthro_data, demographics, puberty, bodpod, baseline_cams, followup_cams, fullness_tastetest, return_data = TRUE) {
+  
+  #### 1. Set up/initial checks #####
+  
+  # check that audit_data exist and is a data.frame
+  demo_homeloc_arg <- methods::hasArg(v1_demo_homeloc)
+  fnirs_arg <- methods::hasArg(fnirs_info)
+  anthro_arg <- methods::hasArg(anthro_data)
+  demo_arg <- methods::hasArg(demographics)
+  puberty_arg <- methods::hasArg(puberty)
+  bodpod_arg <- methods::hasArg(bodpod)
+  bcams_arg <- methods::hasArg(baseline_cams)
+  fcams_arg <- methods::hasArg(followup_cams)
+  tt_arg <- methods::hasArg(fullness_tastetest)
+  
+  
+  if (isTRUE(demo_homeloc_arg)) {
+    if (!is.data.frame(v1_demo_homeloc)) {
+      stop("v1_demo_homeloc must be a data.frame")
+    } 
+  } else if (isFALSE(demo_homeloc_arg)) {
+    stop("demo data from generated from util_redcap_prepost1 must be entered as a data.frame")
+  }
+  
+  if (isTRUE(fnirs_arg)) {
+    if (!is.data.frame(fnirs_info)) {
+      stop("fnirs_info must be a data.frame")
+    } 
+  } else if (isFALSE(fnirs_arg)) {
+    stop("fnirs task information generated from util_redcap_child1 must be entered as a data.frame")
+  }
+  
+  if (isTRUE(anthro_arg)) {
+    if (!is.data.frame(anthro_data)) {
+      stop("anthro_data must be a data.frame")
+    } 
+  } else if (isFALSE(anthro_arg)) {
+    stop("anthropometric data from visit 1 generated from util_redcap_child1 must be entered as a data.frame")
+  }
+  
+  if (isTRUE(demo_arg)) {
+    if (!is.data.frame(demographics)) {
+      stop("demographics must be a data.frame")
+    } 
+  } else if (isFALSE(demo_arg)) {
+    stop("demographic data from visit 1 survey generated from util_redcap_parent1 must be entered as a data.frame")
+  }
+  
+  if (isTRUE(puberty_arg)) {
+    if (!is.data.frame(puberty)) {
+      stop("puberty must be a data.frame")
+    } 
+  } else if (isFALSE(puberty_arg)) {
+    stop("parent-report puberty data visit 1 survey generated from util_redcap_parent1 must be entered as a data.frame")
+  }
+  
+  if (isTRUE(bodpod_arg)) {
+    if (!is.data.frame(bodpod)) {
+      stop("bodpod must be a data.frame")
+    } 
+  } else if (isFALSE(bodpod_arg)) {
+    stop("double-entered bodpod generated from util_redcap_de must be entered as a data.frame")
+  }
+  
+  if (isTRUE(bcams_arg)) {
+    if (!is.data.frame(baseline_cams)) {
+      stop("baseline_cams must be a data.frame")
+    } 
+  } else if (isFALSE(bcams_arg)) {
+    stop("double-entered baseline CAMS generated from util_redcap_de must be entered as a data.frame")
+  }
+  
+  if (isTRUE(fcams_arg)) {
+    if (!is.data.frame(followup_cams)) {
+      stop("followup_cams must be a data.frame")
+    } 
+  } else if (isFALSE(fcams_arg)) {
+    stop("double-entered follow-up CAMS generated from util_redcap_de must be entered as a data.frame")
+  }
+  
+  if (isTRUE(tt_arg)) {
+    if (!is.data.frame(fullness_tastetest)) {
+      stop("fullness_tastetest must be a data.frame")
+    } 
+  } else if (isFALSE(tt_arg)) {
+    stop("double-entered freddy fullness for taste-test generated from util_redcap_de must be entered as a data.frame")
+  }
+  
+  
+  #### Organize Data #####
+  anthro_data <- anthro_data[, !(grepl('v1', names(anthro_data))) & !(grepl('notes', names(anthro_data)))]
+  
+  
+  nirs_dat <- merge(v1_demo_homeloc[c('participant_id', 'home_locale', 'home_rural', 'school_locale', 'school_rural')], demographics, by = 'participant_id')
+  nirs_dat <- merge(nirs_dat, puberty, by = 'participant_id')
+  nirs_dat <- merge(nirs_dat, anthro_data, by = 'participant_id')
+  nirs_dat <- merge(nirs_dat, bodpod, by = 'participant_id')
+  nirs_dat <- merge(nirs_dat, fnirs_info, by = 'participant_id')
+  nirs_dat <- merge(nirs_dat, baseline_cams, by = 'participant_id')
+  nirs_dat <- merge(nirs_dat, followup_cams, by = 'participant_id')
+  nirs_dat <- merge(nirs_dat, fullness_tastetest, by = 'participant_id')
+  
+  
+  if (isTRUE(return_data)){
+    return(list(data = nirs_dat))
+  }
+}
+

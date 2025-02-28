@@ -82,33 +82,33 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   spsrq_scored <- dataprepr::score_spsrq(spsrq_data, base_zero = TRUE, id = 'participant_id')
   spsrq_json <- json_spsrq()
   
-  ## CBQ Data
+  ## CBQ Data ####
   cbq_data <- data[, grepl('record_id', names(data)) | grepl('cbq', names(data))]
   cbq_data <- cbq_data[, !(names(cbq_data) %in% c('cbq_missingcheck'))]
   names(cbq_data)[1] <- 'participant_id'
   
-  cbq_scores <- dataprepr::score_cbq(cbq_data, base_zero = TRUE, id = 'participant_id')
+  cbq_scores <- dataprepr::score_cbq(cbq_data, does_not_apply_value = 99, base_zero = FALSE, id = 'participant_id')
   cbq_json <- NA
   
-  ## PWLB Data
+  ## PWLB Data ####
   pwlb_data <- data[, grepl('record_id', names(data)) | grepl('pwlb', names(data))]
   pwlb_data <- pwlb_data[, !(names(pwlb_data) %in% c('pwlb_missingcheck'))]
   names(pwlb_data)[1] <- 'participant_id'
   pwlb_json <- NA
   
-  ## SCPF Data
+  ## SCPF Data ####
   scpf_data <- data[, grepl('record_id', names(data)) | grepl('scpf', names(data))]
   scpf_data <- scpf_data[, !(names(scpf_data) %in% c('scpf_missingcheck'))]
   names(scpf_data)[1] <- 'participant_id'
   scpf_json <- NA
   
-  ## FMCB Data
+  ## FMCB Data ####
   fmcb_data <- data[, grepl('record_id', names(data)) | grepl('fmcb', names(data))]
   fmcb_data <- fmcb_data[, !(names(fmcb_data) %in% c('fmcb_missingcheck'))]
   names(fmcb_data)[1] <- 'participant_id'
   fmcb_json <- NA
   
-  ## TFEQ Data
+  ## TFEQ Data ####
   tfeq_data <- data[, grepl('record_id', names(data)) | grepl('tfeq', names(data))]
   tfeq_data <- tfeq_data[, !(names(tfeq_data) %in% c('tfeq_missingcheck'))]
   names(tfeq_data)[1] <- 'participant_id'

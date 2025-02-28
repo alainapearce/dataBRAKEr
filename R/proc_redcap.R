@@ -28,6 +28,9 @@
 #'
 #'
 #' @export
+#' 
+
+# look up redcap_read_oneshot() and redcap_read, readcap_metadata_read
 
 proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return_data = FALSE) {
 
@@ -88,7 +91,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   
   
   #### Load and organize visit data ####
-  redcap_visit_data <- read.csv(visit_data_path, header = TRUE)
+  redcap_visit_data <- read.csv(visit_data_file, header = TRUE)
 
   
   # subset events and remove unnecessary columns
@@ -138,26 +141,30 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   
   # all validated so can just take reviewer 1 data
   redcap_de_data <- redcap_de_data[grepl('--2', redcap_de_data[['record_id']]), ]
+  redcap_de_data <- redcap_de_data[!(grepl('pilot', redcap_de_data[['record_id']])), ]
+  
+  redcap_de_data['record_id'] <- sapply(redcap_de_data['record_id'], function(x) gsub('--2', '', x))
+  
+  de_data_clean <- util_redcap_de(redcap_de_data)
+  
+
+  # create necessary files for fNIRS processing ####
+  nirs_demo_data <- util_nirs_demo(v1_demo_homeloc = prepost_v1_data$demo, fnirs_info = child_v1_data$fnirs_info, anthro_data = child_v1_data$anthro_data, demographics = parent_v1_data$demo_data$data, puberty = parent_v1_data$puberty_data$data$score_dat, bodpod = de_data_clean$bodpod$data, baseline_cams = de_data_clean$baseline_cams$data, followup_cams = de_data_clean$followup_cams$data, fullness_tastetest = de_data_clean$taste_test$data)
+  
+  write.table(nirs_demo_data, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'nirs_demo_data.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  
+  baseline_fitcap <- child_v1_data$fnirs_cap
+  
+  write.table(baseline_fitcap, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-baseline_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  
+  #followup_fitcap <- child_v3_data$fnirs_cap
+  
+  #write.csv(followup_fitcap, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-followup_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  
+  #--------------------------------#
   
   ## interview quick work
-  bod_pod_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('bodpod', names(redcap_de_data))]
-  names(bod_pod_data)[1] <- 'participant_id'
-  bod_pod_data$participant_id <- sub('--2', '', bod_pod_data$participant_id)
-  bod_pod_data$participant_id <- sub('^00|^0', '', bod_pod_data$participant_id)
-  bod_pod_data <- bod_pod_data[bod_pod_data$participant_id != 'pilot-006', ]
   
-  wasi_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('wasi', names(redcap_de_data))]
-  names(wasi_data)[1] <- 'participant_id'
-  wasi_data$participant_id <- sub('--2', '', wasi_data$participant_id)
-  wasi_data$participant_id <- sub('^00|^0', '', wasi_data$participant_id)
-  wasi_data <- wasi_data[wasi_data$participant_id != 'pilot-006', ]
-  
-  intake_data <- redcap_de_data[, grepl('record_id', names(redcap_de_data)) | grepl('_g', names(redcap_de_data)) | grepl('_kcal', names(redcap_de_data)) | grepl('meal', names(redcap_de_data))]
-  intake_data <- intake_data[, !grepl('cams', names(intake_data)) & !grepl('complete', names(intake_data)) & !grepl('tt', names(intake_data)) & !grepl('fnirs', names(intake_data)) & !grepl('bodpod', names(intake_data))]
-  names(intake_data)[1] <- 'participant_id'
-  intake_data$participant_id <- sub('--2', '', intake_data$participant_id)
-  intake_data$participant_id <- sub('^00|^0', '', intake_data$participant_id)
-  intake_data <- intake_data[intake_data$participant_id != 'pilot-006', ]
   
   ## ure_dat -- wasi
   ure_dat <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
@@ -185,7 +192,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   ure_dat_metabolite <- merge(ure_dat_metabolite, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all.x = TRUE)
   ure_dat_metabolite <- merge(ure_dat_metabolite, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all.x = TRUE)
   
-  write.csv(ure_dat_metabolite, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ure_pilot_data_metabolite.csv'), row.names = FALSE)
+  write.csv(ure_dat_metabolite, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'mattheisen_honors_data.csv'), row.names = FALSE)
   
   
   ## dairy grant pilot data
