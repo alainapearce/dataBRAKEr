@@ -162,6 +162,11 @@ proc_actigraph <- function(data_path, session = 'baseline', overwrite = FALSE) {
                           filename2id = filename2id))
   
 
+  #organize data
+  save_path <- paste0(base_wd, slash, 'bids', slash, 'derivatives', slash, 'motion', slash, session, slash, 'clean')
+  
+  util_actigraph_clean(save_path, ggir_path, mMARCH_path = deriv_dir_mMARCH, metrics = c('SL', 'PA', 'CR'), overwrite)
+  
   
   
 }

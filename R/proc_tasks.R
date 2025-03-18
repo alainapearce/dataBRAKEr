@@ -8,7 +8,7 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
 #'
-#' @param data_path full path to raw_untouched data directory
+#' @param base_wd full path to directory containing both raw_untouched and bids directories
 #' @inheritParams util_task_org_sourcedata
 #'
 #' @return data.frame for each task with status for each processing step
@@ -16,7 +16,7 @@
 #' @examples
 #'
 #' # process task data for the Food Choice Task
-#' proc_tasks_pardat <- proc_tasks(data_path, overwrite)
+#' proc_tasks_pardat <- proc_tasks(base_wd, overwrite)
 #'
 #' \dontrun{
 #' }
@@ -24,44 +24,33 @@
 #'
 #' @export
 
-proc_tasks <- function(data_path, overwrite = FALSE) {
+proc_tasks <- function(base_wd, overwrite = FALSE) {
   
   #### 1. Set up/initial checks #####
   
-  # check that data_path exist and is a data.frame
-  path_arg <- methods::hasArg(data_path)
+  # check that base_wd exist and is a data.frame
+  path_arg <- methods::hasArg(base_wd)
   
   if (isTRUE(path_arg)) {
-    if (!is.character(data_path)) {
-      stop("data_path must be entered as a string")
-    } else if (!file.exists(data_path)) {
-      stop("data_path entered, but file does not exist. Check data_path string.")
+    if (!is.character(base_wd)) {
+      stop("base_wd must be entered as a string")
+    } else if (!file.exists(base_wd)) {
+      stop("base_wd entered, but file does not exist. Check base_wd string.")
     }
   } else if (isFALSE(path_arg)) {
-    stop("data_path must be entered as a string")
+    stop("base_wd must be entered as a string")
   }
   
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The proc_tasks.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-  
-  # find location of slashes so can decompose filepaths
-  slash_loc <- unlist(gregexpr('/', data_path))
-  
-  # set paths for other directories
-  if (substr(data_path, nchar(data_path), nchar(data_path)) == slash){
-    base_wd <- substr(data_path, 1, tail(slash_loc, 2))
-  } else {
-    base_wd <- substr(data_path, 1, tail(slash_loc, 1))
-  }
+  #### Define paths ####
+  bids_wd <- file.path(base_wd, 'bids')
+  data_path <- file.path(base_wd, 'raw_untouched')
+  sourcedata_wd <- file.path(base_wd, 'bids', 'sourcedata')
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata')
+  phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
   
   # Food Rating ####
   # get list of available subjects 
-  foodrating_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'foodrating_game', slash), pattern = '.csv'))
+  foodrating_list <- as.data.frame(list.files(path = file.path(data_path, 'foodrating_game'), pattern = '.csv'))
   names(foodrating_list) <- 'filename'
   
   #get list of subject IDs
@@ -78,7 +67,7 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   
   # Food Choice ####
   # get list of available subjects 
-  foodchoice_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'foodchoice_game', slash), pattern = '.csv'))
+  foodchoice_list <- as.data.frame(list.files(path = file.path(data_path, 'foodchoice_game'), pattern = '.csv'))
   names(foodchoice_list) <- 'filename'
   
   #get list of subject IDs
@@ -101,7 +90,7 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   
   # Shape Game ####
   # get list of available subjects 
-  shape_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'shape_game', slash), pattern = '.csv'))
+  shape_list <- as.data.frame(list.files(path = file.path(data_path, 'shape_game'), pattern = '.csv'))
   names(shape_list) <- 'filename'
   
   #get list of subject IDs
@@ -122,7 +111,7 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   
   # Space Game ####
   # get list of available subjects 
-  space_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'space_game', slash), pattern = '.mat'))
+  space_list <- as.data.frame(list.files(path = file.path(data_path, 'space_game'), pattern = '.mat'))
   names(space_list) <- 'filename'
   
   #get list of subject IDs
@@ -139,7 +128,7 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   
   # NIH Toolbox - raw data ####
   # get list of available subjects 
-  nih_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'nih_toolbox', slash), pattern = 'events.csv'))
+  nih_list <- as.data.frame(list.files(path = file.path(data_path, 'nih_toolbox'), pattern = 'events.csv'))
   names(nih_list) <- 'filename'
   
   nih_list_flanker <- as.data.frame(nih_list[grepl('flanker', nih_list[['filename']]), ])
@@ -158,23 +147,26 @@ proc_tasks <- function(data_path, overwrite = FALSE) {
   # org
   nih_list[['sourcedata_done']] <- sapply(nih_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'nih', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'beh', overwrite = overwrite), simplify = TRUE)
   
-  #process raw data
-  listsort_data <- util_task_nihtoolbox(task = 'listsort', base_wd = base_wd, sub_str_list = nih_list[!is.na(nih_list[['listsort']]), 'sub_str'], overwrite = overwrite)
-  listsort_data <- as.data.frame(sapply(names(listsort_data), function(x) unlist(listsort_data[[x]]), simplify = TRUE))
-  write.csv(listsort_data, paste0(base_wd, 'bids', slash, 'sourcedata', slash, 'phenotype', slash, 'nih_listsort_data.csv'), row.names = FALSE)
+  # process raw data
+  nih_list[['rawdata_done']] <- sapply(nih_list[['sub_str']], function(x) util_task_nihtoolbox(sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
   
-  flanker_data <- util_task_nihtoolbox(task = 'flanker', base_wd = base_wd, sub_str_list = nih_list[!is.na(nih_list[['flanker-dccs']]), 'sub_str'], overwrite = overwrite)
-  flanker_data <- as.data.frame(sapply(names(flanker_data), function(x) unlist(flanker_data[[x]]), simplify = TRUE))
-  write.csv(flanker_data, paste0(base_wd, 'bids', slash, 'sourcedata', slash, 'phenotype', slash, 'nih_flanker_data.csv'), row.names = FALSE)
+  # generate derivatives file
   
-  dccs_data <- util_task_nihtoolbox(task = 'dccs', base_wd = base_wd, sub_str_list = nih_list[!is.na(nih_list[['flanker-dccs']]), 'sub_str'], overwrite = overwrite)
-  dccs_data <- as.data.frame(sapply(names(dccs_data), function(x) unlist(dccs_data[[x]]), simplify = TRUE))
-  write.csv(dccs_data, paste0(base_wd, 'bids', slash, 'sourcedata', slash, 'phenotype', slash, 'nih_dccs_data.csv'), row.names = FALSE)
+  #create derivative file
+  if (!dir.exists(phenotype_wd)) {
+    dir.create(phenotype_wd, recursive = TRUE)
+  }
   
+  nih_events_dat <- do.call('rbind', sapply(nih_list[['sub_str']], function(x) read.table(file.path(raw_wd, x, 'ses-baseline', 'beh', paste0(x, '_ses-baseline_task-nih_toolbox_events.tsv')), sep = '\t', header = TRUE), simplify = FALSE))
+  write.table(nih_events_dat, file.path(phenotype_wd, 'nih_toolbox_events.tsv'), sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
   
+  nih_scores_dat <- do.call('rbind', sapply(nih_list[['sub_str']], function(x) read.table(file.path(raw_wd, x, 'ses-baseline', 'beh', paste0(x, '_ses-baseline_task-nih_toolbox_scores.tsv')), sep = '\t', header = TRUE), simplify = FALSE))
+  write.table(nih_scores_dat, file.path(phenotype_wd, 'nih_toolbox_scores.tsv'), sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
+  
+                            
   # Food Taste-Test ####
   # get list of available subjects 
-  tastetest_list <- as.data.frame(list.files(path = paste0(data_path, slash, 'tastetest', slash), pattern = '.csv'))
+  tastetest_list <- as.data.frame(list.files(path = file.path(data_path, 'tastetest'), pattern = '.csv'))
   names(tastetest_list) <- 'filename'
   
   #get list of subject IDs

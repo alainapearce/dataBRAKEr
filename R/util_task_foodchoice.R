@@ -40,24 +40,17 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     stop("base_wd must be entered as a string")
   }
   
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The foodchoice_task.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
   
   # get directory paths
-  raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash)
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'nirs')
   
-  data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, 'foodchoice', slash, sub_str, '_ses-', ses, '_task-foodchoice_events.tsv')
+  data_file <- file.path(base_wd, 'bids', 'sourcedata',, sub_str, paste0('ses-', ses), 'nirs', 'foodchoice', paste0(sub_str, '_ses-', ses, '_task-foodchoice_events.tsv'))
   
   print(sub_str)
   
   #check for '999'
   if (!file.exists(data_file)){
-    data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, 'foodchoice', slash, sub_str, '_ses-', ses, '_task-foodchoice_events-999.tsv')
+    data_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'nirs', 'foodchoice', paste0(sub_str, '_ses-', ses, '_task-foodchoice_events-999.tsv'))
 
     if (file.exists(data_file)){
       alt_999 <- TRUE
@@ -72,7 +65,7 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   dat <- read.csv(data_file, sep = '\t', header = TRUE, na.strings = c('n/a', 'NA'))
   
   if (isTRUE(alt_999)){
-    foodrating_file <- paste0(base_wd, slash, 'raw_untouched', slash, 'foodrating_game', slash, sub_str, '_foodrating.csv')
+    foodrating_file <- file.path(base_wd, 'raw_untouched', 'foodrating_game', paste0(sub_str, '_foodrating.csv'))
     dat_foodrating <- read.csv(foodrating_file, sep = ',', header = TRUE, na.strings = c('n/a', 'NA'))
     
     # update values for foodchoice

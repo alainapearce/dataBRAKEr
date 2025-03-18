@@ -41,19 +41,19 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   if (isTRUE(data_arg)) {
     if (!is.character(visit_data_path)) {
-      stop("visit_data_path must be entered as a string")
+      stop('visit_data_path must be entered as a string')
     } else if (!file.exists(visit_data_path)) {
-      stop("visit_data_path entered, but file does not exist. Check visit_data_path string.")
+      stop('visit_data_path entered, but file does not exist. Check visit_data_path string.')
     }
   } else if (isFALSE(data_arg)) {
-    stop("visit_data_path must be entered as a string")
+    stop('visit_data_path must be entered as a string')
   }
 
   #### IO setup ####
-  if (.Platform$OS.type == "unix") {
+  if (.Platform$OS.type == 'unix') {
     slash <- '/'
   } else {
-    slash <- "\\"
+    slash <- '\\'
     print('The proc_tasks.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
   }
 
@@ -93,6 +93,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #### Load and organize visit data ####
   redcap_visit_data <- read.csv(visit_data_file, header = TRUE)
 
+  redcap_visit_data <- redcap_visit_data[!(grepl('pilot|PILOT', redcap_visit_data[['record_id']])), ]
   
   # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){
@@ -102,18 +103,22 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     
     #remove empty columns
     if (grepl('prepost', event_name)){
-      sub_dat <- sub_dat[, !colSums(is.na(sub_dat) | sub_dat == "") == nrow(sub_dat)]
+      sub_dat <- sub_dat[, !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
       
     } else if (event_name == 'child_visit_1_arm_1') {
-      sub_dat <- sub_dat[, grepl('^hfi', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == "") == nrow(sub_dat)]
+      sub_dat <- sub_dat[, grepl('^hfi', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
      
     } else if (event_name == 'child_visit_2_arm_1') {
-      sub_dat <- sub_dat[, grepl('^loc', names(sub_dat)) | grepl('^sic', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == "") == nrow(sub_dat)]
+      sub_dat <- sub_dat[, grepl('^loc', names(sub_dat)) | grepl('^sic', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
       
     } else if (event_name == 'parent_visit_1_arm_1') {
-      sub_dat <- sub_dat[, grepl('^demo', names(sub_dat)) | grepl('^pds', names(sub_dat)) | grepl('^tanner', names(sub_dat)) | grepl('^cfq', names(sub_dat)) | grepl('^cebq', names(sub_dat)) | grepl('^efcr', names(sub_dat)) | grepl('^lbc', names(sub_dat)) | grepl('^brief', names(sub_dat)) | grepl('^ffq', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == "") == nrow(sub_dat)]
+      sub_dat <- sub_dat[, grepl('^demo', names(sub_dat)) | grepl('^pds', names(sub_dat)) | grepl('^tanner', names(sub_dat)) | grepl('^cfq', names(sub_dat)) | grepl('^cebq', names(sub_dat)) | grepl('^efcr', names(sub_dat)) | grepl('^lbc', names(sub_dat)) | grepl('^brief', names(sub_dat)) | grepl('^ffq', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
     } else if (event_name == 'parent_visit_2_arm_1') {
-      sub_dat <- sub_dat[, grepl('^cshq', names(sub_dat)) | grepl('^bes', names(sub_dat)) | grepl('^ffbs', names(sub_dat)) | grepl('^hfe', names(sub_dat)) | grepl('^spsrq', names(sub_dat)) | grepl('^cbq', names(sub_dat)) | grepl('^pwlb', names(sub_dat)) | grepl('^scpf', names(sub_dat)) | grepl('^fmcb', names(sub_dat)) | grepl('^tfeq', names(sub_dat))| !colSums(is.na(sub_dat) | sub_dat == "") == nrow(sub_dat)]
+      sub_dat <- sub_dat[, grepl('^cshq', names(sub_dat)) | grepl('^bes', names(sub_dat)) | grepl('^ffbs', names(sub_dat)) | grepl('^hfe', names(sub_dat)) | grepl('^spsrq', names(sub_dat)) | grepl('^cbq', names(sub_dat)) | grepl('^pwlb', names(sub_dat)) | grepl('^scpf', names(sub_dat)) | grepl('^fmcb', names(sub_dat)) | grepl('^tfeq', names(sub_dat))| !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
+    } else if (event_name == 'child_visit_3_arm_1'){
+      sub_dat <- sub_dat[, grepl('record_id', names(sub_dat)) | grepl('^v3', names(sub_dat)) | grepl('^relationship', names(sub_dat)) | grepl('^capfit', names(sub_dat)) | grepl('^pref', names(sub_dat)) | grepl('^loc', names(sub_dat)) | grepl('^sic', names(sub_dat)) | grepl('^wcs', names(sub_dat)) | grepl('*_timing', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
+    } else if (event_name == 'parent_visit_3_arm_1'){
+      sub_dat <- sub_dat[, !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
     }
     
     #return
@@ -127,6 +132,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   parent_visit_1_arm_1 <- redcap_long_wide('parent_visit_1_arm_1', redcap_visit_data)
   child_visit_2_arm_1 <- redcap_long_wide('child_visit_2_arm_1', redcap_visit_data)
   parent_visit_2_arm_1 <- redcap_long_wide('parent_visit_2_arm_1', redcap_visit_data)
+  child_visit_3_arm_1 <- redcap_long_wide('child_visit_3_arm_1', redcap_visit_data)
+  parent_visit_3_arm_1 <- redcap_long_wide('parent_visit_3_arm_1', redcap_visit_data)
   
   # organize event data
   prepost_v1_data <- util_redcap_prepost1(visit_1_prepost_arm_1)
@@ -135,6 +142,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   parent_v1_data <- util_redcap_parent1(parent_visit_1_arm_1, prepost_v1_data$demo[c('participant_id', 'v1_date')])
   child_v2_data <- util_redcap_child2(child_visit_2_arm_1)
   parent_v2_data <- util_redcap_parent2(parent_visit_2_arm_1)
+  child_v3_data <- util_redcap_child3(child_visit_3_arm_1)
+  parent_v3_data <- util_redcap_parent3(parent_visit_3_arm_1)
   
   #### Load and organize double-entry data ####
   redcap_de_data <- read.csv(data_de_path, header = TRUE)
@@ -151,7 +160,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # create necessary files for fNIRS processing ####
   nirs_demo_data <- util_nirs_demo(v1_demo_homeloc = prepost_v1_data$demo, fnirs_info = child_v1_data$fnirs_info, anthro_data = child_v1_data$anthro_data, demographics = parent_v1_data$demo_data$data, puberty = parent_v1_data$puberty_data$data$score_dat, bodpod = de_data_clean$bodpod$data, baseline_cams = de_data_clean$baseline_cams$data, followup_cams = de_data_clean$followup_cams$data, fullness_tastetest = de_data_clean$taste_test$data)
   
-  write.table(nirs_demo_data, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'nirs_demo_data.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  write.table(nirs_demo_data$data, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'nirs_demo_data.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
   baseline_fitcap <- child_v1_data$fnirs_cap
   
@@ -162,6 +171,91 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #write.csv(followup_fitcap, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-followup_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
   #--------------------------------#
+  
+  ## REDCap data for metabolite analyses - sleep
+  de_data_clean$bodpod$data$participant_id <- as.numeric(de_data_clean$bodpod$data$participant_id)
+  
+  ure_dat_metab_sleep <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id', all = TRUE)
+  ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, child_v1_data$anthro_data, by = 'participant_id', all = TRUE)
+  ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, de_data_clean$bodpod$data, by = 'participant_id', all = TRUE)
+  ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, parent_v2_data$cshq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
+  ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, child_v1_data$sleep_wk_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
+  ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
+
+  
+  write.csv(ure_dat_metab_sleep, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ure_metab-sleep_demo.csv'), row.names = FALSE)
+  
+  ## ure_dat -- metabolites x obesity
+  ure_dat_metabolite <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
+  ure_dat_metabolite <- merge(ure_dat_metabolite, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
+  ure_dat_metabolite <- merge(ure_dat_metabolite, bod_pod_data, by = 'participant_id')
+  ure_dat_metabolite <- merge(ure_dat_metabolite, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all.x = TRUE)
+  ure_dat_metabolite <- merge(ure_dat_metabolite, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all.x = TRUE)
+  
+  write.csv(ure_dat_metabolite, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'mattheisen_honors_data.csv'), row.names = FALSE)
+  
+  ## ure_dat -- restriction and EAH
+  de_data_clean$baseline_intake$data$participant_id <- as.numeric(de_data_clean$baseline_intake$data$participant_id)
+  
+  ure_dat_eah<- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
+  ure_dat_eah <- merge(ure_dat_eah, child_v1_data$anthro_data, by = 'participant_id')
+  ure_dat_eah <- merge(ure_dat_eah, parent_v1_data$cfq_data$data$bids_phenotype, by = 'participant_id')
+  ure_dat_eah <- merge(ure_dat_eah, de_data_clean$baseline_intake$data, by = 'participant_id', all.x = TRUE)
+  
+  write.csv(ure_dat_eah, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ure_cfq-eah.csv'), row.names = FALSE)
+  
+  ## ssib dat Kyle -- EF and CFQ
+  
+  tanner_dat <- parent_visit_1_arm_1[, grepl('record_id', names(parent_visit_1_arm_1)) | grepl('demo_c_sex', names(parent_visit_1_arm_1)) | grepl('tanner', names(parent_visit_1_arm_1))]
+  names(tanner_dat)[1] <- 'participant_id'
+  tanner_dat[['tanner_choice']] <- ifelse(tanner_dat[['demo_c_sex']] == 0, tanner_dat[['tanner_m']], tanner_dat[['tanner_f']])
+
+  tanner_datv3 <- parent_visit_3_arm_1[, grepl('record_id', names(parent_visit_3_arm_1)) | grepl('pds_sex', names(parent_visit_3_arm_1)) | grepl('tanner', names(parent_visit_3_arm_1))]
+  names(tanner_datv3)[1] <- 'participant_id'
+  tanner_datv3[['tanner_choice']] <- ifelse(tanner_datv3[['pds_sex']] == 1, tanner_datv3[['tanner_m']], tanner_datv3[['tanner_f']]) 
+  
+  #baseline
+  v1_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|baseline', names(de_data_clean$bodpod$data))]
+  names(v1_bodpod) <- gsub('baseline_', '', names(v1_bodpod))
+  
+  names(child_v1_data$anthro_data) <- gsub('v1_', '', names(child_v1_data$anthro_data))
+
+  baseline_dat <- merge(parent_v1_data$demo_data$data[c('participant_id', 'demo_income','demo_mod_ed', 'demo_dad_ed')], v1_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
+  baseline_dat <- merge(baseline_dat, child_v1_data$anthro_data[, !grepl('heightweight_notes', names(child_v1_data$anthro_data))], by = 'participant_id', all = TRUE)
+  
+  baseline_dat <- merge(baseline_dat, parent_v1_data$puberty_data$data$score_dat, by = 'participant_id', all = TRUE)
+  
+  baseline_dat <- merge(baseline_dat, tanner_dat[c('participant_id', 'tanner_choice')], by = 'participant_id', all = TRUE)
+  
+  baseline_dat <- merge(baseline_dat, parent_v1_data$cfq_data$data$score_dat, by = 'participant_id', all = TRUE)
+  
+  baseline_dat[['ses']] <- 'baseline'
+
+  #followup
+  v2_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|followup', names(de_data_clean$bodpod$data))]
+  names(v2_bodpod) <- gsub('followup_|3', '', names(v2_bodpod))
+  
+  followup_dat <- merge(parent_v3_data$demo_data$data, v2_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
+  
+  followup_dat <- merge(followup_dat, child_v3_data$anthro_data, by = 'participant_id', all = TRUE)
+  
+  followup_dat <- merge(followup_dat, parent_v3_data$puberty_data$data$score_dat, by = 'participant_id', all = TRUE)
+  
+  followup_dat <- merge(followup_dat, tanner_datv3[c('participant_id', 'tanner_choice')], by = 'participant_id', all = TRUE)
+  
+  followup_dat <- merge(followup_dat, parent_v3_data$cfq_data$data$score_dat, by = 'participant_id', all = TRUE)
+  
+  followup_dat[['ses']] <- 'followup'
+  
+  #merge 
+  cfq_ef_long <- rbind.data.frame(baseline_dat, followup_dat)
+  
+  baseline_demo <- merge(prepost_v1_data$demo[c('participant_id', 'v1_date')], parent_v1_data$demo_data$data[c('participant_id', 'demo_c_dob', 'demo_c_sex', 'demo_race', 'demo_ethnicity', 'demo_child_other_race')], by = 'participant_id', all = TRUE)
+  
+  cfq_ef_long <- merge(baseline_demo, cfq_ef_long, by = 'participant_id', all = TRUE)
+  
+  write.csv(cfq_ef_long, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'kyle_brake_phenotype.csv'), row.names = FALSE)
+  
   
   ## interview quick work
   
@@ -185,14 +279,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.csv(r01_dat, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'r01_pilot_data.csv'), row.names = FALSE)
   
   
-  ## ure_dat -- metabolites
-  ure_dat_metabolite <- merge(prepost_v1_data$demo, parent_v1_data$demo_data$data, by = 'participant_id')
-  ure_dat_metabolite <- merge(ure_dat_metabolite, child_v1_data$demo_data$child_v1demo_data, by = 'participant_id')
-  ure_dat_metabolite <- merge(ure_dat_metabolite, bod_pod_data, by = 'participant_id')
-  ure_dat_metabolite <- merge(ure_dat_metabolite, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all.x = TRUE)
-  ure_dat_metabolite <- merge(ure_dat_metabolite, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all.x = TRUE)
-  
-  write.csv(ure_dat_metabolite, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'mattheisen_honors_data.csv'), row.names = FALSE)
   
   
   ## dairy grant pilot data

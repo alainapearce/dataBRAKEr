@@ -25,6 +25,7 @@
 
 util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, overwrite = FALSE) {
   
+  print(sub_str)
   #### 1. Set up/initial checks #####
   
   # check that audit_data exist and is a data.frame
@@ -40,44 +41,35 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
     stop("base_wd must be entered as a string")
   }
   
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The proc_tasks.R has not been thoroughly tested on Windows systems, may have base_wd errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-  
   
   if (task_str == 'nih'){
-    raw_untouched_path <- paste0(base_wd, slash,'raw_untouched', slash, task_str, '_toolbox', slash)
+    raw_untouched_path <- file.path(base_wd,'raw_untouched', paste0(task_str, '_toolbox'))
     
   } else {
-    raw_untouched_path <- paste0(base_wd, slash,'raw_untouched', slash, task_str, '_game', slash)
+    raw_untouched_path <- file.path(base_wd,'raw_untouched', paste0(task_str, '_game'))
   }
   
   # get all files for sub in raw_untouched
   if (task_str == 'nih'){
     raw_files <- list.files(path = raw_untouched_path, pattern = sub_str)
-    raw_files <- raw_files[grepl('events', raw_files)]
-    
+
     # new file name
-    if (sum(grepl('listsort', raw_files)) == 1){
-      rename_files <- gsub('_listsort', paste0('_ses-', ses, '_task-nih_listsort'), raw_files[grepl('listsort', raw_files)])
+    if (sum(grepl('events', raw_files)) > 0){
+      rename_files <- paste0(sub_str, '_ses-', ses, '_task-nih_toolbox_events.tsv')
+      
+      data_list_events <- do.call('rbind', sapply(raw_files[grepl('-events', raw_files)], function(x) suppressWarnings(read.csv(file.path(raw_untouched_path, x), header = TRUE, sep = ',')), simplify = FALSE))
     } 
     
-    if (sum(grepl('flanker', raw_files)) == 1){
+    if (sum(grepl('scores', raw_files)) > 0){
+      data_list_scores <- do.call('rbind', sapply(raw_files[grepl('-scores', raw_files)], function(x) suppressWarnings(read.csv(file.path(raw_untouched_path, x), header = TRUE, sep = ',')), simplify = FALSE))
+      
       if (exists('rename_files')) {
-        rename_files[2] <- gsub('_flanker-dccs', paste0('_ses-', ses, '_task-nih_flanker'), raw_files[grepl('flanker', raw_files)])
-        
-        rename_files[3] <- gsub('_flanker-dccs', paste0('_ses-', ses, '_task-nih_dccs'), raw_files[grepl('dccs', raw_files)])
+        rename_files[2] <- paste0(sub_str, '_ses-', ses, '_task-nih_toolbox_scores.tsv')
       } else {
-        rename_files <- gsub('_flanker-dccs', paste0('_ses-', ses, '_task-nih_flanker'), raw_files[grepl('flanker', raw_files)])
-        
-        rename_files[2] <- gsub('_flanker-dccs', paste0('_ses-', ses, '_task-nih_dccs'), raw_files[grepl('dccs', raw_files)])
+        rename_files <- paste0(sub_str, '_ses-', ses, '_task-nih_toolbox_scores.tsv')
       }
     }
-    
+
   } else {
     raw_files <- list.files(path = raw_untouched_path, pattern = sub_str)
     
@@ -106,7 +98,11 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   
   #### Save in sourcedata #####
   # set paths for other directories
-  source_wd <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, task_cat, slash, task_str, slash)
+  if (task_str == 'nih'){
+    source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), task_cat)
+  } else {
+    source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), task_cat, task_str)
+  }
   
   if (task_str == 'tastetest'){
     #fix sub str for tastetest
@@ -123,25 +119,25 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   if (!file.exists(gsub('csv', 'tsv', paste0(source_wd, rename_files[1]))) | isTRUE(overwrite)) {  
     
     if (task_str != 'space'){
-      #copy non .csv  files over
-      file.copy(from = paste0(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = paste0(source_wd, rename_files[!grepl('.csv', rename_files)]))
+      
+      if (sum(!grepl('.csv', raw_files)) > 0) {
+        #copy non .csv  files over
+        file.copy(from = paste0(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = paste0(source_wd, rename_files[!grepl('.csv', rename_files)]))
+      }
       
       #change data file to .tsv
       rename_tsv <- gsub('.csv', '.tsv', rename_files[grepl('.csv', rename_files)])
       
       if (task_str == 'nih'){
-        if (sum(grepl('listsort', raw_files)) == 1){
-          dat_listsort <- read.csv(paste0(raw_untouched_path, raw_files[grepl('listsort', raw_files)]), header = TRUE)
-          
-          write.table(dat_listsort, paste0(source_wd, rename_tsv[grepl('listsort', rename_tsv)]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
-        }
-        
-        if (sum(grepl('flanker', raw_files)) == 1){
-        
-          dat_flankerdccs <- read.csv(paste0(raw_untouched_path, raw_files[grepl('flanker', raw_files)]), header = TRUE)
-          
-          write.table(dat_flankerdccs[grepl('Flanker', dat_flankerdccs[['Inst']]), ], paste0(source_wd, rename_tsv[grepl('flanker', rename_tsv)]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
-          write.table(dat_flankerdccs[!grepl('Flanker', dat_flankerdccs[['Inst']]), ], paste0(source_wd, rename_tsv[grepl('dccs', rename_tsv)]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+        if (sum(grepl('events', raw_files)) > 0 ){
+          write.table(data_list_events, file.path(source_wd, rename_files[1]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+          if (sum(grepl('scores', raw_files)) > 0 ){
+            write.table(data_list_scores, file.path(source_wd, rename_files[2]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+          }
+        } else {
+          if (sum(grepl('scores', raw_files)) > 0 ){
+            write.table(data_list_scores, file.path(source_wd, rename_files), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+          }
         }
         
       } else {

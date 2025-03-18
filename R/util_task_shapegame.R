@@ -40,18 +40,11 @@ util_task_shapegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     stop("base_wd must be entered as a string")
   }
   
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The shapegame_task.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-  
+
   # get directory paths
-  raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'beh', slash)
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'beh')
   
-  data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'beh', slash, sub_str, '_ses-', ses, '_task-shapegame_events.tsv')
+  data_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'beh', paste0(sub_str, '_ses-', ses, '_task-shapegame_events.tsv'))
   
   #print(sub_str)
     

@@ -47,6 +47,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   demo_data <- household_data[c('participant_id', 'demo_c_dob', 'demo_c_sex', 'demo_race', 'demo_ethnicity', 'demo_child_other_race', 'demo_income', 'demo_mod_ed', 'demo_dad_ed')]
 
   ## Puberty Data ####
+  ## add tanner
   puberty_data <- data[, grepl('record_id', names(data)) | grepl('pds', names(data))]
   names(puberty_data)[1] <- 'participant_id'
   names(puberty_data) <- gsub('pds_sex', 'sex', names(puberty_data))
@@ -62,7 +63,7 @@ util_redcap_parent1 <- function(data, v1_date_data, return_data = TRUE) {
   cfq_data <- cfq_data[, !(names(cfq_data) %in% c('cfq_resp_missingcheck', 'cfq_pwc_missingcheck', 'cfq_cwc_missingcheck', 'cfq_conc_missingcheck', 'cfq_presrest_missingcheck', 'cfq_mon_missingcheck'))]
   names(cfq_data)[1] <- 'participant_id'
   
-  cfq_scored <- dataprepr::score_cfq(cfq_data, pna = 5, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id')
+  cfq_scored <- dataprepr::score_cfq(cfq_data, pcw_na_value = 5, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id')
   cfq_json <- json_cfq()
   
   ## CEBQ Data ####

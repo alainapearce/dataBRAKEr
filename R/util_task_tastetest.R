@@ -69,8 +69,26 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   # remove practice
   dat <- dat[!is.na(dat[['fix']]), ]
   
-  # reduce columns
-  dat <- dat[c('participant', 'date', 'expName', 'condFile', 'order', 'stimFile', 'fix', 'trials.thisN', 'trials.thisIndex', 'food_img.started', 'rating_slider.started', 'q_prompt.started', 'rating', 'fixationjitter.started', 'promptjitter.started', 'fixationjitter.stopped', 'promptjitter.stopped', 'psychopyVersion', 'frameRate')]
+  # need to adjust for first few participants that didn't have responses recorded (still have triggers so can process fNIRS data)
+  
+  if (names(dat)[1] == 'trials.thisRepN') {
+    
+    # reduce columns
+    
+    dat[['foodItem']] <- NaN
+    dat[['food_condition']] <- NaN
+    dat[['trigger_taste']] <- NaN
+    dat[['trigger_want']] <- NaN
+    dat[['trigger_like']] <- NaN
+    dat[['trigger_sip']] <- NaN
+    dat[['want_rating']] <- NaN
+    dat[['like_rating']] <- NaN
+    
+    dat <- dat[c('participant', 'date', 'expName', 'EDorder', 'order', 'foodItem', 'food_condition', 'trigger_taste', 'trigger_want', 'trigger_like', 'trigger_sip', 'trials.thisN', 'trials.thisIndex', 'block_timed_txt.started', 'want_rating_slider.started', 'want_rating', 'tastetest_trial.started', 'like_rating_slider.started', 'like_rating', 'sip_key.rt', 'psychopyVersion', 'frameRate')]
+    
+  } else {
+    
+  }
   
   # update names
   names(dat) <- c('sub', 'date', 'exp_name', 'cond', 'exp_cond_num', 'stim_file', 'fix', 'cond_trial', 'trial_index', 'food_onset', 'slider_onset', 'prompt_onset', 'rating', 'jitter_fix_onset', 'jitter_prompt_onset', 'jitter_fix_offset', 'jitter_prompt_offset', 'psychopy_ver', 'frame_rate')

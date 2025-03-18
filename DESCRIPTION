@@ -27,9 +27,7 @@ Imports:
     ggplot2,
     digest,
     reshape,
-    GGIR,
-    mMARCH.AC,
-    xlsx
+    GGIR
 Remotes:
     alainapearce/dataprepr
 Suggests: 

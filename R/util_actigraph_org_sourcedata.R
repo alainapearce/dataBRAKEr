@@ -39,14 +39,6 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
     stop("base_wd must be entered as a string")
   }
   
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The proc_tasks.R has not been thoroughly tested on Windows systems, may have base_wd errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-  
   
   # check that session exist and is a string
   dir_arg <- methods::hasArg(dir_name)
@@ -55,7 +47,7 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
     if (!is.character(dir_name)) {
       stop("dir_name must be entered as a string")
     } else {
-      raw_untouched_path <- paste0(base_wd, slash,'raw_untouched', slash, dir_name, slash)
+      raw_untouched_path <- file.path(base_wd,'raw_untouched', dir_name)
     }
   }
   
@@ -71,9 +63,9 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
   
   #### Save in sourcedata #####
   # set paths for other directories
-  source_wd <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'beh', slash)
+  source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'beh')
   
-  raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'beh', slash)
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'beh')
   
   #make directory if needed
   if (!dir.exists(source_wd)) {
@@ -86,11 +78,11 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
   } 
   
   # copy files
-  if (!file.exists(paste0(source_wd, slash, rename_files[1])) | isTRUE(overwrite)) {  
+  if (!file.exists(file.path(source_wd, rename_files[1])) | isTRUE(overwrite)) {  
     
-    file.copy(from = paste0(raw_untouched_path, slash, raw_files), to = paste0(source_wd, slash, rename_files), overwrite = overwrite)
+    file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(source_wd, rename_files), overwrite = overwrite)
     
-    file.copy(from = paste0(raw_untouched_path, slash, aw_files), to = paste0(raw_wd, slash, rename_files), overwrite = overwrite)
+    file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(raw_wd, rename_files), overwrite = overwrite)
     
     #return message
     if (isTRUE(overwrite)){

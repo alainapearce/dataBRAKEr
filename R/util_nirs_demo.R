@@ -120,16 +120,19 @@ util_nirs_demo <- function(v1_demo_homeloc, fnirs_info, anthro_data, demographic
   
   #### Organize Data #####
   anthro_data <- anthro_data[, !(grepl('v1', names(anthro_data))) & !(grepl('notes', names(anthro_data)))]
+  bodpod[['participant_id']] <- as.numeric(bodpod[['participant_id']])
+  baseline_cams[['participant_id']] <- as.numeric(baseline_cams[['participant_id']])
+  followup_cams[['participant_id']] <- as.numeric(followup_cams[['participant_id']])
+  fullness_tastetest[['participant_id']] <- as.numeric(fullness_tastetest[['participant_id']])
   
-  
-  nirs_dat <- merge(v1_demo_homeloc[c('participant_id', 'home_locale', 'home_rural', 'school_locale', 'school_rural')], demographics, by = 'participant_id')
-  nirs_dat <- merge(nirs_dat, puberty, by = 'participant_id')
-  nirs_dat <- merge(nirs_dat, anthro_data, by = 'participant_id')
-  nirs_dat <- merge(nirs_dat, bodpod, by = 'participant_id')
-  nirs_dat <- merge(nirs_dat, fnirs_info, by = 'participant_id')
-  nirs_dat <- merge(nirs_dat, baseline_cams, by = 'participant_id')
-  nirs_dat <- merge(nirs_dat, followup_cams, by = 'participant_id')
-  nirs_dat <- merge(nirs_dat, fullness_tastetest, by = 'participant_id')
+  nirs_dat <- merge(v1_demo_homeloc[c('participant_id', 'home_locale', 'home_rural', 'school_locale', 'school_rural')], demographics, by = 'participant_id', all = TRUE)
+  nirs_dat <- merge(nirs_dat, puberty, by = 'participant_id', all = TRUE)
+  nirs_dat <- merge(nirs_dat, anthro_data, by = 'participant_id', all = TRUE)
+  nirs_dat <- merge(nirs_dat, bodpod, by = 'participant_id', all = TRUE)
+  nirs_dat <- merge(nirs_dat, fnirs_info, by = 'participant_id', all = TRUE)
+  nirs_dat <- merge(nirs_dat, baseline_cams, by = 'participant_id', all = TRUE)
+  nirs_dat <- merge(nirs_dat, followup_cams, by = 'participant_id', all = TRUE)
+  nirs_dat <- merge(nirs_dat, fullness_tastetest, by = 'participant_id', all = TRUE)
   
   
   if (isTRUE(return_data)){
