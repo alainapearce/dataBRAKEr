@@ -87,7 +87,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
         desc_str <- 'pre'
       }
       
-      rename_files <- gsub(paste0('-', desc_str,'-meal_', task_str), paste0('_ses-', ses, '_task-', task_str, '_desc-', desc_str, 'meal_events'), raw_files)
+      rename_files <- gsub(paste0('-', desc_str,'-meal_', task_str), paste0('_ses-', ses, '_task-taste_desc-', desc_str, '_events'), raw_files)
     } else {
       rename_files <- gsub(paste0('_', task_str), paste0('_ses-', ses, '_task-', task_str, '_events'), raw_files)
       
@@ -107,7 +107,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   if (task_str == 'tastetest'){
     #fix sub str for tastetest
     source_wd <- gsub(sub_str, gsub(paste0('-', desc_str, '-meal'), '', sub_str), source_wd) 
-    source_wd <- gsub(task_str, paste0(task_str, '-', desc_str, 'meal'), source_wd)
+    source_wd <- gsub(task_str, paste0(desc_str, 'meal'), source_wd)
   } 
   
   #make directory if needed
@@ -122,7 +122,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
       
       if (sum(!grepl('.csv', raw_files)) > 0) {
         #copy non .csv  files over
-        file.copy(from = paste0(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = paste0(source_wd, rename_files[!grepl('.csv', rename_files)]))
+        file.copy(from = file.path(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = file.path(source_wd, rename_files[!grepl('.csv', rename_files)]))
       }
       
       #change data file to .tsv
@@ -141,13 +141,13 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
         }
         
       } else {
-        dat <- read.csv(paste0(raw_untouched_path, raw_files[grepl('.csv', raw_files)]), header = TRUE)
-        write.table(dat, paste0(source_wd, rename_tsv), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+        dat <- read.csv(file.path(raw_untouched_path, raw_files[grepl('.csv', raw_files)]), header = TRUE)
+        write.table(dat, file.path(source_wd, rename_tsv), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
       }
       
       
     } else {
-      file.copy(from = paste0(raw_untouched_path, raw_files), to = paste0(source_wd, rename_files))
+      file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(source_wd, rename_files))
       
     }
     

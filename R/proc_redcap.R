@@ -160,15 +160,16 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # create necessary files for fNIRS processing ####
   nirs_demo_data <- util_nirs_demo(v1_demo_homeloc = prepost_v1_data$demo, fnirs_info = child_v1_data$fnirs_info, anthro_data = child_v1_data$anthro_data, demographics = parent_v1_data$demo_data$data, puberty = parent_v1_data$puberty_data$data$score_dat, bodpod = de_data_clean$bodpod$data, baseline_cams = de_data_clean$baseline_cams$data, followup_cams = de_data_clean$followup_cams$data, fullness_tastetest = de_data_clean$taste_test$data)
   
+  
   write.table(nirs_demo_data$data, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'nirs_demo_data.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
   baseline_fitcap <- child_v1_data$fnirs_cap
   
   write.table(baseline_fitcap, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-baseline_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
-  #followup_fitcap <- child_v3_data$fnirs_cap
+  followup_fitcap <- child_v3_data$fnirs_cap
   
-  #write.csv(followup_fitcap, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-followup_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  write.table(followup_fitcap, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-followup_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
   #--------------------------------#
   

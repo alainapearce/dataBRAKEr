@@ -166,7 +166,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE) {
                             
   # Food Taste-Test ####
   # get list of available subjects 
-  tastetest_list <- as.data.frame(list.files(path = file.path(data_path, 'tastetest'), pattern = '.csv'))
+  tastetest_list <- as.data.frame(list.files(path = file.path(data_path, 'tastetest_game'), pattern = '.csv'))
   names(tastetest_list) <- 'filename'
   
   #get list of subject IDs

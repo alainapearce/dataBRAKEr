@@ -41,15 +41,6 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     stop("base_wd must be entered as a string")
   }
   
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The tastetest_task.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-  
-  # get directory paths
   
   # get version
   if (grepl('post', sub_str)){
@@ -60,20 +51,17 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   sub_str <- gsub(paste0('-', desc_str, '-meal'), '', sub_str)
   
-  raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash)
-  data_file <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, 'ses-', ses, slash, 'nirs', slash, 'tastetest-', desc_str, 'meal', slash, sub_str, '_ses-', ses, '_task-tastetest_desc-', desc_str, 'meal_events.tsv')
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'nirs', paste0(desc_str, 'meal'))
+  data_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'nirs', paste0(desc_str, 'meal'), paste0(sub_str, '_ses-', ses, '_task-taste_desc-', desc_str, '_events.tsv'))
   
   #### Organize Data #####
-  dat <- read.csv(data_file, sep = '\t', header = TRUE, na.strings = c('n/a', 'NA'))
-  
-  # remove practice
-  dat <- dat[!is.na(dat[['fix']]), ]
+  dat <- read.table(data_file, sep = '\t', header = TRUE, na.strings = c('n/a', 'NA'))
   
   # need to adjust for first few participants that didn't have responses recorded (still have triggers so can process fNIRS data)
   
   if (names(dat)[1] == 'trials.thisRepN') {
     
-    # reduce columns
+    # adjust columns for initial participants missing RT information
     
     dat[['foodItem']] <- NaN
     dat[['food_condition']] <- NaN
@@ -83,43 +71,132 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     dat[['trigger_sip']] <- NaN
     dat[['want_rating']] <- NaN
     dat[['like_rating']] <- NaN
+    dat[['onset']] <- NA
+    dat[['duration']] <- NA
+    dat[['task_component']] <- NA
     
-    dat <- dat[c('participant', 'date', 'expName', 'EDorder', 'order', 'foodItem', 'food_condition', 'trigger_taste', 'trigger_want', 'trigger_like', 'trigger_sip', 'trials.thisN', 'trials.thisIndex', 'block_timed_txt.started', 'want_rating_slider.started', 'want_rating', 'tastetest_trial.started', 'like_rating_slider.started', 'like_rating', 'sip_key.rt', 'psychopyVersion', 'frameRate')]
+    dat <- dat[c('onset', 'duration', 'participant', 'date', 'expName', 'EDorder', 'order', 'foodItem', 'food_condition', 'task_component', 'trigger_taste', 'trigger_want', 'trigger_like', 'trigger_sip', 'trials.thisN', 'block_timed_txt.started', 'want_rating_slider.started', 'want_rating', 'tastetest_trial.started', 'like_rating_slider.started', 'like_rating', 'sip_txt.started', 'sip_key.rt', 'psychopyVersion', 'frameRate')]
+    
+    if (is.na(dat[nrow(dat), 'frameRate'])){
+      dat[['participant']] <- dat[1, 'participant']
+      dat[['date']] <- dat[1, 'date']
+      dat[['expName']] <- dat[1, 'expName']
+      dat[['EDorder']] <- dat[1, 'EDorder']
+      dat[['order']] <- dat[1, 'order']
+      dat[['psychopyVersion']] <- dat[1, 'psychopyVersion']
+      dat[['frameRate']] <- dat[1, 'frameRate']
+    }
+    
+    # remove practice
+    dat <- dat[!is.na(dat[['block_timed_txt.started']]), ]
+    
+    # add trial structure
+    dat <- rbind.data.frame(dat, dat, dat, dat, dat, dat, dat, dat, dat, dat, dat, dat, dat, dat, dat)
+    
+    # remove copied onsets as not valid - will get during fNIRS Matlab processing
+    dat[['block_timed_txt.started']] <- NA
+    dat[['want_rating_slider.started']] <- NA
+    dat[['tastetest_trial.started']] <- NA
+    dat[['like_rating_slider.started']] <- NA
+    dat[['sip_txt.started']] <- NA
+    dat[['sip_key.rt']] <- NA
+    
+    
+    if (dat[1, 'EDorder'] == 1) {
+      dat[['food_condition']] <- c('meal', 'meal', 'meal', 'low_ed', 'low_ed', 'low_ed', 'meal', 'meal', 'meal', 'high_ed', 'high_ed', 'high_ed', 'meal', 'meal', 'meal')
+      dat[['foodItem']] <- c('Chicken Nugget', 'Macarroni and Cheese', 'Grape', 'Orange', 'Broccoli', 'Green Bean', 'Grape', 'Chicken Nugget', 'Macarroni and Cheese', 'Chocolate', 'Cracker', 'Fruit Chew', 'Macarroni and Cheese', 'Grape', 'Chicken Nugget')
+      dat[['trigger_taste']] <- c(1, 1, 1, 2, 2, 2, 1, 1, 1, 3, 3, 3, 1, 1, 1)
+    } else {
+      dat[['food_condition']] <- c('meal', 'meal', 'meal', 'high_ed', 'high_ed', 'high_ed', 'meal', 'meal', 'meal', 'low_ed', 'low_ed', 'low_ed', 'meal', 'meal', 'meal')
+      dat[['foodItem']] <- c('Chicken Nugget', 'Macarroni and Cheese', 'Grape', 'Chocolate', 'Cracker', 'Fruit Chew', 'Grape', 'Chicken Nugget', 'Macarroni and Cheese', 'Orange', 'Broccoli', 'Green Bean', 'Macarroni and Cheese', 'Grape', 'Chicken Nugget')
+      dat[['trigger_taste']] <- c(1, 1, 1, 3, 3, 3, 1, 1, 1, 2, 2, 2, 1, 1, 1)
+    }
+    
+    dat[['trigger_want']] <- 4
+    dat[['trigger_like']] <- 5
+    dat[['trigger_sip']] <- 6
     
   } else {
+    # remove practice
+    dat <- dat[!is.na(dat[['trigger_taste']]), ]
+    dat[['onset']] <- NA
+    dat[['duration']] <- NA
+    dat[['task_component']] <- NA
     
+    # reduce columns
+    dat <- dat[c('onset', 'duration', 'participant', 'date', 'expName', 'EDorder', 'order', 'foodItem', 'food_condition', 'task_component', 'trigger_taste', 'trigger_want', 'trigger_like', 'trigger_sip', 'trials.thisN', 'block_timed_txt.started', 'want_rating_slider.started', 'want_rating', 'tastetest_trial.started', 'like_rating_slider.started', 'like_rating', 'sip_txt.started', 'sip_key.rt', 'psychopyVersion', 'frameRate')]
   }
   
   # update names
-  names(dat) <- c('sub', 'date', 'exp_name', 'cond', 'exp_cond_num', 'stim_file', 'fix', 'cond_trial', 'trial_index', 'food_onset', 'slider_onset', 'prompt_onset', 'rating', 'jitter_fix_onset', 'jitter_prompt_onset', 'jitter_fix_offset', 'jitter_prompt_offset', 'psychopy_ver', 'frame_rate')
+  names(dat) <- c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_taste', 'trigger_want', 'trigger_like', 'trigger_sip', 'trial_index', 'food_onset', 'want_slider_onset', 'want_rating', 'taste_onset', 'like_slider_onset', 'like_rating', 'sip_onset', 'sip_dur', 'psychopy_ver', 'frame_rate')
   
-  # add duration
-  dat[['duration']] <- 2
+  
+  ## separate so that onset and duration columns are common to all task components and then rbind
+  
+  # wanting
+  want_dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_want', 'trial_index', 'want_slider_onset', 'want_rating', 'psychopy_ver', 'frame_rate')]
+  
+  want_dat[['onset']] <- want_dat[['want_slider_onset']]
+  want_dat[['duration']] <- 4
+  want_dat[['task_component']] <- 'want_rating'
+  
+  want_dat <- want_dat[, !grepl('want_slider_onset', names(want_dat))]
+  
+  names(want_dat)[names(want_dat) == 'want_rating'] <- 'rating'
+  names(want_dat)[names(want_dat) == 'trigger_want'] <- 'trigger'
+  
+  # taste
+  taste_dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_taste', 'trial_index', 'taste_onset', 'psychopy_ver', 'frame_rate')]
+  
+  taste_dat[['onset']] <- taste_dat[['taste_onset']]
+  taste_dat[['duration']] <- 10
+  taste_dat[['task_component']] <- 'taste_test'
+  
+  taste_dat <- taste_dat[, !grepl('taste_onset', names(taste_dat))]
+  
+  taste_dat[['rating']] <- NA
+  names(taste_dat)[names(taste_dat) == 'trigger_taste'] <- 'trigger'
+  
+  taste_dat <- taste_dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger', 'trial_index', 'rating', 'psychopy_ver', 'frame_rate')]
+  
+  # like
+  like_dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_like', 'trial_index', 'like_slider_onset', 'like_rating', 'psychopy_ver', 'frame_rate')]
+  
+  like_dat[['onset']] <- like_dat[['like_slider_onset']]
+  like_dat[['duration']] <- 4
+  like_dat[['task_component']] <- 'like_rating'
+  
+  like_dat <- like_dat[, !grepl('like_slider_onset', names(like_dat))]
+  
+  names(like_dat)[names(like_dat) == 'like_rating'] <- 'rating'
+  names(like_dat)[names(like_dat) == 'trigger_like'] <- 'trigger'
+  
+  # sip
+  sip_dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_sip', 'trial_index', 'sip_onset', 'sip_dur', 'psychopy_ver', 'frame_rate')]
+  
+  sip_dat[['onset']] <- sip_dat[['sip_onset']]
+  sip_dat[['duration']] <- ifelse(sip_dat[['sip_dur']] <= 10, sip_dat[['sip_dur']], 10)
+  sip_dat[['task_component']] <- 'sip'
+  
+  sip_dat <- sip_dat[, !grepl('sip_onset', names(sip_dat))]
+  
+  sip_dat[['rating']] <- NA
+  names(sip_dat)[names(sip_dat) == 'trigger_sip'] <- 'trigger'
+  
+  sip_dat <- sip_dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger', 'trial_index', 'rating', 'psychopy_ver', 'frame_rate')]
+  
+  # compbind datasets by task component
+  dat_proc <- rbind.data.frame(want_dat, taste_dat, like_dat, sip_dat)
+  dat_proc <- dat_proc[order(dat_proc[[c('onset')]]), ]
   
   # clean up sub values
-  dat[['sub']] <- sapply(dat[['sub']], function(x) substr(x, tail(unlist(gregexpr('0', x)), 1)+1, nchar(x)))
-  dat[['sub']] <- as.numeric(dat[['sub']])
-  
-  # clean up condition values
-  dat[['cond']] <- ifelse(dat[['cond']] == 'health_stim.csv', 'health', ifelse(dat[['cond']] == 'taste_stim.csv', 'taste', ifelse(dat[['cond']] == 'want_stim.csv', 'want', as.character(dat[['cond']]))))
+  dat_proc[['sub']] <- sapply(dat_proc[['sub']], function(x) substr(x, tail(unlist(gregexpr('0', x)), 1)+1, nchar(x)))
+  dat_proc[['sub']] <- as.numeric(dat_proc[['sub']])
   
   # clean up date
-  dat[['date']] <- lubridate::date(dat[['date']])
-  
-  # organize trials by image ED
-  low_ed <- c("images/apple.jpeg", "images/banana.jpeg", "images/blueberries.jpeg", "images/broccoli.jpeg", "images/cantelope.jpeg", "images/carrots.jpeg", "images/corn.jpeg", "images/cucumber.jpeg", "images/delimeat.jpeg", "images/fruitcocktail.jpeg", "images/grapes.jpeg", "images/greenbeans.jpeg", "images/jello.jpeg", "images/lettuce.jpeg", "images/orange.jpeg", "images/peas.jpeg", "images/pineapple.jpeg", "images/popcicle.jpeg", "images/potato.jpeg", "images/redpepper.jpeg", "images/strawberries.jpeg", "images/tomato.jpeg", "images/turkey.jpeg", "images/watermellon.jpeg")
-  
-  high_ed <- c("images/bacon.jpeg", "images/bagel.jpeg", "images/blueberrymuffin.jpeg", "images/cake.jpeg", "images/cheeseburger.jpeg", "images/chickennugs.jpeg", "images/chips.jpeg", "images/chocolate_candy.jpeg", "images/chocolate_pie.jpeg", "images/chocolatecake.jpeg", "images/cinnamonroll.jpeg", "images/cookie.jpeg", "images/donut.jpeg", "images/fries.jpeg", "images/grilledcheese.jpeg", "images/macandcheese.jpeg", "images/nachos.jpeg", "images/oreos.jpeg", "images/peanutbutter_candy.jpeg", "images/pizza.jpeg", "images/pretzle.jpeg", "images/ricecrispy.jpeg", "images/ritzcracker.jpeg", "images/starbursts.jpeg", "images/waffles.jpeg", "images/sub.jpeg")
-  
-  # add figure ED information
-  dat[['image_ed']] <- ifelse(dat[['stim_file']] %in% high_ed, 'high_ed', 'low_ed')
-  
-  # add onset column - will be completed using Matlab during fNIRS processing
-  dat[['onset']] <- NA
-  
-  # re-order columns
-  dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'cond', 'exp_cond_num', 'stim_file', 'image_ed', 'fix', 'cond_trial', 'trial_index', 'food_onset', 'slider_onset', 'prompt_onset', 'rating', 'jitter_fix_onset', 'jitter_prompt_onset', 'jitter_fix_offset', 'jitter_prompt_offset', 'psychopy_ver', 'frame_rate')]
-  
+  print(sub_str)
+  dat_proc[['date']] <- lubridate::date(dat_proc[['date']])
+
   
   #### Save in rawdata #####
   
@@ -127,8 +204,8 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(paste0(raw_wd, sub_str, '_task-tastetest_events.tsv')) | isTRUE(overwrite)) {
-    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-tastetest_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_', desc_str, '_events.tsv'))) | isTRUE(overwrite)) {
+    write.table(dat_proc, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_', desc_str, '_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')
