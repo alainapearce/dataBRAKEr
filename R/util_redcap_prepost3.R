@@ -12,7 +12,7 @@
 #' @examples
 #'
 #' # process REDCap data
-#' prepost_visit2_data <- util_redcap_prepost2(data)
+#' prepost_visit3_data <- util_redcap_prepost3(data)
 #'
 #' \dontrun{
 #' }
@@ -32,17 +32,17 @@ util_redcap_prepost3 <- function(data, return_data = TRUE) {
       stop("data must be a data.frame")
     } 
   } else if (isFALSE(data_arg)) {
-    stop("data for REDCap event visit_2_prepost_arm_1 must be entered as a data.frame")
+    stop("data for REDCap event visit_3_prepost_arm_1 must be entered as a data.frame")
   }
   
   #reduce columns and update names
   
   ## pre/post visit data
-  pre_v2demo_data <- data[c('record_id', 'v2pre_date', 'sample_collected', 'v2_datorg_notes')]
-  names(pre_v2demo_data)[1:2] <- c('participant_id', 'v2_date')
+  pre_v3demo_data <- data[c('record_id', 'v3pre_date', 'v3_dataorg_notes')]
+  names(pre_v3demo_data)[1:2] <- c('participant_id', 'v3_date')
 
   if (isTRUE(return_data)){
-    return(pre_v2demo_data)
+    return(pre_v3demo_data)
   }
 }
 

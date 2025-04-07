@@ -113,6 +113,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   # process visit data ####
   visit_1_prepost_arm_1 <- redcap_long_wide('visit_1_prepost_arm_1', redcap_visit_data)
   visit_2_prepost_arm_1 <- redcap_long_wide('visit_2_prepost_arm_1', redcap_visit_data)
+  visit_3_prepost_arm_1 <- redcap_long_wide('visit_3_prepost_arm_1', redcap_visit_data)
   child_visit_1_arm_1 <- redcap_long_wide('child_visit_1_arm_1', redcap_visit_data)
   parent_visit_1_arm_1 <- redcap_long_wide('parent_visit_1_arm_1', redcap_visit_data)
   child_visit_2_arm_1 <- redcap_long_wide('child_visit_2_arm_1', redcap_visit_data)
@@ -123,6 +124,8 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   # organize event data
   prepost_v1_data <- util_redcap_prepost1(visit_1_prepost_arm_1)
   prepost_v2_data <- util_redcap_prepost2(visit_2_prepost_arm_1)
+  prepost_v3_data <- util_redcap_prepost3(visit_3_prepost_arm_1)
+  
   child_v1_data <- util_redcap_child1(child_visit_1_arm_1)
   parent_v1_data <- util_redcap_parent1(parent_visit_1_arm_1, prepost_v1_data$demo[c('participant_id', 'v1_date')])
   child_v2_data <- util_redcap_child2(child_visit_2_arm_1)
@@ -162,6 +165,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   #baseline
   v1_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|baseline', names(de_data_clean$bodpod$data))]
   names(v1_bodpod) <- gsub('baseline_', '', names(v1_bodpod))
+  v1_bodpod$participant_id <- as.numeric(v1_bodpod$participant_id )
   
   names(child_v1_data$anthro_data) <- gsub('v1_', '', names(child_v1_data$anthro_data))
   
@@ -179,6 +183,8 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   v2_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|followup', names(de_data_clean$bodpod$data))]
   names(v2_bodpod) <- gsub('followup_|3', '', names(v2_bodpod))
   
+  v2_bodpod$participant_id <- as.numeric(v2_bodpod$participant_id )
+  
   followup_dat <- merge(parent_v3_data$demo_data$data, v2_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
   
   followup_dat <- merge(followup_dat, child_v3_data$anthro_data, by = 'participant_id', all = TRUE)
@@ -194,9 +200,11 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   
   baseline_demo <- merge(prepost_v1_data$demo[c('participant_id', 'v1_date')], parent_v1_data$demo_data$data[c('participant_id', 'demo_c_dob', 'demo_c_sex', 'demo_race', 'demo_ethnicity', 'demo_child_other_race')], by = 'participant_id', all = TRUE)
   
-  cfq_ef_long <- merge(baseline_demo, cfq_ef_long, by = 'participant_id', all = TRUE)
+  baseline_demo <- merge(baseline_demo, prepost_v3_data[c('participant_id', 'v3_date')], by = 'participant_id', all = TRUE)
   
-  write.csv(cfq_ef_long, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'kyle_brake_phenotype.csv'), row.names = FALSE)
+  ffq_long <- merge(baseline_demo, ffq_long, by = 'participant_id', all = TRUE)
+
+  write.csv(ffq_long, file.path(sourcedata_wd, 'phenotype', 'marissa_brake_phenotype.csv'), row.names = FALSE)
   
   
   ## REDCap data for metabolite analyses - sleep
