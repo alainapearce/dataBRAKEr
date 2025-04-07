@@ -9,8 +9,7 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
 #'
-#' @param visit_data_path full path to the redcap visit data in sourcedata directory
-#' @param data_de_path full path to the redcap double-entry data in sourcedata directory
+#' @param sourcedata_wd full path to the sourcedata directory
 #' @param overwrite overwrite existing files (default = FALSE)
 #' @param return_data return phenotype to console (default = FLASE)
 #'
@@ -32,7 +31,7 @@
 
 # look up redcap_read_oneshot() and redcap_read, readcap_metadata_read
 
-proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return_data = FALSE) {
+proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
 
   #### 1. Set up/initial checks #####
 
@@ -49,22 +48,10 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     stop('visit_data_path must be entered as a string')
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == 'unix') {
-    slash <- '/'
-  } else {
-    slash <- '\\'
-    print('The proc_tasks.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-
-  # find location of slashes so can decompose filepaths
-  slash_loc <- unlist(gregexpr(slash, visit_data_path))
-
-  # set paths for other directories
-  base_wd <- substr(visit_data_path, 1, tail(slash_loc, 4))
-  bids_wd <- substr(visit_data_path, 1, tail(slash_loc, 3))
-  phenotype_wd <- paste0(bids_wd, slash, 'phenotype', slash)
   
+  visit_data_path <- file.path(sourcedata_wd, 'phenotype', list.files(path = file.path(sourcedata_wd, 'phenotype'), pattern = 'visit'))
+  data_de_path <- file.path(sourcedata_wd, 'phenotype', list.files(path = file.path(sourcedata_wd, 'phenotype'), pattern = 'double'))
+
   # add file ending if it is missing
   if (!grep('.csv', visit_data_path)) {
     visit_data_file <- paste0(visit_data_path, '.csv')
@@ -86,8 +73,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   if (!file.exists(data_de_file)) {
     stop ('entered data_de_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
   }
-  
-  
   
   
   #### Load and organize visit data ####
@@ -172,6 +157,47 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.table(followup_fitcap, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ses-followup_nirs-fitcap.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
   #--------------------------------#
+  
+  ## REDCap data for metabolite analyses - sleep
+  #baseline
+  v1_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|baseline', names(de_data_clean$bodpod$data))]
+  names(v1_bodpod) <- gsub('baseline_', '', names(v1_bodpod))
+  
+  names(child_v1_data$anthro_data) <- gsub('v1_', '', names(child_v1_data$anthro_data))
+  
+  baseline_dat <- merge(parent_v1_data$demo_data$data[c('participant_id', 'demo_income','demo_mod_ed', 'demo_dad_ed')], v1_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
+  
+  baseline_dat <- merge(baseline_dat, child_v1_data$anthro_data[, !grepl('heightweight_notes', names(child_v1_data$anthro_data))], by = 'participant_id', all = TRUE)
+  
+  baseline_dat <- merge(baseline_dat, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all = TRUE)
+  
+  baseline_dat <- merge(baseline_dat, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
+  
+  baseline_dat[['ses']] <- 'baseline'
+  
+  #followup
+  v2_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|followup', names(de_data_clean$bodpod$data))]
+  names(v2_bodpod) <- gsub('followup_|3', '', names(v2_bodpod))
+  
+  followup_dat <- merge(parent_v3_data$demo_data$data, v2_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
+  
+  followup_dat <- merge(followup_dat, child_v3_data$anthro_data, by = 'participant_id', all = TRUE)
+  
+  followup_dat <- merge(followup_dat, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all = TRUE)
+  
+  followup_dat <- merge(followup_dat, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
+  
+  followup_dat[['ses']] <- 'followup'
+  
+  #merge 
+  ffq_long <- rbind.data.frame(baseline_dat, followup_dat)
+  
+  baseline_demo <- merge(prepost_v1_data$demo[c('participant_id', 'v1_date')], parent_v1_data$demo_data$data[c('participant_id', 'demo_c_dob', 'demo_c_sex', 'demo_race', 'demo_ethnicity', 'demo_child_other_race')], by = 'participant_id', all = TRUE)
+  
+  cfq_ef_long <- merge(baseline_demo, cfq_ef_long, by = 'participant_id', all = TRUE)
+  
+  write.csv(cfq_ef_long, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'kyle_brake_phenotype.csv'), row.names = FALSE)
+  
   
   ## REDCap data for metabolite analyses - sleep
   de_data_clean$bodpod$data$participant_id <- as.numeric(de_data_clean$bodpod$data$participant_id)

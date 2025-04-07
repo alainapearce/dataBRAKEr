@@ -5,17 +5,17 @@
 \title{util_task_nihtoolbox: Process raw data from the NIH Toolbox}
 \usage{
 util_task_nihtoolbox(
-  task,
-  sub_str_list,
+  sub_str,
+  ses,
   base_wd,
   overwrite = FALSE,
   return_data = TRUE
 )
 }
 \arguments{
-\item{task}{task string ('flanker', 'dccs', or 'listserve')}
+\item{sub_str}{participant string (i.e., sub_###) as character}
 
-\item{sub_str_list}{list of participant strings for group database}
+\item{ses}{session name (i.e., 'baseline', 'followup')}
 
 \item{base_wd}{absolute path to the data directory}
 

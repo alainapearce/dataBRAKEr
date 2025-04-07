@@ -7,8 +7,6 @@
 proc_actigraph(data_path, session = "baseline", overwrite = FALSE)
 }
 \arguments{
-\item{data_path}{full path to raw_untouched data directory}
-
 \item{session}{string indicating 'baseline' (default) or 'followup' actigraph data}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}

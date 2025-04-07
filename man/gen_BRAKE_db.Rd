@@ -75,8 +75,6 @@ gen_BRAKE_db(
 
 \item{write_path}{(optional) a string with the path indicating where to save the generated databases if write_dat is TRUE (default option). If no path is given, databases will be written to working directory.}
 
-\item{data_path}{full path to raw_untouched data directory}
-
 \item{return_data}{indicate whether to return databases to the environment. Default is FALSE.}
 }
 \value{
