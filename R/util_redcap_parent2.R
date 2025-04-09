@@ -60,8 +60,7 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   names(ffbs_data)[1] <- 'participant_id'
   
   ffbs_scored <- dataprepr::score_ffbs(ffbs_data, base_zero = TRUE, id = 'participant_id')
-  #ffbs_scored <- score_ffbs(ffbs_data, base_zero = TRUE, id = 'participant_id')
-  
+
   ffbs_json <- json_ffbs()
   
   ## HFE Data ####
@@ -69,9 +68,8 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   hfe_data <- hfe_data[, !(names(hfe_data) %in% c('hfe_fam_qcheck', 'hfe_track_qcheck', 'hfe_rules_qcheck', 'hfe_available_qcheck', 'hfe_like_qcheck', 'hfe_shop_qcheck', 'hfe_shoploc_qcheck', 'hfe_eatout_qcheck', 'hfe_eatout_qcheck2', 'hfe_neighborhood_qcheck', 'hfe_p1_qcheck', 'hfe_p2_qcheck', 'hfe_p3_qcheck', 'hfe_p4_qcheck', 'hfe_p5_qcheck', 'hfe_p6_qcheck'))]
   names(hfe_data)[1] <- 'participant_id'
   
-  #hfe_scored <- dataprepr::score_nik_hfe(hfe_data, base_zero = TRUE, id = 'participant_id')
-  hfe_scored <- score_nik_hfe(hfe_data, base_zero = FALSE, id = 'participant_id')
-  
+  hfe_scored <- dataprepr::score_nik_hfe(hfe_data, base_zero = FALSE, id = 'participant_id')
+
   hfe_json <- json_nki_hfe()
   
   ## SPSRQ Data ####
@@ -87,31 +85,43 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   cbq_data <- cbq_data[, !(names(cbq_data) %in% c('cbq_missingcheck'))]
   names(cbq_data)[1] <- 'participant_id'
   
-  cbq_scores <- dataprepr::score_cbq(cbq_data, does_not_apply_value = 99, base_zero = FALSE, id = 'participant_id')
+  cbq_scored <- dataprepr::score_cbq(cbq_data, does_not_apply_value = 99, base_zero = FALSE, id = 'participant_id')
   cbq_json <- NA
   
   ## PWLB Data ####
   pwlb_data <- data[, grepl('record_id', names(data)) | grepl('pwlb', names(data))]
   pwlb_data <- pwlb_data[, !(names(pwlb_data) %in% c('pwlb_missingcheck'))]
   names(pwlb_data)[1] <- 'participant_id'
+  
+  pwlb_scored <- dataprepr::score_pwlb(pwlb_data, base_zero = TRUE, id = 'participant_id')
+  
   pwlb_json <- NA
   
   ## SCPF Data ####
   scpf_data <- data[, grepl('record_id', names(data)) | grepl('scpf', names(data))]
   scpf_data <- scpf_data[, !(names(scpf_data) %in% c('scpf_missingcheck'))]
   names(scpf_data)[1] <- 'participant_id'
+  
+  scpf_scored <- dataprepr::score_scpf(scpf_data, base_zero = TRUE, id = 'participant_id')
+  
   scpf_json <- NA
   
   ## FMCB Data ####
   fmcb_data <- data[, grepl('record_id', names(data)) | grepl('fmcb', names(data))]
   fmcb_data <- fmcb_data[, !(names(fmcb_data) %in% c('fmcb_missingcheck'))]
   names(fmcb_data)[1] <- 'participant_id'
+  
+  fmcb_scored <- dataprepr::score_fmcb(fmcb_data, base_zero = TRUE, id = 'participant_id')
+  
   fmcb_json <- NA
   
   ## TFEQ Data ####
   tfeq_data <- data[, grepl('record_id', names(data)) | grepl('tfeq', names(data))]
   tfeq_data <- tfeq_data[, !(names(tfeq_data) %in% c('tfeq_missingcheck'))]
   names(tfeq_data)[1] <- 'participant_id'
+  
+  tfeq_scored <- dataprepr::score_tfeq18(tfeq_data, base_zero = TRUE, id = 'participant_id')
+  
   tfeq_json <- NA
   
   if (isTRUE(return_data)){
@@ -121,11 +131,11 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
       ffbs_data = list(data = ffbs_scored, meta = ffbs_json),
       hfe_data = list(data = hfe_scored, meta = hfe_json), 
       spsrq_data = list(data = spsrq_scored, meta = spsrq_json), 
-      cbq_data = list(data = cbq_data, meta = cbq_json), 
-      pwlb_data = list(data = pwlb_data, meta = pwlb_json), 
-      scpf_data = list(data = scpf_data, meta = scpf_json), 
-      fmcb_data = list(data = fmcb_data, meta = fmcb_json), 
-      tfeq_data = list(data = tfeq_data, meta = tfeq_json)))
+      cbq_data = list(data = cbq_scored, meta = cbq_json), 
+      pwlb_data = list(data = pwlb_scored, meta = pwlb_json), 
+      scpf_data = list(data = scpf_scored, meta = scpf_json), 
+      fmcb_data = list(data = fmcb_scored, meta = fmcb_json), 
+      tfeq_data = list(data = tfeq_scored, meta = tfeq_json)))
   }
 }
 

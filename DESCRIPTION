@@ -27,7 +27,8 @@ Imports:
     ggplot2,
     digest,
     reshape,
-    GGIR
+    GGIR,
+    REDCapDM
 Remotes:
     alainapearce/dataprepr
 Suggests: 

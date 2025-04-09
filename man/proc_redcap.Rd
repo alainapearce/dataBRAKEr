@@ -4,17 +4,10 @@
 \alias{proc_redcap}
 \title{proc_redcap: Process raw data downloaded from Study BRAKE REDCap}
 \usage{
-proc_redcap(
-  visit_data_path,
-  data_de_path,
-  overwrite = FALSE,
-  return_data = FALSE
-)
+proc_redcap(sourcedata_wd, overwrite = FALSE, return_data = FALSE)
 }
 \arguments{
-\item{visit_data_path}{full path to the redcap visit data in sourcedata directory}
-
-\item{data_de_path}{full path to the redcap double-entry data in sourcedata directory}
+\item{sourcedata_wd}{full path to the sourcedata directory}
 
 \item{overwrite}{overwrite existing files (default = FALSE)}
 

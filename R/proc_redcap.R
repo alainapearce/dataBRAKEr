@@ -33,19 +33,23 @@
 
 proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
 
+  
+  redcap_visit_data <- REDCapDM::redcap_data(uri = "https://redcap.ctsi.psu.edu/api/",
+                             token = Sys.getenv("brake_redcap_key"))
+  
   #### 1. Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(visit_data_path)
+  data_arg <- methods::hasArg(sourcedata_wd)
 
   if (isTRUE(data_arg)) {
-    if (!is.character(visit_data_path)) {
-      stop('visit_data_path must be entered as a string')
-    } else if (!file.exists(visit_data_path)) {
-      stop('visit_data_path entered, but file does not exist. Check visit_data_path string.')
+    if (!is.character(sourcedata_wd)) {
+      stop('sourcedata_wd must be entered as a string')
+    } else if (!file.exists(sourcedata_wd)) {
+      stop('sourcedata_wd entered, but file does not exist. Check sourcedata_wd string.')
     }
   } else if (isFALSE(data_arg)) {
-    stop('visit_data_path must be entered as a string')
+    stop('sourcedata_wd must be entered as a string')
   }
 
   
@@ -64,16 +68,6 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   } else {
     data_de_file <- data_de_path
   }
-  
-  # check file existis
-  if (!file.exists(visit_data_file)) {
-    stop ('entered visit_data_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
-  }
-  
-  if (!file.exists(data_de_file)) {
-    stop ('entered data_de_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
-  }
-  
   
   #### Load and organize visit data ####
   redcap_visit_data <- read.csv(visit_data_file, header = TRUE)
@@ -161,7 +155,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   
   #--------------------------------#
   
-  ## REDCap data for metabolite analyses - sleep
+  ## REDCap data for metabolite analyses - ffq
   #baseline
   v1_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|baseline', names(de_data_clean$bodpod$data))]
   names(v1_bodpod) <- gsub('baseline_', '', names(v1_bodpod))
@@ -180,18 +174,18 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   baseline_dat[['ses']] <- 'baseline'
   
   #followup
-  v2_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|followup', names(de_data_clean$bodpod$data))]
-  names(v2_bodpod) <- gsub('followup_|3', '', names(v2_bodpod))
+  v3_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|followup', names(de_data_clean$bodpod$data))]
+  names(v3_bodpod) <- gsub('followup_|3', '', names(v3_bodpod))
   
-  v2_bodpod$participant_id <- as.numeric(v2_bodpod$participant_id )
+  v3_bodpod$participant_id <- as.numeric(v3_bodpod$participant_id )
   
-  followup_dat <- merge(parent_v3_data$demo_data$data, v2_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
+  followup_dat <- merge(parent_v3_data$demo_data$data, v3_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
   
   followup_dat <- merge(followup_dat, child_v3_data$anthro_data, by = 'participant_id', all = TRUE)
   
-  followup_dat <- merge(followup_dat, child_v1_data$hfi_data$data$score_dat, by = 'participant_id', all = TRUE)
+  followup_dat <- merge(followup_dat, parent_v3_data$hfi_data$data$score_dat, by = 'participant_id', all = TRUE)
   
-  followup_dat <- merge(followup_dat, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
+  followup_dat <- merge(followup_dat, parent_v3_data$ffq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
   
   followup_dat[['ses']] <- 'followup'
   
