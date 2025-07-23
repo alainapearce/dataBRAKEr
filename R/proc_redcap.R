@@ -34,45 +34,53 @@
 proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
 
   
-  redcap_visit_data <- REDCapDM::redcap_data(uri = "https://redcap.ctsi.psu.edu/api/",
-                             token = Sys.getenv("brake_redcap_key"))
-  
   #### 1. Set up/initial checks #####
 
-  # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(sourcedata_wd)
-
-  if (isTRUE(data_arg)) {
-    if (!is.character(sourcedata_wd)) {
-      stop('sourcedata_wd must be entered as a string')
-    } else if (!file.exists(sourcedata_wd)) {
-      stop('sourcedata_wd entered, but file does not exist. Check sourcedata_wd string.')
+  # check that data is passed if redcap_api = FALSE
+  if (isFALSE(redcap_api)){
+    
+    # check that redcap_visit_data exist and is a data.frame
+    visit_data_arg <- methods::hasArg(redcap_visit_data)
+    
+    if (isTRUE(visit_data_arg)) {
+      if (!is.data.frame(redcap_visit_data)) {
+        stop('redcap_visit_data must be a data.frame with recap_api = FALSE')
+      }
+    } else if (isFALSE(visit_data_arg)) {
+      stop('redcap_visit_data must be a data.frame with recap_api = FALSE')
     }
-  } else if (isFALSE(data_arg)) {
-    stop('sourcedata_wd must be entered as a string')
-  }
-
-  
-  visit_data_path <- file.path(sourcedata_wd, 'phenotype', list.files(path = file.path(sourcedata_wd, 'phenotype'), pattern = 'visit'))
-  data_de_path <- file.path(sourcedata_wd, 'phenotype', list.files(path = file.path(sourcedata_wd, 'phenotype'), pattern = 'double'))
-
-  # add file ending if it is missing
-  if (!grep('.csv', visit_data_path)) {
-    visit_data_file <- paste0(visit_data_path, '.csv')
+    
+    # check that redcap_de_data exist and is a data.frame
+    de_data_arg <- methods::hasArg(redcap_de_data)
+    
+    if (isTRUE(de_data_arg)) {
+      if (!is.data.frame(redcap_de_data)) {
+        stop('redcap_de_data must be a data.frame with recap_api = FALSE')
+      }
+    } else if (isFALSE(de_data_arg)) {
+      stop('redcap_de_data must be a data.frame with recap_api = FALSE')
+    }
+    
   } else {
-    visit_data_file <- visit_data_path
+    # get data from REDCap directly (only will work if have access and keys setup)
+    Sys.setenv(reach_redcap_key = keyring::key_get('brake_redcap_key'))
+    redcap_visit <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/', token = Sys.getenv('reach_redcap_key'))
+    
+    
+    Sys.setenv(reach_de_redcap_key = keyring::key_get('brake-de_redcap_key'))
+    redcap_de <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/', token = Sys.getenv('reach_de_redcap_key'))
+    
+    redcap_visit_data <- redcap_visit[['data']]
+    redcap_visit_dict <- redcap_visit[['dictionary']]
+    
+    redcap_de_data <- redcap_de[['data']]
+    redcap_de_dict <- redcap_de[['dictionary']]
+    
+    # remove '.factor'
+    redcap_visit_data <- redcap_visit_data[, !grepl('.factor', names(redcap_visit_data))]
+    redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
   }
   
-  if (!grep('.csv', data_de_path)) {
-    data_de_file <- paste0(data_de_path, '.csv')
-  } else {
-    data_de_file <- data_de_path
-  }
-  
-  #### Load and organize visit data ####
-  redcap_visit_data <- read.csv(visit_data_file, header = TRUE)
-
-  redcap_visit_data <- redcap_visit_data[!(grepl('pilot|PILOT', redcap_visit_data[['record_id']])), ]
   
   # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){
@@ -81,24 +89,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
     sub_dat <- data[data[['redcap_event_name']] == event_name, ]
     
     #remove empty columns
-    if (grepl('prepost', event_name)){
-      sub_dat <- sub_dat[, !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
-      
-    } else if (event_name == 'child_visit_1_arm_1') {
-      sub_dat <- sub_dat[, grepl('^hfi', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
-     
-    } else if (event_name == 'child_visit_2_arm_1') {
-      sub_dat <- sub_dat[, grepl('^loc', names(sub_dat)) | grepl('^sic', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
-      
-    } else if (event_name == 'parent_visit_1_arm_1') {
-      sub_dat <- sub_dat[, grepl('^demo', names(sub_dat)) | grepl('^pds', names(sub_dat)) | grepl('^tanner', names(sub_dat)) | grepl('^cfq', names(sub_dat)) | grepl('^cebq', names(sub_dat)) | grepl('^efcr', names(sub_dat)) | grepl('^lbc', names(sub_dat)) | grepl('^brief', names(sub_dat)) | grepl('^ffq', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
-    } else if (event_name == 'parent_visit_2_arm_1') {
-      sub_dat <- sub_dat[, grepl('^cshq', names(sub_dat)) | grepl('^bes', names(sub_dat)) | grepl('^ffbs', names(sub_dat)) | grepl('^hfe', names(sub_dat)) | grepl('^spsrq', names(sub_dat)) | grepl('^cbq', names(sub_dat)) | grepl('^pwlb', names(sub_dat)) | grepl('^scpf', names(sub_dat)) | grepl('^fmcb', names(sub_dat)) | grepl('^tfeq', names(sub_dat))| !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
-    } else if (event_name == 'child_visit_3_arm_1'){
-      sub_dat <- sub_dat[, grepl('record_id', names(sub_dat)) | grepl('^v3', names(sub_dat)) | grepl('^relationship', names(sub_dat)) | grepl('^capfit', names(sub_dat)) | grepl('^pref', names(sub_dat)) | grepl('^loc', names(sub_dat)) | grepl('^sic', names(sub_dat)) | grepl('^wcs', names(sub_dat)) | grepl('*_timing', names(sub_dat)) | !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
-    } else if (event_name == 'parent_visit_3_arm_1'){
-      sub_dat <- sub_dat[, !colSums(is.na(sub_dat) | sub_dat == '') == nrow(sub_dat)]
-    }
+    sub_dat <- sub_dat[, !colSums(is.na(sub_dat)) == nrow(sub_dat)]
     
     #return
     return(sub_dat)
@@ -128,7 +119,6 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   parent_v3_data <- util_redcap_parent3(parent_visit_3_arm_1)
   
   #### Load and organize double-entry data ####
-  redcap_de_data <- read.csv(data_de_path, header = TRUE)
   
   # all validated so can just take reviewer 1 data
   redcap_de_data <- redcap_de_data[grepl('--2', redcap_de_data[['record_id']]), ]
@@ -140,10 +130,13 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   
 
   # create necessary files for fNIRS processing ####
-  nirs_demo_data <- util_nirs_demo(v1_demo_homeloc = prepost_v1_data$demo, fnirs_info = child_v1_data$fnirs_info, anthro_data = child_v1_data$anthro_data, demographics = parent_v1_data$demo_data$data, puberty = parent_v1_data$puberty_data$data$score_dat, bodpod = de_data_clean$bodpod$data, baseline_cams = de_data_clean$baseline_cams$data, followup_cams = de_data_clean$followup_cams$data, fullness_tastetest = de_data_clean$taste_test$data)
+  nirs_demo_data <- util_nirs_demo(v1_demo_homeloc = prepost_v1_data$demo, fnirs_info = child_v1_data$fnirs_info, anthro_data = child_v1_data$anthro_data, followup_anthro_data = child_v3_data$anthro_data, demographics = parent_v1_data$demo_data$data, puberty = parent_v1_data$puberty_data$data$score_dat, bodpod = de_data_clean$bodpod$data, baseline_cams = de_data_clean$baseline_cams$data, followup_cams = de_data_clean$followup_cams$data, fullness_tastetest = de_data_clean$taste_test$data, v3_date = prepost_v3_data)
   
+  # quick fixes for notes where /n formatting got saved
+  nirs_demo_data$data[grepl('notes', names(nirs_demo_data$data))] <- sapply(names(nirs_demo_data$data)[grepl('notes', names(nirs_demo_data$data))], function(x) gsub('\n', '', nirs_demo_data$data[[x]]))
   
-  write.table(nirs_demo_data$data, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'nirs_demo_data.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+   
+  write.table(nirs_demo_data$data, file.path(bids_wd, 'sourcedata', 'phenotype', 'nirs_demo_data.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
   baseline_fitcap <- child_v1_data$fnirs_cap
   

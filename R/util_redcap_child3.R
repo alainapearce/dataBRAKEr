@@ -40,9 +40,9 @@ util_redcap_child3 <- function(data, return_data = TRUE) {
   
   
   ## fNIRS fit ####
-  fnirs_cap <- data[c('record_id', 'capfit_frontback', 'capfit_ears', 'capfit_circ', 'capfit_capsize', 'capfit_notes')]
+  fnirs_cap <- data[c('record_id', 'capfit_frontback', 'capfit_ears', 'capfit_circ', 'capfit_capsize')]
   
-  names(fnirs_cap) <- c('participant_id', 'fnris_frontback_cm', 'fnirs_ears_cm', 'fnirs_circ_cm', 'fnirs_capsize', 'fnirs_cap_notes')
+  names(fnirs_cap) <- c('participant_id', 'fnris_frontback_cm', 'fnirs_ears_cm', 'fnirs_circ_cm', 'fnirs_capsize')
   fnirs_cap <- fnirs_cap[rowSums(is.na(fnirs_cap)) != ncol(fnirs_cap)-2, ]
   
   

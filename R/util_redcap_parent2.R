@@ -85,7 +85,7 @@ util_redcap_parent2 <- function(data, return_data = TRUE) {
   cbq_data <- cbq_data[, !(names(cbq_data) %in% c('cbq_missingcheck'))]
   names(cbq_data)[1] <- 'participant_id'
   
-  cbq_scored <- dataprepr::score_cbq(cbq_data, does_not_apply_value = 99, base_zero = FALSE, id = 'participant_id')
+  cbq_scored <- dataprepr::score_cbq(cbq_data, pna_value = 99, base_zero = FALSE, id = 'participant_id')
   cbq_json <- NA
   
   ## PWLB Data ####
