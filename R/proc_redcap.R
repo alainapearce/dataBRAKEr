@@ -1,41 +1,83 @@
 #' proc_redcap: Process raw data downloaded from Study BRAKE REDCap
-#'
+#' 
 #' This function:
-#' 1) reads REDCap data from sourcedata
-#' 2) cleans data to save in BIDS format in phenotype. Produces the following files:
-#'    *
-#' 3) calls functions to create .json files for each phoneypte/x.tsv file
+#' \itemize{
+#'    \item{1) Reads REDCap data (visit and double-entry) using the REDCap API}
+#'    \item{2) Calls util_ functions to clean and compile data in dataframes}
+#'    \item{3) Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe}
+#'    \item{4) Compiles data repeated across visits and sessions}
+#'}
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
+#' @param redcap_api (logical) execute REDCap API. Default = FALSE.
+#' @param redcap_visit_data REDCap visit data from a prior API call
+#' @param redcap_de_data REDCap double-entry data from a prior API call
 #'
-#' @param sourcedata_wd full path to the sourcedata directory
-#' @param overwrite overwrite existing files (default = FALSE)
-#' @param return_data return phenotype to console (default = FLASE)
-#'
-#' @return If return_data is set to TRUE, will return a list including:
-#'  1) clean raw phenotype datasets for each task
-#'  2) meta-data/.json inforamtion for each task
+#' @return Will return a list including data and metadata for:
+#' #' \itemize{
+#'  \item{'paticipants' - BIDS specified participants.tsv file}
+#'  \item{'anthropometrics' - height, weight, and computed anthropometric data}
+#'  \item{'demographics' - compiled demographic data}
+#'  \item{'dxa' - verified DXA data}
+#'  \item{'household' - compiled demographicinformation about houshold}
+#'  \item{'infancy' - compiled demographic information related to infancy}
+#'  \item{'intake' - compiled intake data with computed intake values}
+#'  \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+#'  \item{'parent_updates' - all visit updates}
+#'  \item{'researcher_notes' - all visit notes}
+#'  \item{'audit' - Alcohol Use Disorders Identification Test}
+#'  \item{'bes' - Binge Eating Scale}
+#'  \item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
+#'  \item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
+#'  \item{'cbq' - Child Behavior Questionnaire}
+#'  \item{'cchip' - Community Childhood Hunger Identification Project}
+#'  \item{'cebq' - Children's Eating Behavior Questionnaire}
+#'  \item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
+#'  \item{'cfq' - Child Feeding Questionnaire}
+#'  \item{'chaos' - Confusion, Hubbub, and Order Scale}
+#'  \item{'class' - *need*}
+#'  \item{'cshq' - Children Sleep Habits Questionnaire}
+#'  \item{'debq' - Dutch Eating Behavior Questionnaire}
+#'  \item{'efcr' - External Food Cue Responsiveness Scale}
+#'  \item{'ffbs' - Family Food Behavior Survey}
+#'  \item{'fsq' - *need*}
+#'  \item{'hfi' - Fulkerson Home Food Inventory}
+#'  \item{'hfias' - Household Food Insecurity Access Scale}
+#'  \item{'hfssm' - U.S. Household Food Security Survey Module}
+#'  \item{'kbas' - Kid's Brand Awareness Scale}
+#'  \item{'lbc' - Lifestyle Behavior Checklist}
+#'  \item{'loc' - Loss of Control-Eating Questionnaire}
+#'  \item{'pmum' - Problematic Media Use Measure *need*}
+#'  \item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
+#'  \item{'pss' - Perceived Stress Scale}
+#'  \item{'pstca' - *need*}
+#'  \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
+#'  \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+#'  \item{'rank' - Parent ranking of foods sources? *need*}
+#'  \item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
+#'  \item{'sic' - Stress in Children Questionnaire *need*}
+#'  \item{'sleeplog' - Week long sleep log}
+#'  \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
+#'  \item{'stq' - Screen Time Questionnaire *need*}
+#'  \item{'tfeq' - Three Factor Eating Questionnaire}
+#' }
 #'
 #' @examples
 #'
-#' # process REDCap data
-#' phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
-#'
 #' \dontrun{
+#' redcap_data <- proc_redcap(base_wd, overwrite = FALSE, overwrite_jsons = FALSE)
+#'
 #' }
 #'
+#' @seealso [write_redcap()]
 #'
 #' @export
-#' 
 
-# look up redcap_read_oneshot() and redcap_read, readcap_metadata_read
-
-proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
-
+proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
   
-  #### 1. Set up/initial checks #####
-
+  #### Set up/initial checks #####
+  
   # check that data is passed if redcap_api = FALSE
   if (isFALSE(redcap_api)){
     
@@ -64,11 +106,13 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   } else {
     # get data from REDCap directly (only will work if have access and keys setup)
     Sys.setenv(reach_redcap_key = keyring::key_get('brake_redcap_key'))
-    redcap_visit <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/', token = Sys.getenv('reach_redcap_key'))
+    redcap_visit <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/',
+                                          token = Sys.getenv('reach_redcap_key'))
     
     
     Sys.setenv(reach_de_redcap_key = keyring::key_get('brake-de_redcap_key'))
-    redcap_de <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/', token = Sys.getenv('reach_de_redcap_key'))
+    redcap_de <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/',
+                                       token = Sys.getenv('reach_de_redcap_key'))
     
     redcap_visit_data <- redcap_visit[['data']]
     redcap_visit_dict <- redcap_visit[['dictionary']]
@@ -79,8 +123,14 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
     # remove '.factor'
     redcap_visit_data <- redcap_visit_data[, !grepl('.factor', names(redcap_visit_data))]
     redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
+    
+    # Make ID column bids compliant: Convert record_id to strings padded with zeros and add 'sub_'
+    redcap_visit_data <- redcap_visit_data[!grepl('PILOT|pilot-6', redcap_visit_data[['record_id']]), ]
+    redcap_visit_data['record_id'] <- sprintf('sub-%03d', as.numeric(redcap_visit_data[['record_id']]))
+    
   }
   
+  #### Extract visit data ####
   
   # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){
@@ -106,16 +156,21 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   child_visit_3_arm_1 <- redcap_long_wide('child_visit_3_arm_1', redcap_visit_data)
   parent_visit_3_arm_1 <- redcap_long_wide('parent_visit_3_arm_1', redcap_visit_data)
   
-  # organize event data
-  prepost_v1_data <- util_redcap_prepost1(visit_1_prepost_arm_1)
-  prepost_v2_data <- util_redcap_prepost2(visit_2_prepost_arm_1)
-  prepost_v3_data <- util_redcap_prepost3(visit_3_prepost_arm_1)
   
-  child_v1_data <- util_redcap_child1(child_visit_1_arm_1)
-  parent_v1_data <- util_redcap_parent1(parent_visit_1_arm_1, prepost_v1_data$demo[c('participant_id', 'v1_date')])
-  child_v2_data <- util_redcap_child2(child_visit_2_arm_1)
+  #### Process visit data ####
+  
+  # make data.frame of dates, ages, and sex
+  date_data <- util_redcap_dates(child_v1 = visit_1_prepost_arm_1, child_v2 = visit_2_prepost_arm_1, child_v3 = visit_3_prepost_arm_1, parent_v1 = parent_visit_1_arm_1)
+  
+  # get pre/post data information
+  prepost_data <- util_redcap_prepost(v1_data = visit_1_prepost_arm_1, v2_data = visit_2_prepost_arm_1, v3_data = child_visit_3_arm_1)
+  
+  # organize event data
+  child_v1_data <- util_redcap_child1(child_visit_1_arm_1, date_data)
+  parent_v1_data <- util_redcap_parent1(parent_visit_1_arm_1)
+  child_v2_data <- util_redcap_child2(child_visit_2_arm_1, date_data)
   parent_v2_data <- util_redcap_parent2(parent_visit_2_arm_1)
-  child_v3_data <- util_redcap_child3(child_visit_3_arm_1)
+  child_v3_data <- util_redcap_child3(child_visit_3_arm_1, date_data)
   parent_v3_data <- util_redcap_parent3(parent_visit_3_arm_1)
   
   #### Load and organize double-entry data ####
@@ -128,14 +183,14 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   
   de_data_clean <- util_redcap_de(redcap_de_data)
   
-
+  
   # create necessary files for fNIRS processing ####
   nirs_demo_data <- util_nirs_demo(v1_demo_homeloc = prepost_v1_data$demo, fnirs_info = child_v1_data$fnirs_info, anthro_data = child_v1_data$anthro_data, followup_anthro_data = child_v3_data$anthro_data, demographics = parent_v1_data$demo_data$data, puberty = parent_v1_data$puberty_data$data$score_dat, bodpod = de_data_clean$bodpod$data, baseline_cams = de_data_clean$baseline_cams$data, followup_cams = de_data_clean$followup_cams$data, fullness_tastetest = de_data_clean$taste_test$data, v3_date = prepost_v3_data)
   
   # quick fixes for notes where /n formatting got saved
   nirs_demo_data$data[grepl('notes', names(nirs_demo_data$data))] <- sapply(names(nirs_demo_data$data)[grepl('notes', names(nirs_demo_data$data))], function(x) gsub('\n', '', nirs_demo_data$data[[x]]))
   
-   
+  
   write.table(nirs_demo_data$data, file.path(bids_wd, 'sourcedata', 'phenotype', 'nirs_demo_data.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
   
   baseline_fitcap <- child_v1_data$fnirs_cap
@@ -190,7 +245,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   baseline_demo <- merge(baseline_demo, prepost_v3_data[c('participant_id', 'v3_date')], by = 'participant_id', all = TRUE)
   
   ffq_long <- merge(baseline_demo, ffq_long, by = 'participant_id', all = TRUE)
-
+  
   write.csv(ffq_long, file.path(sourcedata_wd, 'phenotype', 'marissa_brake_phenotype.csv'), row.names = FALSE)
   
   
@@ -203,7 +258,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, parent_v2_data$cshq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
   ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, child_v1_data$sleep_wk_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
   ure_dat_metab_sleep <- merge(ure_dat_metab_sleep, parent_v1_data$ffq_data$data$bids_phenotype, by = 'participant_id', all = TRUE)
-
+  
   
   write.csv(ure_dat_metab_sleep, paste0(bids_wd, slash, 'sourcedata', slash, 'phenotype', slash, 'ure_metab-sleep_demo.csv'), row.names = FALSE)
   
@@ -231,7 +286,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   tanner_dat <- parent_visit_1_arm_1[, grepl('record_id', names(parent_visit_1_arm_1)) | grepl('demo_c_sex', names(parent_visit_1_arm_1)) | grepl('tanner', names(parent_visit_1_arm_1))]
   names(tanner_dat)[1] <- 'participant_id'
   tanner_dat[['tanner_choice']] <- ifelse(tanner_dat[['demo_c_sex']] == 0, tanner_dat[['tanner_m']], tanner_dat[['tanner_f']])
-
+  
   tanner_datv3 <- parent_visit_3_arm_1[, grepl('record_id', names(parent_visit_3_arm_1)) | grepl('pds_sex', names(parent_visit_3_arm_1)) | grepl('tanner', names(parent_visit_3_arm_1))]
   names(tanner_datv3)[1] <- 'participant_id'
   tanner_datv3[['tanner_choice']] <- ifelse(tanner_datv3[['pds_sex']] == 1, tanner_datv3[['tanner_m']], tanner_datv3[['tanner_f']]) 
@@ -241,7 +296,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   names(v1_bodpod) <- gsub('baseline_', '', names(v1_bodpod))
   
   names(child_v1_data$anthro_data) <- gsub('v1_', '', names(child_v1_data$anthro_data))
-
+  
   baseline_dat <- merge(parent_v1_data$demo_data$data[c('participant_id', 'demo_income','demo_mod_ed', 'demo_dad_ed')], v1_bodpod[c('participant_id', 'bodpod_date', 'fat_p')], by = 'participant_id', all = TRUE)
   baseline_dat <- merge(baseline_dat, child_v1_data$anthro_data[, !grepl('heightweight_notes', names(child_v1_data$anthro_data))], by = 'participant_id', all = TRUE)
   
@@ -252,7 +307,7 @@ proc_redcap <- function(sourcedata_wd, overwrite = FALSE, return_data = FALSE) {
   baseline_dat <- merge(baseline_dat, parent_v1_data$cfq_data$data$score_dat, by = 'participant_id', all = TRUE)
   
   baseline_dat[['ses']] <- 'baseline'
-
+  
   #followup
   v2_bodpod <- de_data_clean$bodpod$data[, grepl('participant_id|followup', names(de_data_clean$bodpod$data))]
   names(v2_bodpod) <- gsub('followup_|3', '', names(v2_bodpod))

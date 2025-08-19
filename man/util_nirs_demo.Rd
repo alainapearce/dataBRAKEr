@@ -8,12 +8,14 @@ util_nirs_demo(
   v1_demo_homeloc,
   fnirs_info,
   anthro_data,
+  followup_anthro_data,
   demographics,
   puberty,
   bodpod,
   baseline_cams,
   followup_cams,
   fullness_tastetest,
+  v3_date,
   return_data = TRUE
 )
 }
@@ -23,6 +25,8 @@ util_nirs_demo(
 \item{fnirs_info}{fnirs task information generated from util_redcap_child1.R}
 
 \item{anthro_data}{anthropometric data from visit 1 generated from util_redcap_child1.R}
+
+\item{followup_anthro_data}{anthropometric data from visit 3 generated from util_redcap_child3.R}
 
 \item{demographics}{demographic data from visit 1 survey generated from util_redcap_parent1.R}
 
@@ -35,6 +39,8 @@ util_nirs_demo(
 \item{followup_cams}{double-entered follow-up CAMS generated from util_redcap_de.R}
 
 \item{fullness_tastetest}{double-entered freddy fullness for taste-test generated from util_redcap_de.R}
+
+\item{v3_date}{date from prepost_v3_data}
 
 \item{return_data}{return organized data (default = TRUE)}
 }
