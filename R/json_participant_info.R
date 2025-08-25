@@ -1,4 +1,4 @@
-#' son_participant_info: Generates a json file for general participant info
+#' json_participant_info: Generates a json file for general participant info
 #'
 #' This function generates a json file for general participant information and protocol information pertaining to rurality status and task/study status for Study BRAKE.
 #'

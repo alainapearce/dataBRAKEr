@@ -1,0 +1,176 @@
+#' json_meal_info: Generates a json file for meal information, fullness, liking, and wanting
+#'
+#' This function generates a json file for meal information, fullness, liking, and wanting
+#'
+#' @return A string with data stored in JSON format containing meta-data for meal information, fullness, liking, and wanting
+#'
+#'
+#' @export
+
+json_meal_info <- function() {
+
+  meal_info_list <- list(
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
+                           Levels = list ('1' =	'Child visit protocol 1 (baseline)',
+                                          '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
+    
+    # fullness variables ----
+    pre_liking_fullness_time = list( Description = 'Pre-liking (i.e., before VAS liking ratings) fullness rating time',
+                                   Unit = "hh:mm:ss"),
+    pre_liking_fullness_notes = list( Description = 'Notes about pre-liking (i.e., before VAS meal liking ratings) fullness rating'),
+    pre_meal_fullness_time = list( Description = 'Pre-meal fullness rating time',
+                                   Unit = "hh:mm:ss"),
+    pre_meal_fullness_notes = list( Description = 'Notes about pre-meal fullness rating'),
+    post_meal_fullness_time = list( Description = 'Post-meal fullness rating time',
+                                   Unit = "hh:mm:ss"),
+    post_meal_fullness_notes = list( Description = 'Notes about post-meal fullness rating'),
+    pre_want_fullness_time = list( Description = 'Pre-EAH liking and wanting (i.e., before VAS liking and wanting ratings for EAH) fullness rating time',
+                                    Unit = "hh:mm:ss"),
+    pre_want_fullness_notes = list( Description = 'Notes about pre-eah liking and wanting (i.e., before VAS liking and wanting ratings for EAH) fullness rating'),
+    post_eah_fullness_time = list( Description = 'Post-EAH fullness rating time',
+                                    Unit = "hh:mm:ss"),
+    post_eah_fullness_notes = list( Description = 'Notes about post-EAH fullness rating'),
+    
+    # liking variables ----
+    
+    liking_mac = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this macaroni and cheese?',
+                         Levels = list ('0' =	'Hate it',
+                                        '1'	= 'Dislike it',
+                                        '2'	= 'It\'s okay',
+                                        '3'	= 'Like it',
+                                        '4'	= 'Love it')),
+    liking_cknug = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this chicken nugget?',
+                         Levels = list ('0' =	'Hate it',
+                                        '1'	= 'Dislike it',
+                                        '2'	= 'It\'s okay',
+                                        '3'	= 'Like it',
+                                        '4'	= 'Love it')),
+    liking_grapes = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this grape?',
+                         Levels = list ('0' =	'Hate it',
+                                        '1'	= 'Dislike it',
+                                        '2'	= 'It\'s okay',
+                                        '3'	= 'Like it',
+                                        '4'	= 'Love it')),
+    liking_carrot = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this carrot?',
+                         Levels = list ('0' =	'Hate it',
+                                        '1'	= 'Dislike it',
+                                        '2'	= 'It\'s okay',
+                                        '3'	= 'Like it',
+                                        '4'	= 'Love it')),
+    liking_water = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this water?',
+                         Levels = list ('0' =	'Hate it',
+                                        '1'	= 'Dislike it',
+                                        '2'	= 'It\'s okay',
+                                        '3'	= 'Like it',
+                                        '4'	= 'Love it')),
+    liking_popcorn = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this popcorn?',
+                           Levels = list ('0' =	'Hate it',
+                                          '1'	= 'Dislike it',
+                                          '2'	= 'It\'s okay',
+                                          '3'	= 'Like it',
+                                          '4'	= 'Love it')),
+    liking_pretzel = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this pretzel?',
+                           Levels = list ('0' =	'Hate it',
+                                          '1'	= 'Dislike it',
+                                          '2'	= 'It\'s okay',
+                                          '3'	= 'Like it',
+                                          '4'	= 'Love it')),
+    liking_corn_chip = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this corn chip?',
+                             Levels = list ('0' =	'Hate it',
+                                            '1'	= 'Dislike it',
+                                            '2'	= 'It\'s okay',
+                                            '3'	= 'Like it',
+                                            '4'	= 'Love it')),
+    liking_oreo = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this cookie?',
+                        Levels = list ('0' =	'Hate it',
+                                       '1'	= 'Dislike it',
+                                       '2'	= 'It\'s okay',
+                                       '3'	= 'Like it',
+                                       '4'	= 'Love it')),
+    liking_brownie = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this brownie?',
+                           Levels = list ('0' =	'Hate it',
+                                          '1'	= 'Dislike it',
+                                          '2'	= 'It\'s okay',
+                                          '3'	= 'Like it',
+                                          '4'	= 'Love it')),
+    liking_starburst = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this Starburst?',
+                             Levels = list ('0' =	'Hate it',
+                                            '1'	= 'Dislike it',
+                                            '2'	= 'It\'s okay',
+                                            '3'	= 'Like it',
+                                            '4'	= 'Love it')),
+    liking_skittle = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this Skittle?',
+                           Levels = list ('0' =	'Hate it',
+                                          '1'	= 'Dislike it',
+                                          '2'	= 'It\'s okay',
+                                          '3'	= 'Like it',
+                                          '4'	= 'Love it')),
+    liking_chocolate = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this chocolate (Hershey Kiss)?',
+                             Levels = list ('0' =	'Hate it',
+                                            '1'	= 'Dislike it',
+                                            '2'	= 'It\'s okay',
+                                            '3'	= 'Like it',
+                                            '4'	= 'Love it')),
+    liking_icecream = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this ice cream?',
+                            Levels = list ('0' =	'Hate it',
+                                           '1'	= 'Dislike it',
+                                           '2'	= 'It\'s okay',
+                                           '3'	= 'Like it',
+                                           '4'	= 'Love it')),
+    liking_want_eah_notes = list( Description = 'Notes on pre-EAH liking and wanting data for EAH foods'),
+    
+    eah_wanting_popcorn = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat popcorn right now?'),
+    eah_wanting_pretzels = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat pretzels right now?'),
+    eah_wanting_corn_chips = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat corn chips right now?'),
+    eah_wanting_oreos = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat Oreos right now?'),
+    eah_wanting_brownies = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat brownies right now?'),
+    eah_wanting_starburst = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat Starbursts right now?'),
+    eah_wanting_skittles = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat skittles right now?'),
+    eah_wanting_chocolate = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat Hershey Kiss right now?'),
+    eah_wanting_ice_cream = list( Description = 'EAH Wanting Questionnaire item: How much do you want to eat ice cream right now?'),
+  
+    eah_wanting_markers = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with these markers right now?'),
+    eah_wanting_crayons = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with these crayons right now?'),
+    eah_wanting_color_book_marvels = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with this coloring book right now?'),
+    eah_wanting_oonies_inflate = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with this Oonies Inflator right now?'),
+    eah_wanting_colorpencils = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with these colored pencils right now?'),
+    eah_wanting_activitybook = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with this activity book right now?'),
+    eah_wanting_colorbook = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with this coloring book right now?'),
+    eah_wanting_legos = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with Legos right now?'),
+    eah_wanting_squeakee = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with Squeakee the Balloon Dog right now?'),
+    eah_wanting_dinosaurs = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with dinosaurs right now?'),
+    eah_wanting_oonies = list( Description = 'EAH Wanting Questionnaire item: How much do you want to play with Oonies right now?'),
+    game_want_eah_notes = list( Description = 'Notes about pre-EAH game wanting ratings'),
+    
+    # food_paradigm_info variables ----
+    test_meal_book = list( Description = 'Book the child selected to listen to during the test meal'),
+    test_meal_start_time = list( Description = 'Meal start time',
+                                 Unit = "hh:mm"),
+    test_meal_end_time = list( Description = 'Meal end time',
+                               Unit = "hh:mm"),
+    test_meal_duration = list( Description = 'Meal duration. Derived in redcap from test_meal_start_time and test_meal_end_time',
+                               Derivative = TRUE),
+    test_meal_notes = list( Description = 'Notes about meal protocol'),
+    eah_start_time = list( Description = 'EAH protocol start time',
+                                 Unit = "hh:mm"),
+    eah_end_time = list( Description = 'EAH protocol start time',
+                                 Unit = "hh:mm"),
+    eah_notes = list( Description = 'Notes about EAH protocol'))
+
+  # convert formatting to JSON
+  meal_info_json <- RJSONIO::toJSON(meal_info_list, pretty = TRUE)
+
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(meal_info_json, asText = TRUE))){
+    print('Meal info JSON file may be invalid')
+  }
+
+  return(meal_info_json)
+
+}

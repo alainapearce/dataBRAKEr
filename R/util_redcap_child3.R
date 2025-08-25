@@ -1,27 +1,42 @@
-#' util_redcap_child3: Organize child visit 3 data from REDCap (called within proc_redcap.R)
+#' util_redcap_child3: Organize child visit 3 data from REDCap
 #'
-#' This function organizes REDCap data from REDCap visit data, event child_visit_1_arm_1
+#' This function organizes REDCap data from REDCap visit data, event child_visit_3_arm_1
 #'
+#' @param data data from REDCap event child_visit_3_arm_1
+#' @inheritParams util_redcap_child1
+#' 
+#' @return Will return a list including:
+#' \itemize{
+#'  \item{clean raw child visit 3 datasets}
+#'  \item{meta-data formated as json for each dataset}
+#'  }
 #'
-#' @param data data from REDCap event child_visit_1_arm_1
-#' @inheritParams util_redcap_prepost1
-#'
-#' @return If return_data is set to TRUE, will return a list including:
-#'  1) clean raw child visit 1 datasets
-#'  2) meta-data/.json for each dataset
-#'
+#'  Returned data includes:
+#'  \itemize{
+#'    \item{fnirs_cap}
+#'    \item{anthro_data}
+#'    \item{meal_info}
+#'    \item{fnirs_tasks_info}
+#'    \item{pref_rank}
+#'    \item{loc_data}
+#'    \item{sic_data}
+#'    \item{cwc_data}
+#'    \item{body_es_data}
+#'  }
 #' @examples
 #'
 #' # process REDCap data
-#' child_visit3_data <- util_redcap_child3_org(data)
+#' child_visit3_list <- util_redcap_child3(data)
 #'
 #' \dontrun{
 #' }
 #'
+#' @seealso [proc_redcap(), util_redcap_dates()]
+#'
 #'
 #' @export
 
-util_redcap_child3 <- function(data, return_data = TRUE) {
+util_redcap_child3 <- function(data, date_data) {
   
   #### 1. Set up/initial checks #####
   
@@ -33,70 +48,192 @@ util_redcap_child3 <- function(data, return_data = TRUE) {
       stop("data must be a data.frame")
     } 
   } else if (isFALSE(data_arg)) {
-    stop("child data for REDCap event child_visit_1_arm_1 must be entered as a data.frame")
+    stop("child data for REDCap event child_visit_3_arm_1 must be entered as a data.frame")
   }
   
-  #reduce columns and update names
+  date_data_arg <- methods::hasArg(date_data)
+  
+  if (isTRUE(date_data_arg)) {
+    if (!is.data.frame(date_data)) {
+      stop('date_data must be a data.frame')
+    }
+  } else if (isFALSE(date_data_arg)) {
+    stop('date_data from util_redcap_dates() must be entered as a data.frame')
+  }
+  
+  # update name of participant ID column
+  names(data)[names(data) == 'record_id'] <- 'participant_id'
+  
+  # add session column
+  data['session_id'] <- 'ses-followup'
+  
+  # add visit number
+  data['visit_protocol'] <- 3
+  
+  # merge with date_data
+  data <- merge(data, date_data[c('participant_id', 'v3_date')], by = 'participant_id', all.x = TRUE)
+  names(data)[names(data) == 'v3_date'] <- 'visit_date'
+  data['visit_date'] <- lubridate::as_date(data[['visit_date']])
+  
+  # get non-repeate instrument data
+  data_all <- data
+  data <- data_all[is.na(data_all['redcap_repeat_instrument']), ]
   
   
   ## fNIRS fit ####
-  fnirs_cap <- data[c('record_id', 'capfit_frontback', 'capfit_ears', 'capfit_circ', 'capfit_capsize')]
+  fnirs_cap <- data[grepl('_id|^visit|capfit', names(data))]
   
-  names(fnirs_cap) <- c('participant_id', 'fnris_frontback_cm', 'fnirs_ears_cm', 'fnirs_circ_cm', 'fnirs_capsize')
-  fnirs_cap <- fnirs_cap[rowSums(is.na(fnirs_cap)) != ncol(fnirs_cap)-2, ]
+  #reduce columns and reorder
+  fnirs_cap <- fnirs_cap[!grepl('hfi|mid', names(fnirs_cap))]
+  
+  fnirs_cap <- fnirs_cap[c('participant_id','session_id', 'visit_date', 'visit_protocol', names(fnirs_cap)[grepl('capfit', names(fnirs_cap))])]
+  
+  #update names
+  names(fnirs_cap) <- gsub('capfit', 'fnirs', names(fnirs_cap))
+  names(fnirs_cap)[names(fnirs_cap) == 'fnirs_frontback'] <- 'fnirs_frontback_cm'
+  names(fnirs_cap)[names(fnirs_cap) == 'fnirs_ears'] <- 'fnirs_ears_cm'
+  names(fnirs_cap)[names(fnirs_cap) == 'fnirs_circ'] <- 'fnirs_circ_cm'
+  
+  fnirs_cap_json <- json_fnirscap()
+  
+  ## anthro ####
+  child_anthro <- data[grepl('_id|^visit|weight|height|notes|relationship', names(data))]
+  
+  #reduce columns and reorder
+  child_anthro <- child_anthro[!grepl('grapes|cknug|intake|meal|game|general|status', names(child_anthro))]
+  
+  names(child_anthro) <- gsub('v3_|_v3', '', names(child_anthro))
+  
+  child_anthro <- child_anthro[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'relationship', names(child_anthro)[grepl('c_', names(child_anthro))], names(child_anthro)[grepl('p_', names(child_anthro))], 'heightweight_notes')]
+  
+  #update names
+  names(child_anthro) <- gsub('avg', 'mean', names(child_anthro))
+  names(child_anthro) <- gsub('c_', '', names(child_anthro))
+  names(child_anthro) <- gsub('p_', 'parent1_', names(child_anthro))
+  names(child_anthro)[names(child_anthro) == 'relationship'] <- 'parent1_relationship'
+  
+  child_anthro_json <- json_child_anthro()
+  
+  ## meal information - NOTE: meal intake and freddy data are double entered ####
+  meal_info <- data[grepl('_id|^visit|ff|test_meal', names(data))]
+  
+  meal_info <- meal_info[!grepl('fnirs|ff_check|min_check|record', names(meal_info))]
+  
+  # update names
+  names(meal_info) <- gsub('ff', 'fullness', names(meal_info))
+  names(meal_info) <- gsub('freddy', 'fullness', names(meal_info))
+  
+  meal_info <- meal_info[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(meal_info)[grepl('fullness', names(meal_info))], names(meal_info)[grepl('test_meal', names(meal_info))])]
+  
+  names(meal_info) <- gsub('^want_', 'eah_wanting_', names(meal_info))
   
   
-  ## demo ####
-  child_v1demo_data <- data[c('record_id', 'v3_general_notes', 'relationship_v3', 'v3_c_height1_cm', 'v3_c_height2_cm', 'v3_c_weight1_kg', 'v3_c_weight2_kg', 'v3_c_height_avg_cm', 'v3_c_weight_avg_kg', 'v3_c_bmi', 'v3_c_bmi_pcent', 'v3_c_weightstatus', 'v3_p_height1_cm', 'v3_p_height2_cm', 'v3_p_weight1_kg', 'v3_p_weight2_kg', 'v3_p_height_avg_cm', 'v3_p_weight_avg_kg', 'v3_p_bmi', 'v3_p_weightstatus')]
-  names(child_v1demo_data)[1] <- 'participant_id'
-  names(child_v1demo_data) <- gsub('v3_|v3|_v3', '', names(child_v1demo_data))
-  
-  child_v1demo_data <- child_v1demo_data[rowSums(is.na(child_v1demo_data)) != ncol(child_v1demo_data)-2, ]
+  meal_info_json <- json_meal_info_v3()
   
   
-  ## task information ####
+  ## fNIRS information - NOTE: fready and CAMS values double entered ####
+  tastetest_data <- data_all[!is.na(data_all[['redcap_repeat_instrument']]) & data_all[['redcap_repeat_instrument']] == 'tastetest_game', grepl('_id|^visit|tastetest', names(data_all))]
   
-  # fnirs_info <- data[c('record_id', 'pre_fnirs_hungry', 'pre_fnirs_snack', 'pre_fnris_snack_notes', 'pre_fnirs_postsnack_ffcheck', 'pre_fnirs_snack_hungry', 'foodrating_check', 'foodrating_fnirs_check', 'foodrating_notes', 'foodchoice_check', 'snack_won', 'foodchoice_fnirs_check', 'foodchoice_eye_check', 'foodchoice_notes')]
-  # 
-  # names(fnirs_info)[c(1, 7:8, 10:13)] <- c('participant_id', 'foodrating_complete', 'foodrating_fnirs_good', 'foodchoice_complete', 'foodchoice_prize', 'foodchoice_fnirs_good', 'foodchoice_eyetrack_good')
+  #update names
+  names(tastetest_data) <- gsub('check', 'complete', names(tastetest_data))
   
-  ## meal information ####
-  # meal_info <- data[c('record_id', 'pre_liking_ff_time', 'pre_liking_ff_notes', 'vas_mac', 'vas_cknug', 'vas_grapes', 'vas_carrot', 'vas_water', 'pre_meal_ff_time', 'pre_meal_ff_notes', 'test_meal_book', 'test_meal_start_time', 'test_meal_end_time', 'test_meal_duration', 'test_meal_notes', 'post_meal_ff_time', 'toolbox_list_sorting_notes', 'pre_wanting_ff_time', 'pre_wanting_ff_notes', 'eah_liking_and_wanting_timestamp', 'vas_popcorn', 'want_popcorn', 'vas_pretzel', 'want_pretzel', 'vas_cornchip', 'want_cornchip', 'vas_cookie', 'want_cookie', 'vas_brownie', 'want_brownie', 'vas_starburst', 'want_starburst', 'vas_skittle', 'want_skittle', 'vas_chocolate', 'want_chocolate', 'vas_icecream', 'want_icecream', 'vas_eah_want_notes', 'eah_game_wanting_timestamp', 'want_markers', 'want_crayons', 'want_color_marvels', 'want_oonies_inflate', 'want_colorpencils', 'wan_activitybook', 'want_colorbook', 'want_legos', 'want_squeakee', 'want_dinosaurs', 'want_oonies', 'eah_game_wanting_notes', 'pre_eah_freddy_time', 'eah_start_time', 'eah_end_time', 'eah_notes', 'post_eah_ff_time', 'post_eah_ff_notes')]
-  # 
-  # names(meal_info)[c(1, 11:15, 17:20, 39:40, 52, 54:55)] <- c('participant_id', 'meal_book', 'meal_start', 'meal_end', 'meal_duration', 'meal_notes', 'nih_listsort_notes', 'pre_want_ff_time', 'pre_want_ff_notes', 'eah_likewant_time', 'eah_likewant_notes', 'eah_game_want_time', 'eah_game_want_notes', 'eah_start', 'eah_end')
-  # 
-  # names(meal_info)[1] <- 'participant_id'
+  #premeal
+  fnirs_info <- tastetest_data[tastetest_data[['tastetest_timing']] == 0, ]
   
-  ## Sleep Week data ####
-  # sleep_data <- data[c('record_id', 'date_mon', 'date_tu', 'date_wed', 'date_th', 'date_fri', 'date_sat', 'date_sun', 'bedtime_mon', 'bedtime_tu', 'bedtime_wed', 'bedtime_th', 'bedtime_fri', 'bedtime_sat', 'bedtime_sun', 'attempt_mon', 'attempt_tu', 'attempt_wed', 'attempt_th', 'attempt_fri', 'attempt_sat', 'attempt_sun', 'asleep_mon', 'asleep_tu', 'asleep_wed', 'asleep_th', 'asleep_fri', 'asleep_sat', 'asleep_sun', 'times_mon', 'times_tu', 'times_wed', 'times_th', 'times_fri', 'times_sat', 'times_sun', 'waso_mon', 'waso_tu', 'waso_wed', 'waso_th', 'waso_fri', 'waso_sat', 'waso_sun', 'awake_mon', 'awake_tu', 'awake_wed', 'awake_th', 'awake_fri', 'awake_sat', 'awake_sun', 'out_on_mon', 'out_on_tu', 'out_on_wed', 'out_on_th', 'out_on_fri', 'out_on_sat', 'out_on_sun')]
-  # names(sleep_data)[1] <- 'participant_id'
-  # 
-  # sleep_wk_scored <- dataprepr::score_sleeplog(sleep_data, id = 'participant_id', summer_start = '2023-06-06', summer_end = '2023-08-23')
-  # child_sleep_json <- json_sleeplog()
-  # 
-  ## HFI data ####
-  # hfi_data <- data[, grepl('record_id', names(data)) | grepl('hfi', names(data))] 
-  # hfi_data <- hfi_data[, !grepl('qcheck', names(hfi_data))]
-  # names(hfi_data)[1] <- 'participant_id'
-  # 
-  # names(hfi_data) <- gsub('___', '', names(hfi_data))
-  # names(hfi_data) <- gsub('visible', 'accesible', names(hfi_data))
-  # 
-  # hfi_scored <- dataprepr::score_hfi(hfi_data, id = 'participant_id', base_zero = TRUE)
-  # #hfi_scored <- score_hfi(hfi_data, id = 'participant_id', base_zero = TRUE)
-  # hfi_json <- json_hfi()
+  names(fnirs_info) <- gsub('tastetest', 'premeal_tastetest', names(fnirs_info))
   
-  if (isTRUE(return_data)){
-    return(list(
-      anthro_data = child_v1demo_data, 
-      #demo_data = child_household_data,
-      fnirs_cap = fnirs_cap #, 
-      #shapegame_info = shapegame_info, 
-      #fnirs_info = fnirs_info,
-      #meal_info = meal_info,
-      #sleep_wk_data = list(data = sleep_wk_scored, meta = child_sleep_json),
-      #hfi_data = list(data = hfi_scored, meta = hfi_json)
-      ))
-  }
+  #postmeal
+  post_fnirs_info <- tastetest_data[tastetest_data[['tastetest_timing']] == 1, ]
+  names(post_fnirs_info) <- gsub('tastetest', 'postmeal_tastetest', names(post_fnirs_info))
+  
+  # merge
+  fnirs_info <- merge(fnirs_info, post_fnirs_info[grepl('participant_id|post', names(post_fnirs_info))], by = 'participant_id')
+  
+  # organize
+  fnirs_info <- fnirs_info[!grepl('timing', names(fnirs_info))]
+  
+  fnirs_info <- fnirs_info[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(fnirs_info)[grepl('pre', names(fnirs_info))], names(fnirs_info)[grepl('post', names(fnirs_info))])]
+  
+  fnirs_info_json <- json_fnirsinfo_v3()
+  
+  ## preference rank information - NOTE: need to get liking from task ####
+  prefrank_data <- data_all[!is.na(data_all[['redcap_repeat_instrument']]) & data_all[['redcap_repeat_instrument']] == 'preferencerank', grepl('_id|^visit|pref_rank', names(data_all))]
+  
+   #premeal
+  prefrank <- prefrank_data[prefrank_data[['pref_rank_timing']] == 0, ]
+  
+  names(prefrank) <- gsub('pref_rank', 'premeal_pref_rank', names(prefrank))
+  
+  #postmeal
+  post_prefrank <- prefrank_data[prefrank_data[['pref_rank_timing']] == 1, ]
+  names(post_prefrank) <- gsub('pref_rank', 'postmeal_pref_rank', names(post_prefrank))
+  
+  # merge
+  prefrank <- merge(prefrank, post_prefrank[grepl('participant_id|post', names(post_prefrank))], by = 'participant_id')
+  
+  # organize
+  prefrank <- prefrank[!grepl('timing', names(prefrank))]
+  
+  prefrank <- prefrank[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(prefrank)[grepl('premeal', names(prefrank))], names(prefrank)[grepl('postmeal', names(prefrank))])]
+  
+  prefrank_json <- json_pref_rank()
+  
+  ## LOC data ####
+  loc_data <- data[grepl('_id|^visit|loc', names(data))]
+  loc_data <- loc_data[!grepl('share', names(loc_data))]
+  
+  loc_data <- loc_data[c('participant_id','session_id', 'visit_date', 'visit_protocol', names(loc_data)[grepl('loc', names(loc_data))])]
+  
+  loc_json <- json_loc()
+  
+  ## SIC data ####
+  sic_data <- data[grepl('_id|^visit|sic', names(data))]
+  
+  sic_data <- sic_data[c('participant_id','session_id', 'visit_date', 'visit_protocol', names(sic_data)[grepl('sic', names(sic_data))])]
+  
+  #score 
+  sic_scored <- dataprepr::score_sic(sic_data, base_zero = TRUE, id = 'participant_id')
+  
+  sic_json <- json_sic()
+  
+  ## cwc data ####
+  cwc_data <- data[grepl('_id|^visit|wcs', names(data))]
+  
+  #update names
+  names(cwc_data) <- gsub('wcs', 'cwc', names(cwc_data))
+  
+  cwc_data <- util_format_cwc_data(cwc_data)
+  
+  cwc_data <- cwc_data[c('participant_id','session_id', 'visit_date', 'visit_protocol', names(cwc_data)[grepl('cwc', names(cwc_data))])]
+  
+  #score 
+  cwc_scored <- dataprepr::score_cwc(cwc_data, base_zero = FALSE, id = 'participant_id', pna_value = 99)
+  
+  cwc_json <- json_cwc()
+  
+  ## bis data ####
+  bis_data <- data[grepl('_id|^visit|bis', names(data))]
+  
+  bis_data <- bis_data[c('participant_id','session_id', 'visit_date', 'visit_protocol', names(bis_data)[grepl('bis', names(bis_data))])]
+  
+  #score 
+  bis_data['bis_score'] <- bis_data[['bis_1']] - bis_data[['bis_2']]
+  
+  bis_scored <- list(score_dat = bis_data[grepl('_id|^visit|bis_score', names(bis_data))],
+                     bids_phenotype = bis_data)
+  
+  bis_json <- json_body_es()
+  
+  return(list(
+    fnirs_cap = list(data = fnirs_cap, meta = fnirs_cap_json),
+    anthro_data = list(data = child_anthro, meta = child_anthro_json),
+    meal_info = list(data = meal_info, meta = meal_info_json), 
+    fnirs_tasks_info = list(data = fnirs_info, meta = fnirs_info_json),
+    pref_rank = list(data = prefrank, meta = prefrank_json),
+    loc_data = list(data = loc_data, meta = loc_json),
+    sic_data = list(data = sic_scored, meta = sic_json),
+    cwc_data = list(data = cwc_scored, meta = cwc_json),
+    body_es_data = list(data = bis_scored, meta = bis_json)))
+  
 }
 

@@ -16,9 +16,21 @@
 #'
 #' @return Will return a list including data and metadata for:
 #' #' \itemize{
+#' #child v1
+#'    \item{'fnirs_cap'}
+#'    \item{'anthro_data'}
+#'    \item{'shapegame_info'}
+#'    \item{'fnirs_tasks_info'}
+#'    \item{'meal_info'}
+#'    \item{'sleep_wk_data'}
+#'    \item{'hfi_data'}
+#' 
+#' 
 #'  \item{'paticipants' - BIDS specified participants.tsv file}
 #'  \item{'anthropometrics' - height, weight, and computed anthropometric data}
 #'  \item{'demographics' - compiled demographic data}
+#'  
+#'  
 #'  \item{'dxa' - verified DXA data}
 #'  \item{'household' - compiled demographicinformation about houshold}
 #'  \item{'infancy' - compiled demographic information related to infancy}
@@ -105,14 +117,13 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     
   } else {
     # get data from REDCap directly (only will work if have access and keys setup)
-    Sys.setenv(reach_redcap_key = keyring::key_get('brake_redcap_key'))
-    redcap_visit <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/',
-                                          token = Sys.getenv('reach_redcap_key'))
+    Sys.setenv(brake_redcap_key = keyring::key_get('brake_redcap_key'))
+    redcap_visit <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/', token = Sys.getenv('brake_redcap_key'))
     
     
-    Sys.setenv(reach_de_redcap_key = keyring::key_get('brake-de_redcap_key'))
+    Sys.setenv(brake_de_redcap_key = keyring::key_get('brake-de_redcap_key'))
     redcap_de <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/',
-                                       token = Sys.getenv('reach_de_redcap_key'))
+                                       token = Sys.getenv('brake_de_redcap_key'))
     
     redcap_visit_data <- redcap_visit[['data']]
     redcap_visit_dict <- redcap_visit[['dictionary']]
@@ -167,22 +178,14 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
   
   # organize event data
   child_v1_data <- util_redcap_child1(child_visit_1_arm_1, date_data)
-  parent_v1_data <- util_redcap_parent1(parent_visit_1_arm_1)
+  parent_v1_data <- util_redcap_parent1(parent_visit_1_arm_1, date_data)
   child_v2_data <- util_redcap_child2(child_visit_2_arm_1, date_data)
-  parent_v2_data <- util_redcap_parent2(parent_visit_2_arm_1)
+  parent_v2_data <- util_redcap_parent2(parent_visit_2_arm_1, date_data)
   child_v3_data <- util_redcap_child3(child_visit_3_arm_1, date_data)
-  parent_v3_data <- util_redcap_parent3(parent_visit_3_arm_1)
+  parent_v3_data <- util_redcap_parent3(parent_visit_3_arm_1, date_data)
   
-  #### Load and organize double-entry data ####
-  
-  # all validated so can just take reviewer 1 data
-  redcap_de_data <- redcap_de_data[grepl('--2', redcap_de_data[['record_id']]), ]
-  redcap_de_data <- redcap_de_data[!(grepl('pilot', redcap_de_data[['record_id']])), ]
-  
-  redcap_de_data['record_id'] <- sapply(redcap_de_data['record_id'], function(x) gsub('--2', '', x))
-  
-  de_data_clean <- util_redcap_de(redcap_de_data)
-  
+  #### Process double-entry data ####
+  processed_de_data <- util_redcap_de(redcap_api = FALSE, redcap_de_data, date_data)
   
   # create necessary files for fNIRS processing ####
   nirs_demo_data <- util_nirs_demo(v1_demo_homeloc = prepost_v1_data$demo, fnirs_info = child_v1_data$fnirs_info, anthro_data = child_v1_data$anthro_data, followup_anthro_data = child_v3_data$anthro_data, demographics = parent_v1_data$demo_data$data, puberty = parent_v1_data$puberty_data$data$score_dat, bodpod = de_data_clean$bodpod$data, baseline_cams = de_data_clean$baseline_cams$data, followup_cams = de_data_clean$followup_cams$data, fullness_tastetest = de_data_clean$taste_test$data, v3_date = prepost_v3_data)

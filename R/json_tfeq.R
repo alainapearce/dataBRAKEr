@@ -1,7 +1,6 @@
 #' json_tfeq: Generates a json file for the Three-Factor Eating Questionnaire-R18
 #'
 #' This function generates a json file for the scored Three-Factor Eating Questionnaire-R18 and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_tfeq18 function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Three-Factor Eating Questionnaire-R18
 #'
@@ -17,9 +16,14 @@ json_tfeq <- function() {
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/11126230/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
-                       Levels = list ('ses-1' = 'session 1 / baseline',
-                                      'ses-2' = 'session 2 / follow-up')),
-    tfeq_form_date = list( Description = 'Date (YYYY-MM-DD) the tfeq form was completed on Redcap'),
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
+                           Levels = list ('1' =	'Child visit protocol 1 (baseline)',
+                                          '2' =	'Child visit protocol 2 (baseline)',
+                                          '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     tfeq1 = list( Description = 'When I smell a sizzling steak or juice piece of meat, I find it very difficult to keep from eating, even if I have just finished a meal.',
                   Levels = list ('0' = 'Definitely false',
                                  '1' = 'Mostly false',

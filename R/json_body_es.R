@@ -1,0 +1,136 @@
+#' json_body_es: Generates a json file for the Body Esteem Scale
+#'
+#' This function generates a json file for the scored Body Esteem Scale and raw participant responses.
+#'
+#' @return A string with data stored in JSON format containing meta-data for the Body Esteem Scale
+#'
+#'
+#' @export
+
+json_body_es <- function() {
+
+  bes_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'Body Esteem Scale. Trained research assistants adminsitered the scale to children by reading each question',
+      Reference = 'Mendelson, B. K., & White, D. R. (1982). Relation between body-esteem and self-esteem of obese and normal children. Perceptual and motor skills, 54(3), 899-905. https://doi.org/10.2466/pms.1982.54.3.899',
+      TermURL = 'https://pubmed.ncbi.nlm.nih.gov/7099901/'),
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
+                           Levels = list ('1' =	'Child visit protocol 1 (baseline)',
+                                          '2' =	'Child visit protocol 2 (baseline)',
+                                          '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
+    bes1 = list( Description = 'I like what I look like in pictures',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes2 = list( Description = 'Kids my own age like my looks',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes3 = list( Description = 'I\'m pretty happy about the way I look',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes4 = list( Description = 'Most people have a nicer body than I do',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes5 = list( Description = 'My weight makes me unhappy',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes6 = list( Description = 'I like what I see when I look in the mirror',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes7 = list( Description = 'I wish I were thinner',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes8 = list( Description = 'There are lots of things I\'d change about my looks if I could',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes9 = list( Description = 'I\'m proud of my body',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes10 = list( Description = 'I really like what I weigh',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes11 = list( Description = 'I wish I looked better',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes12 = list( Description = 'I often feel ashamed of how I look',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes13 = list( Description = 'Other people make fun of the way I look',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes14 = list( Description = 'I think I have a good body',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes15 = list( Description = 'I\'m looking as nice as I\'d like to',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes16 = list( Description = 'It\'s pretty tough to look like me',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes17 = list( Description = 'I wish I were fatter',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes18 = list( Description = 'I often wish I looked like someone else',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes19 = list( Description = 'My classmates would like to look like me',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes20 = list( Description = 'I have a high opinion about the way I look',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes21 = list( Description = 'My looks upset me',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes22 = list( Description = 'I\'m as nice looking as most people',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes23 = list( Description = 'My parents like my looks',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes24 = list( Description = 'I worry about the way I look',
+                 Levels = list ('0' = 'No',
+                                '1' = 'Yes',
+                                '2' = 'Prefer not to answer')),
+    bes_total = list( Description = 'Total score',
+                     Derivative = TRUE))
+
+  # convert formatting to JSON
+  bes_json <- RJSONIO::toJSON(bes_list, pretty = TRUE)
+
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(bes_json, asText = TRUE))){
+    print('Body Esteem JSON file may be invalid')
+  }
+
+  return(bes_json)
+
+}

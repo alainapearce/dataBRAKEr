@@ -13,14 +13,14 @@
 #'
 #'  Returned data includes:
 #'  \itemize{
-#'    \item{visit_data_child}
-#'    \item{food_paradigm_info}
-#'    \item{freddy_data}
-#'    \item{intake_data}
-#'    \item{liking_data}
-#'    \item{kbas_data}
-#'    \item{stq_data}
+#'    \item{fnirs_cap}
 #'    \item{anthro_data}
+#'    \item{shapegame_info}
+#'    \item{fnirs_tasks_info}
+#'    \item{meal_info}
+#'    \item{toolbox_info}
+#'    \item{sleep_wk_data}
+#'    \item{hfi_data}
 #'  }
 #' @examples
 #'
@@ -36,7 +36,7 @@
 #' 
 #' 
 
-util_redcap_child1 <- function(data) {
+util_redcap_child1 <- function(data, date_data) {
   
   #### Set up/initial checks #####
   
@@ -65,7 +65,7 @@ util_redcap_child1 <- function(data) {
   names(data)[names(data) == 'record_id'] <- 'participant_id'
   
   # add session column
-  data['session_id'] <- 'ses-1'
+  data['session_id'] <- 'ses-baseline'
   
   # add visit number
   data['visit_protocol'] <- 1
@@ -79,71 +79,127 @@ util_redcap_child1 <- function(data) {
   ## fNIRS fit ####
   fnirs_cap <- data[grepl('_id|^visit|capfit', names(data))]
   
-  #reduce columns and update names
+  #reduce columns and reorder
   fnirs_cap <- fnirs_cap[!grepl('hfi|mid', names(fnirs_cap))]
   
   fnirs_cap <- fnirs_cap[c('participant_id','session_id', 'visit_date', 'visit_protocol', names(fnirs_cap)[grepl('capfit', names(fnirs_cap))])]
-                        
-  #updat names
+  
+  #update names
   names(fnirs_cap) <- gsub('capfit', 'fnirs', names(fnirs_cap))
   names(fnirs_cap)[names(fnirs_cap) == 'fnirs_frontback'] <- 'fnirs_frontback_cm'
   names(fnirs_cap)[names(fnirs_cap) == 'fnirs_ears'] <- 'fnirs_ears_cm'
   names(fnirs_cap)[names(fnirs_cap) == 'fnirs_circ'] <- 'fnirs_circ_cm'
   
-  ## demo ####
-  child_v1demo_data <- data[c('record_id', 'v1_general_notes', 'relationship', 'c_height1_cm', 'c_height2_cm', 'c_weight1_kg', 'c_weight2_kg', 'c_height_avg_cm', 'c_weight_avg_kg', 'c_bmi', 'c_bmi_pcent', 'c_weightstatus', 'p_height1_cm', 'p_height2_cm', 'p_weight1_kg', 'p_weight2_kg', 'p_height_avg_cm', 'p_weight_avg_kg', 'p_bmi', 'p_weightstatus', 'heightweight_notes')]
+  fnirs_cap_json <- json_fnirscap()
   
-  names(child_v1demo_data)[1] <- 'participant_id'
+  ## anthro ####
+  child_anthro <- data[grepl('_id|^visit|weight|height|notes|relationship', names(data))]
   
-  ## household ####
-  child_household_data <- data[c('record_id', 'p_height1_cm', 'p_height2_cm', 'p_weight1_kg', 'p_weight2_kg', 'p_height_avg_cm', 'p_weight_avg_kg', 'p_bmi', 'p_weightstatus', 'heightweight_notes')]
+  #reduce columns and reorder
+  child_anthro <- child_anthro[!grepl('_ft|_in|_lbs|meal|eah|pre|post|shapegame|food|capfit|toolbox|status', names(child_anthro))]
   
-  names(child_household_data)[1] <- 'participant_id'
+  child_anthro <- child_anthro[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'relationship', names(child_anthro)[grepl('c_', names(child_anthro))], names(child_anthro)[grepl('p_', names(child_anthro))], 'heightweight_notes')]
   
-  ## task information ####
-  shapegame_info <- data[grepl('_id|shapegame', names(data))]
+  #update names
+  names(child_anthro) <- gsub('avg', 'mean', names(child_anthro))
+  names(child_anthro) <- gsub('c_', '', names(child_anthro))
+  names(child_anthro) <- gsub('p_', 'parent1_', names(child_anthro))
+  names(child_anthro)[names(child_anthro) == 'relationship'] <- 'parent1_relationship'
   
-  names(shapegame_info)[c(1, 6, 8, 10:12, 14)] <- c('participant_id', 'pre_shapegame_postsnack_hungry', 'pre_shapegame_snack2_notes', 'pre_shapegame_postsnack2_note', 'shapegame_complete', 'shapegame_candy', 'shapegame_eyetrack_good')
+  child_anthro_json <- json_child_anthro()
   
-  fnirs_info <- data[c('record_id', 'pre_fnirs_hungry', 'pre_fnirs_snack', 'pre_fnris_snack_notes', 'pre_fnirs_postsnack_ffcheck', 'pre_fnirs_snack_hungry', 'foodrating_check', 'foodrating_fnirs_check', 'foodrating_notes', 'foodchoice_check', 'snack_won', 'foodchoice_fnirs_check', 'foodchoice_eye_check', 'foodchoice_notes')]
+  ## Shape Game information ####
+  shapegame_info <- data[grepl('_id|^visit|shape', names(data))]
   
-  names(fnirs_info)[c(1, 7:8, 10:13)] <- c('participant_id', 'foodrating_complete', 'foodrating_fnirs_good', 'foodchoice_complete', 'foodchoice_prize', 'foodchoice_fnirs_good', 'foodchoice_eyetrack_good')
+  shapegame_info <- shapegame_info[!grepl('ffcheck|prize_check', names(shapegame_info))]
   
-  ## meal information ####
-  meal_info <- data[c('record_id', 'pre_liking_ff_time', 'pre_liking_ff_notes', 'vas_mac', 'vas_cknug', 'vas_grapes', 'vas_carrot', 'vas_water', 'pre_meal_ff_time', 'pre_meal_ff_notes', 'test_meal_book', 'test_meal_start_time', 'test_meal_end_time', 'test_meal_duration', 'test_meal_notes', 'post_meal_ff_time', 'toolbox_list_sorting_notes', 'pre_wanting_ff_time', 'pre_wanting_ff_notes', 'vas_popcorn', 'want_popcorn', 'vas_pretzel', 'want_pretzel', 'vas_cornchip', 'want_cornchip', 'vas_cookie', 'want_cookie', 'vas_brownie', 'want_brownie', 'vas_starburst', 'want_starburst', 'vas_skittle', 'want_skittle', 'vas_chocolate', 'want_chocolate', 'vas_icecream', 'want_icecream', 'vas_eah_want_notes', 'want_markers', 'want_crayons', 'want_color_marvels', 'want_oonies_inflate', 'want_colorpencils', 'wan_activitybook', 'want_colorbook', 'want_legos', 'want_squeakee', 'want_dinosaurs', 'want_oonies', 'eah_game_wanting_notes', 'pre_eah_freddy_time', 'eah_start_time', 'eah_end_time', 'eah_notes', 'post_eah_ff_time', 'post_eah_ff_notes')]
+  # update names
+  names(shapegame_info) <- gsub('_snack_hungry', '_postsnack_hungry', names(shapegame_info))
+  names(shapegame_info) <- gsub('^shapegame_snack', 'pre_shapegame_snack', names(shapegame_info))
   
-  names(meal_info)[c(1, 11:15, 17:19, 38, 50, 52:53)] <- c('participant_id', 'meal_book', 'meal_start', 'meal_end', 'meal_duration', 'meal_notes', 'nih_listsort_notes', 'pre_want_ff_time', 'pre_want_ff_notes', 'eah_likewant_notes', 'eah_game_want_notes', 'eah_start', 'eah_end')
+  names(shapegame_info)[names(shapegame_info) == 'pre_shapegame_snack_hungry'] <- 'pre_shapegame_postsnack_hungry'
+  names(shapegame_info)[names(shapegame_info) == 'shapegame_check'] <- 'shapegame_complete'
+  names(shapegame_info)[names(shapegame_info) == 'shapegame_eye_check'] <- 'shapegame_eyetrack_good'
+  names(shapegame_info)[names(shapegame_info) == 'shape_game_snack'] <- 'shapegame_candy'
   
-  names(meal_info)[1] <- 'participant_id'
+  shapegame_info <- shapegame_info[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(shapegame_info)[grepl('pre', names(shapegame_info))], names(shapegame_info)[grepl('^shape', names(shapegame_info))])]
+  
+  shapegame_info_json <- json_shapegame_info()
+  
+  ## fNIRS task information ####
+  fnirs_info <- data[grepl('_id|^visit|pre_fnirs|rating|choice', names(data))]
+  
+  fnirs_info <- fnirs_info[!grepl('ffcheck', names(fnirs_info))]
+  
+  # update names
+  names(fnirs_info) <- gsub('_snack_hungry', '_postsnack_hungry', names(fnirs_info))
+  names(fnirs_info) <- gsub('_check', '_complete', names(fnirs_info))
+  
+  names(fnirs_info)[names(fnirs_info) == 'foodchoice_eye_complete'] <- 'foodchoice_eye_good'
+  
+  fnirs_info <- fnirs_info[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(fnirs_info)[grepl('pre', names(fnirs_info))], names(fnirs_info)[grepl('rating', names(fnirs_info))], names(fnirs_info)[grepl('choice', names(fnirs_info))])]
+  
+  fnirs_info_json <- json_fnirstasks_info()
+  
+  ## meal information - NOTE: meal intake and freddy data are double entered ####
+  meal_info <- data[grepl('_id|^visit|ff|vas|test_meal|want|wan|eah', names(data))]
+  
+  meal_info <- meal_info[!grepl('ffcheck|fnirs|ff_check|min_check|record|prac|freddy_check', names(meal_info))]
+  
+  # update names
+  names(meal_info) <- gsub('wan_', 'want_', names(meal_info))
+  names(meal_info) <- gsub('ff', 'fullness', names(meal_info))
+  names(meal_info) <- gsub('freddy', 'fullness', names(meal_info))
+  
+  names(meal_info)[names(meal_info) == 'vas_eah_want_notes'] <- 'liking_want_eah_notes'
+  names(meal_info)[names(meal_info) == 'eah_game_wanting_notes'] <- 'game_want_eah_notes'
+  
+  names(meal_info) <- gsub('vas', 'liking', names(meal_info))
+  
+  names(meal_info)[names(meal_info) == 'want_cornchip'] <- 'want_corn_chip'
+  names(meal_info)[names(meal_info) == 'want_cookie'] <- 'want_oreo'
+  
+  meal_info <- meal_info[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(meal_info)[grepl('fullness', names(meal_info))], names(meal_info)[grepl('^liking', names(meal_info))], names(meal_info)[grepl('^want|^game', names(meal_info))], names(meal_info)[grepl('test_meal', names(meal_info))], names(meal_info)[grepl('^eah', names(meal_info))])]
+  
+  names(meal_info) <- gsub('^want_', 'eah_wanting_', names(meal_info))
+  
+  
+  meal_info_json <- json_meal_info_v1()
+  
+  ## Toolbox info ####
+  toolbox_data <- data[grepl('_id|^visit|toolbox', names(data))]
   
   ## Sleep Week data ####
-  sleep_data <- data[c('record_id', 'date_mon', 'date_tu', 'date_wed', 'date_th', 'date_fri', 'date_sat', 'date_sun', 'bedtime_mon', 'bedtime_tu', 'bedtime_wed', 'bedtime_th', 'bedtime_fri', 'bedtime_sat', 'bedtime_sun', 'attempt_mon', 'attempt_tu', 'attempt_wed', 'attempt_th', 'attempt_fri', 'attempt_sat', 'attempt_sun', 'asleep_mon', 'asleep_tu', 'asleep_wed', 'asleep_th', 'asleep_fri', 'asleep_sat', 'asleep_sun', 'times_mon', 'times_tu', 'times_wed', 'times_th', 'times_fri', 'times_sat', 'times_sun', 'waso_mon', 'waso_tu', 'waso_wed', 'waso_th', 'waso_fri', 'waso_sat', 'waso_sun', 'awake_mon', 'awake_tu', 'awake_wed', 'awake_th', 'awake_fri', 'awake_sat', 'awake_sun', 'out_on_mon', 'out_on_tu', 'out_on_wed', 'out_on_th', 'out_on_fri', 'out_on_sat', 'out_on_sun')]
-  names(sleep_data)[1] <- 'participant_id'
+  sleep_data <- data[grepl('_id|^visit|_mon|_tu|_wed|_th|_fri|_sat|_sun', names(data))]
   
+  sleep_data <- sleep_data[!grepl('hfi', names(sleep_data))]
+  
+  # score data
+  library(lubridate)
   sleep_wk_scored <- dataprepr::score_sleeplog(sleep_data, id = 'participant_id', summer_start = '2023-06-06', summer_end = '2023-08-23')
+  
   child_sleep_json <- json_sleeplog()
   
   ## HFI data ####
-  hfi_data <- data[, grepl('record_id', names(data)) | grepl('hfi', names(data))] 
-  hfi_data <- hfi_data[, !grepl('qcheck', names(hfi_data))]
-  names(hfi_data)[1] <- 'participant_id'
+  hfi_data <- data[grepl('_id|^visit|hfi', names(data))] 
   
+  hfi_data <- hfi_data[!grepl('qcheck', names(hfi_data))]
+  
+  # update names
   names(hfi_data) <- gsub('___', '', names(hfi_data))
-  names(hfi_data) <- gsub('visible', 'accesible', names(hfi_data))
+  names(hfi_data) <- gsub('visible', 'accessible', names(hfi_data))
   
   hfi_scored <- dataprepr::score_hfi(hfi_data, id = 'participant_id', base_zero = TRUE)
   hfi_json <- json_hfi()
   
-  if (isTRUE(return_data)){
-    return(list(
-      anthro_data = child_v1demo_data, 
-      demo_data = child_household_data,
-      fnirs_cap = fnirs_cap, 
-      shapegame_info = shapegame_info, 
-      fnirs_info = fnirs_info,
-      meal_info = meal_info,
-      sleep_wk_data = list(data = sleep_wk_scored, meta = child_sleep_json),
-      hfi_data = list(data = hfi_scored, meta = hfi_json)))
-  }
+  return(list(
+    fnirs_cap = list(data = fnirs_cap, meta = fnirs_cap_json),
+    anthro_data = list(data = child_anthro, meta = child_anthro_json),
+    shapegame_info = list(data = shapegame_info, meta = shapegame_info_json),
+    fnirs_tasks_info = list(data = fnirs_info, meta = fnirs_info_json),
+    meal_info = list(data = meal_info, meta = meal_info_json), 
+    toolbox_info = toolbox_data,
+    sleep_wk_data = list(data = sleep_wk_scored, meta = child_sleep_json),
+    hfi_data = list(data = hfi_scored, meta = hfi_json)))
 }
 
