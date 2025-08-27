@@ -14,7 +14,7 @@
 #'  \item{CR - circadian rhythem}
 #'  }
 #' @inheritParams util_task_org_sourcedata
-#' @inheritParams util_redcap_prepost1
+#' @inheritParams util_redcap_prepost
 #'
 #' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 #'

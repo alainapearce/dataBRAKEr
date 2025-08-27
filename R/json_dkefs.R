@@ -150,7 +150,7 @@ json_dkefs <- function() {
     dkefs_df_filled_rep = list( Description = 'Design Fluency: Total number of responses'),
     dkefs_df_filled_rep_ss = list( Description = 'Design Fluency: Total number of responses'),
     dkefs_df_acc_perc = list( Description = 'Design Fluency: Total response accuracy percent'),
-    dkefs_df_acc_perc_ss = list( Description = 'Design Fluency: Total response accuracy percent scaled score'),
+    dkefs_df_acc_perc_ss = list( Description = 'Design Fluency: Total response accuracy percent scaled score')
     )
   
   # convert formatting to JSON

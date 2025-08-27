@@ -22,7 +22,7 @@ util_format_puberty_data <- function(puberty_data) {
   
   # fix tanner choice
   puberty_data['tanner_choice'] <- ifelse(puberty_data[['sex']] == 0, puberty_data[['tanner_f']], puberty_data[['tanner_m']])
-  w2
+  
   # set 4 to '99'
   puberty_data[grepl('pds', names(puberty_data))] <- sapply(names(puberty_data[grepl('pds', names(puberty_data))]), function(x) ifelse(puberty_data[[x]] == 4, 99, puberty_data[[x]]))
   

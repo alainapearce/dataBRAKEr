@@ -4,37 +4,97 @@
 \alias{proc_redcap}
 \title{proc_redcap: Process raw data downloaded from Study BRAKE REDCap}
 \usage{
-proc_redcap(sourcedata_wd, overwrite = FALSE, return_data = FALSE)
+proc_redcap(redcap_api = FALSE, redcap_visit_data, redcap_de_data)
 }
 \arguments{
-\item{sourcedata_wd}{full path to the sourcedata directory}
+\item{redcap_api}{(logical) execute REDCap API. Default = FALSE.}
 
-\item{overwrite}{overwrite existing files (default = FALSE)}
+\item{redcap_visit_data}{REDCap visit data from a prior API call}
 
-\item{return_data}{return phenotype to console (default = FLASE)}
+\item{redcap_de_data}{REDCap double-entry data from a prior API call}
 }
 \value{
-If return_data is set to TRUE, will return a list including:
- 1) clean raw phenotype datasets for each task
- 2) meta-data/.json inforamtion for each task
+Will return a list including data and metadata for:
+#' \itemize{
+#child v1
+   \item{'fnirs_cap'}
+   \item{'anthro_data'}
+   \item{'shapegame_info'}
+   \item{'fnirs_tasks_info'}
+   \item{'meal_info'}
+   \item{'sleep_wk_data'}
+   \item{'hfi_data'}
+
+
+ \item{'paticipants' - BIDS specified participants.tsv file}
+ \item{'anthropometrics' - height, weight, and computed anthropometric data}
+ \item{'demographics' - compiled demographic data}
+ 
+ 
+ \item{'dxa' - verified DXA data}
+ \item{'household' - compiled demographicinformation about houshold}
+ \item{'infancy' - compiled demographic information related to infancy}
+ \item{'intake' - compiled intake data with computed intake values}
+ \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+ \item{'parent_updates' - all visit updates}
+ \item{'researcher_notes' - all visit notes}
+ \item{'audit' - Alcohol Use Disorders Identification Test}
+ \item{'bes' - Binge Eating Scale}
+ \item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
+ \item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
+ \item{'cbq' - Child Behavior Questionnaire}
+ \item{'cchip' - Community Childhood Hunger Identification Project}
+ \item{'cebq' - Children's Eating Behavior Questionnaire}
+ \item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
+ \item{'cfq' - Child Feeding Questionnaire}
+ \item{'chaos' - Confusion, Hubbub, and Order Scale}
+ \item{'class' - *need*}
+ \item{'cshq' - Children Sleep Habits Questionnaire}
+ \item{'debq' - Dutch Eating Behavior Questionnaire}
+ \item{'efcr' - External Food Cue Responsiveness Scale}
+ \item{'ffbs' - Family Food Behavior Survey}
+ \item{'fsq' - *need*}
+ \item{'hfi' - Fulkerson Home Food Inventory}
+ \item{'hfias' - Household Food Insecurity Access Scale}
+ \item{'hfssm' - U.S. Household Food Security Survey Module}
+ \item{'kbas' - Kid's Brand Awareness Scale}
+ \item{'lbc' - Lifestyle Behavior Checklist}
+ \item{'loc' - Loss of Control-Eating Questionnaire}
+ \item{'pmum' - Problematic Media Use Measure *need*}
+ \item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
+ \item{'pss' - Perceived Stress Scale}
+ \item{'pstca' - *need*}
+ \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
+ \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+ \item{'rank' - Parent ranking of foods sources? *need*}
+ \item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
+ \item{'sic' - Stress in Children Questionnaire *need*}
+ \item{'sleeplog' - Week long sleep log}
+ \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
+ \item{'stq' - Screen Time Questionnaire *need*}
+ \item{'tfeq' - Three Factor Eating Questionnaire}
+}
 }
 \description{
 This function:
-1) reads REDCap data from sourcedata
-2) cleans data to save in BIDS format in phenotype. Produces the following files:
-   *
-3) calls functions to create .json files for each phoneypte/x.tsv file
+\itemize{
+   \item{1) Reads REDCap data (visit and double-entry) using the REDCap API}
+   \item{2) Calls util_ functions to clean and compile data in dataframes}
+   \item{3) Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe}
+   \item{4) Compiles data repeated across visits and sessions}
+}
 }
 \details{
 To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 }
 \examples{
 
-# process REDCap data
-phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
-
 \dontrun{
+redcap_data <- proc_redcap(base_wd, overwrite = FALSE, overwrite_jsons = FALSE)
+
 }
 
-
+}
+\seealso{
+[write_redcap()]
 }

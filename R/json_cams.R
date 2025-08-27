@@ -20,7 +20,7 @@ json_cams <- function() {
     cams_pre_premeal_followup = list( Description = 'Pre-meal, Pre-fNIRS anxiety at follow-up'),
     cams_post_premeal_followup = list( Description = 'Pre-meal, Post-fNIRS anxiety at follow-up'),
     cams_pre_postmeal_followup = list( Description = 'Post-meal, Pre-fNIRS anxiety at follow-up'),
-    cams_post_postmeal_followup = list( Description = 'Post-meal, Post-fNIRS anxiety at follow-up'),
+    cams_post_postmeal_followup = list( Description = 'Post-meal, Post-fNIRS anxiety at follow-up')
   )
 
   # convert formatting to JSON

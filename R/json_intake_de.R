@@ -7,7 +7,7 @@
 #'
 #' @export
 
- <- function() {
+json_intake_de <- function() {
 
   intake_de_list <- list(
     participant_id = list( Description = 'participant id number'),

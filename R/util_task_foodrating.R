@@ -1,6 +1,9 @@
 #' util_task_foodrating: Process raw data from the Food Rating Task
 #'
-#' This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
+#' This function: \itemize{
+#' \item{1) cleans data to save in BIDS format in rawdata}
+#' \item{2) generates summary data that can be used to generate a database}
+#' }
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
@@ -43,7 +46,7 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   
   
   # get directory paths
-  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, 'ses-', ses, 'nirs')
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'nirs')
   data_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'nirs', 'foodrating', paste0(sub_str, '_ses-', ses, '_task-foodrating_events.tsv'))
   
   #### Organize Data #####
@@ -62,7 +65,7 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   dat[['duration']] <- 2
   
   # clean up sub values
-  dat[['sub']] <- sapply(dat[['sub']], function(x) substr(x, tail(unlist(gregexpr('0', x)), 1)+1, nchar(x)))
+  dat[['sub']] <- sapply(dat[['sub']], function(x) substr(x, tail(unlist(gregexpr('-', x)), 1)+1, nchar(x)))
   dat[['sub']] <- as.numeric(dat[['sub']])
   
   # clean up condition values
@@ -92,8 +95,8 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(paste0(raw_wd, sub_str, '_task-foodrating_events.tsv')) | isTRUE(overwrite)) {
-    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodrating_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_task-foodrating_events.tsv'))) | isTRUE(overwrite)) {
+    write.table(dat, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-foodrating_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')

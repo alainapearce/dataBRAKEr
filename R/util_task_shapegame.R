@@ -1,6 +1,9 @@
 #' util_task_shapegame: Process raw data from the Shape Game (Value-Modulated Attentional Capture)
 #'
-#' This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
+#' This function: \itemize{
+#' \item{1) cleans data to save in BIDS format in rawdata}
+#' \item{2) generates summary data that can be used to generate a database}
+#' }
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
@@ -51,13 +54,13 @@ util_task_shapegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   #### Organize Data #####
   dat <- read.csv(data_file, sep = '\t', header = TRUE, na.strings = c('n/a', 'NA'))
   
-  # get practice rt and rt cuttoff
+  # get practice rt and rt cutoff
   dat_prac <- dat[!is.na(dat[['practice_trials.thisTrialN']]), ]
   
   # throw out first trial bc sometimes response are longer/may be skew rt/sd estimates
   mean_rt_prac <- mean(dat_prac[2:10, 'prac_key_resp.rt'], na.rm = TRUE)
   sd_rt_prac <- sd(dat_prac[2:10, 'prac_key_resp.rt'], na.rm = TRUE)
-  rt_cuttoff <- mean_rt_prac + 2*sd_rt_prac
+  rt_cutoff <- mean_rt_prac + 2*sd_rt_prac
   
   # remove practice and instructions
   dat <- dat[dat[['trial_file']] != '', ]
@@ -65,7 +68,7 @@ util_task_shapegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   # add practice info to data
   dat[['prac_rt_mean']] <- mean_rt_prac
   dat[['prac_rt_sd']] <- sd_rt_prac
-  dat[['rt_cuttoff']] <- rt_cuttoff
+  dat[['rt_cutoff']] <- rt_cutoff
   
   # remove inter-block message
   dat <- dat[!is.na(dat[['trials.thisN']]), ]
@@ -93,29 +96,16 @@ util_task_shapegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   # remove zero-base ordering
   dat[['trialN']] <- dat[['trialN']] + 1
   
-  # reduce columns and detect if has eye-tracking or not
-  # if ('etRecord.started' %in% names(dat)){
-  #   eye_track = TRUE
-  #   
-  #   eye_dat <- dat[c('participant', 'trialN', 'pos1_roi.started', 'pos2_roi.started', 'pos3_roi.started', 'pos4_roi.started', 'pos5_roi.started', 'pos6_roi.started','etRecord.started', 'pos1_roi.numLooks', 'pos1_roi.timesOn', 'pos1_roi.timesOff', 'pos2_roi.numLooks', 'pos2_roi.timesOn', 'pos2_roi.timesOff', 'pos3_roi.numLooks', 'pos3_roi.timesOn', 'pos3_roi.timesOff', 'pos4_roi.numLooks', 'pos4_roi.timesOn', 'pos4_roi.timesOff', 'pos5_roi.numLooks', 'pos5_roi.timesOn', 'pos5_roi.timesOff', 'pos6_roi.numLooks', 'pos6_roi.timesOn', 'pos6_roi.timesOff')]
-  #   
-  #   # update names
-  #   names(eye_dat) <- c('sub', 'trial', 'pos1_roi_onset', 'pos2_roi_onset', 'pos3_roi_onset', 'pos4_roi_onset', 'pos5_roi_onset', 'pos6_roi_onset' ,'et_record_onset', 'pos1_looks', 'pos1_look_onsets', 'pos1_look_offsets', 'pos2_looks', 'pos2_look_onsets', 'pos2_look_offsets', 'pos3_looks', 'pos3_look_onsets', 'pos3_look_offsets', 'pos4_looks', 'pos4_look_onsets', 'pos4_look_offsets', 'pos5_looks', 'pos5_look_onsets', 'pos5_look_offsets', 'pos6_looks', 'pos6_look_onsets', 'pos6_look_offsets')
-  #   
-  # } else {
-  #   eye_track = FALSE
-  # }
-  
   # get points per trial
-  dat[['trial_points']] <- ifelse(dat[['trial_key_resp.rt']] < dat[['rt_cuttoff']], ifelse(dat[['trial_key_resp.corr']] == 1, ifelse(dat[['trial_type']] == 'high', (dat[['rt_cuttoff']] - dat[['trial_key_resp.rt']])*100, ((dat[['rt_cuttoff']] - dat[['trial_key_resp.rt']])*100)/10), 0), 0)
+  dat[['trial_points']] <- ifelse(dat[['trial_key_resp.rt']] < dat[['rt_cutoff']], ifelse(dat[['trial_key_resp.corr']] == 1, ifelse(dat[['trial_type']] == 'high', (dat[['rt_cutoff']] - dat[['trial_key_resp.rt']])*100, ((dat[['rt_cutoff']] - dat[['trial_key_resp.rt']])*100)/10), 0), 0)
   
   dat[['total_points']] <- cumsum(ifelse(is.na(dat[['trial_points']]), 0, dat[['trial_points']]))
   
   # reduce beh data
-  dat <- dat[c('participant', 'date', 'expName', 'prac_rt_mean', 'prac_rt_sd', 'rt_cuttoff', 'blockN', 'trialN', 'trial_type', 'trial_points', 'total_points', 'pos1', 'pos2', 'pos3', 'pos4', 'pos5', 'pos6', 'direction', 'target_roi', 'high_roi', 'low_roi', 'trial_key_resp.keys', 'trial_key_resp.corr', 'trial_key_resp.rt', 'psychopyVersion', 'frameRate')]
+  dat <- dat[c('participant', 'date', 'expName', 'prac_rt_mean', 'prac_rt_sd', 'rt_cutoff', 'blockN', 'trialN', 'trial_type', 'trial_points', 'total_points', 'pos1', 'pos2', 'pos3', 'pos4', 'pos5', 'pos6', 'direction', 'target_roi', 'high_roi', 'low_roi', 'trial_key_resp.keys', 'trial_key_resp.corr', 'trial_key_resp.rt', 'psychopyVersion', 'frameRate')]
   
   # update names
-  names(dat) <- c('sub', 'date', 'exp_name', 'prac_rt_mean', 'prac_rt_sd', 'rt_cuttoff', 'block', 'trial', 'trial_type', 'trial_points', 'total_points', 'pos1', 'pos2', 'pos3', 'pos4', 'pos5', 'pos6', 'direction', 'target_roi', 'high_roi', 'low_roi', 'resp', 'resp_corr', 'resp_rt', 'psychopy_ver', 'frame_rate')
+  names(dat) <- c('sub', 'date', 'exp_name', 'prac_rt_mean', 'prac_rt_sd', 'rt_cutoff', 'block', 'trial', 'trial_type', 'trial_points', 'total_points', 'pos1', 'pos2', 'pos3', 'pos4', 'pos5', 'pos6', 'direction', 'target_roi', 'high_roi', 'low_roi', 'resp', 'resp_corr', 'resp_rt', 'psychopy_ver', 'frame_rate')
   
   # clean up sub values
   dat[['sub']] <- sapply(dat[['sub']], function(x) substr(x, tail(unlist(gregexpr('-', x)), 1)+2, nchar(x)))
@@ -124,25 +114,15 @@ util_task_shapegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   # clean up date
   dat[['date']] <- lubridate::date(dat[['date']])
   
-  # get long dataset with trial information
-  # if (isTRUE(eye_track)) {
-  #   eye_dat_long <- util_eyetrack_roi(eye_dat, roi_list = c('pos1', 'pos2', 'pos3', 'pos4', 'pos5', 'pos6'), return_data = TRUE)
-  #   eye_dat_long <- merge(eye_dat_long, dat, by = 'trial')
-  # } 
-    
-  
   #### Save in rawdata #####
   
   if (!dir.exists(raw_wd)) {
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(paste0(raw_wd, sub_str, '_task-shapegame_beh.tsv')) | isTRUE(overwrite)) {
-    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-shapegame_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_task-shapegame_events.tsv'))) | isTRUE(overwrite)) {
+    write.table(dat, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-shapegame_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
     
-    # if (isTRUE(eye_track)) {
-    #   write.table(eye_dat_long, gzfile(paste0(raw_wd, sub_str, '_ses-', ses, '_task-shapegame_recording-eyetrack.tsv.gz')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
-    # } 
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')

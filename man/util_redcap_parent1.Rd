@@ -2,21 +2,33 @@
 % Please edit documentation in R/util_redcap_parent1.R
 \name{util_redcap_parent1}
 \alias{util_redcap_parent1}
-\title{util_redcap_parent1: Organize parent visit 1 data from REDCap (called within proc_redcap.R)}
+\title{util_redcap_parent1: Organize parent visit 1 data from REDCap}
 \usage{
-util_redcap_parent1(data, v1_date_data, return_data = TRUE)
+util_redcap_parent1(data, date_data)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_1_arm_1}
-
-\item{v1_date_data}{dataset that includes ID variable and date of first visit}
-
-\item{return_data}{return organized data (default = TRUE)}
 }
 \value{
-If return_data is set to TRUE, will return a list including:
- 1) clean raw parent 1 datasets
- 2) meta-data/.json for each dataset
+Will return a list including:
+\itemize{
+ \item{clean raw parent visit 1 datasets}
+ \item{meta-data formated as json for each dataset}
+ }
+
+ Returned data includes:
+ \itemize{
+   \item{demo_data}
+   \item{infancy_data}
+   \item{household_data}
+   \item{puberty_data}
+   \item{cfq_data}
+   \item{cebq_data}
+   \item{lbc_data}
+   \item{lbc_data}
+   \item{brief_data}
+   \item{ffq_data}
+ }
 }
 \description{
 This function organizes REDCap data from REDCap visit data, event parent_visit_1_arm_1
@@ -24,10 +36,12 @@ This function organizes REDCap data from REDCap visit data, event parent_visit_1
 \examples{
 
 # process REDCap data
-parent_visit1_data <- util_redcap_parent1(data)
+parent_visit1_list <- util_redcap_parent1(data)
 
 \dontrun{
 }
 
-
+}
+\seealso{
+[proc_redcap(), util_redcap_dates()]
 }

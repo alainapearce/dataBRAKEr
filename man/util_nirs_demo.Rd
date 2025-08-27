@@ -41,8 +41,6 @@ util_nirs_demo(
 \item{fullness_tastetest}{double-entered freddy fullness for taste-test generated from util_redcap_de.R}
 
 \item{v3_date}{date from prepost_v3_data}
-
-\item{return_data}{return organized data (default = TRUE)}
 }
 \value{
 If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data

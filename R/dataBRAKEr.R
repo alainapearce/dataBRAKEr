@@ -10,7 +10,7 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
 #' @inheritParams proc_tasks
-#' @inheritParams proc_tasks
+#' @inheritParams util_task_org_sourcedata
 #' @param data_list list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
 #'  \item{'participants' - BIDS specified participants.tsv file}

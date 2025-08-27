@@ -1,6 +1,9 @@
 #' util_task_foodchoice: Process raw data from the Food Choice Task
 #'
-#' This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
+#' This function: \itemize{
+#' \item{1) cleans data to save in BIDS format in rawdata}
+#' \item{2) generates summary data that can be used to generate a database}
+#' }
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
@@ -28,15 +31,15 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   #### 1. Set up/initial checks #####
   
   # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(base_wd)
+  base_wd_arg <- methods::hasArg(base_wd)
   
-  if (isTRUE(data_arg)) {
+  if (isTRUE(base_wd_arg)) {
     if (!is.character(base_wd)) {
       stop("base_wd must be entered as a string")
     } else if (!file.exists(base_wd)) {
       stop("base_wd entered, but file does not exist. Check base_wd string.")
     }
-  } else if (isFALSE(data_arg)) {
+  } else if (isFALSE(base_wd)) {
     stop("base_wd must be entered as a string")
   }
   
@@ -44,9 +47,9 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   # get directory paths
   raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'nirs')
   
-  data_file <- file.path(base_wd, 'bids', 'sourcedata',, sub_str, paste0('ses-', ses), 'nirs', 'foodchoice', paste0(sub_str, '_ses-', ses, '_task-foodchoice_events.tsv'))
+  data_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'nirs', 'foodchoice', paste0(sub_str, '_ses-', ses, '_task-foodchoice_events.tsv'))
   
-  print(sub_str)
+  #print(sub_str)
   
   #check for '999'
   if (!file.exists(data_file)){
@@ -150,7 +153,7 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   dat[['duration']] <- 2
   
   # clean up sub values
-  dat[['sub']] <- sapply(dat[['sub']], function(x) substr(x, tail(unlist(gregexpr('0', x)), 1)+1, nchar(x)))
+  dat[['sub']] <- sapply(dat[['sub']], function(x) substr(x, tail(unlist(gregexpr('-', x)), 1)+1, nchar(x)))
   dat[['sub']] <- as.numeric(dat[['sub']])
   
   # clean up date
@@ -185,11 +188,11 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(paste0(raw_wd, sub_str, '_task-foodchioce_events.tsv')) | isTRUE(overwrite)) {
-    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_events.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_task-foodchoice_events.tsv'))) | isTRUE(overwrite)) {
+    write.table(dat, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-foodchoice_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
     
     if (isTRUE(eye_track)) {
-      write.table(eye_dat_long, gzfile(paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodchioce_recording-eyetrack.tsv.gz')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+      write.table(eye_dat_long, gzfile(file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-foodchoice_recording-eyetrack.tsv.gz'))), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
     } 
     
     if (isTRUE(overwrite)){

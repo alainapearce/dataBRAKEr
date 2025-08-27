@@ -1,6 +1,9 @@
 #' util_task_tastetest: Process raw data from the fNIRS Taste-Test Task
 #'
-#' This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
+#' This function: \itemize{
+#' \item{1) cleans data to save in BIDS format in rawdata}
+#' \item{2) generates summary data that can be used to generate a database}
+#' }
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'

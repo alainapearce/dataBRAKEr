@@ -4,28 +4,26 @@
 \alias{util_redcap_de}
 \title{util_redcap_de: Organize double-entry data from REDCap}
 \usage{
-util_redcap_de(data, return_data = TRUE)
+util_redcap_de(redcap_api = FALSE, redcap_de_data, date_data)
 }
 \arguments{
-\item{data}{data from REDCap data double entry}
+\item{redcap_api}{(logical) execute REDCap API. Default = FALSE.}
 
-\item{return_data}{return organized data (default = TRUE)}
+\item{redcap_de_data}{REDCap double-entry data from a prior API call}
 }
 \value{
-If return_data is set to TRUE, will return a list including:
- 1) double-entered raw data across all visits
- 2) meta-data/.json for each dataset
+Will return a list including data that has been double-entered and checked along with the metadata for:
+\itemize{
+ \item{bodpod}
+ \item{wasi}
+ \item{dkefs}
+ \item{intake}
+ \item{fullness_baseline}
+ \item{fullness_followup}
+ \item{taste_test}
+ \item{cams}
+}
 }
 \description{
-This function organizes double-entry REDCap data for all visits
-}
-\examples{
-
-# process REDCap data
-data_de_proc <- util_redcap_de(data)
-
-\dontrun{
-}
-
-
+This function organizes REDCap double entry data data
 }

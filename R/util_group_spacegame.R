@@ -1,6 +1,6 @@
 #' util_group_spacegame: Get summary data from the Space Game (2-stage reinforcement learning task)
 #'
-#' This function calculates summary performance data for a participant and saves the output in a wide format (overall task) and long format (by block)
+#' This function calculates summary performance data and saves the output
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
@@ -15,7 +15,7 @@
 #' @examples
 #'
 #' # process task data for the Food Choice Task
-#' util_group_spacegame <- util_task_spacegame(data_list, ses, data_path, return = TRUE)
+#' group_spacegame_dat <- util_group_spacegame(ddata_list, ses, base_wd, overwrite, return = TRUE)
 #'
 #' \dontrun{
 #' }
@@ -23,7 +23,7 @@
 #'
 #' @export
 
-util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
+util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE, return_data = FALSE) {
   
   #### 1. Set up/initial checks #####
   
@@ -40,113 +40,32 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
     stop("base_wd must be entered as a string")
   }
   
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The util_group_spacegame.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-  
-  
-  #### Summary Data Function #####
-  
-  beh_sum_spacegame <- function(dat_block){
-    rt_mean_earth <- mean(dat_block[['rt_earth']], na.rm = TRUE)
-    rt_median_earth <- median(dat_block[['rt_earth']], na.rm = TRUE)
-    
-    rt_mean_planet <- mean(dat_block[['rt_planet']], na.rm = TRUE)
-    rt_median_planet <- median(dat_block[['rt_planet']], na.rm = TRUE)
-    
-    n_timeout_earth <- sum(dat_block[['timeout_earth']])
-    n_timeout_planet <- sum(dat_block[['timeout_planet']])
-    
-    score <- dat_block[nrow(dat_block), 'score']
-    
-    ## reward rate
-    rr <- mean(dat_block[dat_block['missed'] == 0, 'points'], na.rm = TRUE)
-    avg_reward <- mean(rowMeans(dat_block[dat_block['missed'] == 0, c('rewards1', 'rewards2')]))
-    rr_adj <- rr - avg_reward
-    
-    #by stake - high
-    rr_s5 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, 'points'], na.rm = TRUE)
-    avg_reward_s5 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')]))
-    rr_adj_s5 <- rr_s5 - avg_reward_s5
-    
-    #by stake - low
-    rr_s1 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 1, 'points'], na.rm = TRUE)
-    avg_reward_s1 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')]))
-    rr_adj_s1 <- rr_s1 - avg_reward_s1
-    
-    ## reward rate - Scaled
-    rr_scaled <- mean(dat_block[dat_block['missed'] == 0, 'points']/9, na.rm = TRUE)
-    avg_reward_scaled <- mean(rowMeans(dat_block[dat_block['missed'] == 0, c('rewards1', 'rewards2')])/9)
-    rr_scaled_adj <- rr_scaled - avg_reward_scaled
-    
-    #by stake - high
-    rr_scaled_s5 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, 'points']/9, na.rm = TRUE)
-    avg_reward_scaled_s5 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 5, c('rewards1', 'rewards2')])/9)
-    rr_scaled_adj_s5 <- rr_scaled_s5 - avg_reward_scaled_s5
-    
-    #by stake - low
-    rr_scaled_s1 <- mean(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 1, 'points']/9, na.rm = TRUE)
-    avg_reward_scaled_s1 <- mean(rowMeans(dat_block[dat_block['missed'] == 0 & dat_block['stake'] == 1, c('rewards1', 'rewards2')])/9)
-    rr_scaled_adj_s1 <- rr_scaled_s1 - avg_reward_scaled_s1
-    
-    #stay probability
-    stay_prob <- sum(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1, 'stay_planet'], na.rm = TRUE)/nrow(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1, ])
-    
-    #by stake - high
-    stay_prob_s5 <- sum(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 5, 'stay_planet'], na.rm = TRUE)/nrow(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 5, ])
-    
-    #by stake - high
-    stay_prob_s1 <- sum(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 1, 'stay_planet'], na.rm = TRUE)/nrow(dat_block[dat_block['missed'] != 1 & dat_block['prev_missed'] != 1 & dat_block['stake'] == 1, ])
-    
-    beh_dat <- data.frame(rt_mean_earth, rt_median_earth, rt_mean_planet, rt_median_planet, n_timeout_earth, n_timeout_planet, rr, rr_adj, rr_s5, rr_adj_s5, rr_s1, rr_adj_s1, rr_scaled, rr_scaled_adj, rr_scaled_s5, rr_scaled_adj_s5, rr_scaled_s1, rr_scaled_adj_s1, stay_prob, stay_prob_s5, stay_prob_s1)
-    
-    
-    return(beh_dat)
-  }
-  
-  
   
   #### Participant Summary Function #####
   
   sum_database_fn <- function(sub_str, ses, base_wd, format){
     # get directory paths
-    raw_wd <- paste0(base_wd, slash, 'bids', slash, 'rawdata', slash, sub_str, slash, 'ses-', ses, slash, 'beh', slash)
+    raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'beh')
     
-    data_file <- paste0(raw_wd, sub_str, '_ses-', ses, '_task-spacegame_beh.tsv')
+    data_file <- file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-spacegame_events.tsv'))
     
-    print(sub_str)
+    #print(sub_str)
     
     dat <- read.table(data_file, sep='\t', header = TRUE, na.strings = 'n/a')
     
+    sum_dat <- util_spacegame_summary(dat)
+    sum_dat['participant_id'] <- sprintf('sub-%03d', dat[1, 'sub'])
+    sum_dat['session_id'] <- paste0('ses-', ses)
+    sum_dat['visit_date'] <- dat[['date']][1]
     
-    if(format == 'wide'){
-      sum_dat <- beh_sum_spacegame(dat)
-      sum_dat$sub <- dat[1, 'sub']
-      sum_dat$ses <- ses
-      sum_dat <- sum_dat[, c("sub", "ses", setdiff(names(sum_dat), c("sub", "ses")))] 
-  
-    } else {
-      #by block
-      
-      sum_dat <- do.call(rbind, t(sapply(unique(dat[['block']]), function(x) beh_sum_spacegame(dat[dat[['block']] == x, ]), simplify = FALSE)))
-      sum_dat$sub <- dat[1, 'sub']
-      sum_dat$ses <- ses
-      sum_dat$block <- seq(1, nrow(sum_dat), 1)
-      sum_dat <- sum_dat[, c("sub", "ses", setdiff(names(sum_dat), c("sub", "ses")))] 
-    }
+    sum_dat <- sum_dat[c('participant_id', 'session_id', 'visit_date', names(sum_dat)[!grepl('_id|^visit', names(sum_dat))])] 
     
-    return(list(
-      dm_groupdata <- as.data.frame(dat),
-      sum_dat <- as.data.frame(sum_dat)))
+    return(as.data.frame(sum_dat))
   }
   
   
   #### Save in derivatives #####
-  deriv_wd <- paste0(base_wd, slash, 'bids', slash, 'derivatives', slash, 'beh', slash)
+  deriv_wd <- file.path(base_wd, 'bids', 'derivatives', 'beh')
   
   if (!dir.exists(deriv_wd)) {
     dir.create(deriv_wd, recursive = TRUE)
@@ -156,41 +75,32 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE) {
   data_list <- data_list[data_list['sub_str'] != 'sub-026', ]
   
   ## Wide/Overall Data ####
-  if (!file.exists(paste0(deriv_wd, 'task-spacegame_beh.tsv')) | isTRUE(overwrite)) {
+  if (!file.exists(file.path(deriv_wd, 'task-spacegame_beh.tsv')) | isTRUE(overwrite)) {
     
     # generate summary database
-    gen_data <- t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses = 'baseline', base_wd = base_wd, format = 'wide'), simplify = TRUE, USE.NAMES = TRUE))
+    sum_database <- as.data.frame(t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses = 'baseline', base_wd = base_wd, format = 'wide'), simplify = TRUE, USE.NAMES = TRUE)))
     
-    write.table(sum_database, paste0(deriv_wd, 'task-spacegame_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+    sum_database[!grepl('_id|^visit', names(sum_database))] <- sapply(sum_database[!grepl('_id|^visit', names(sum_database))], function(x) round(as.numeric(x), 3))
     
-    if (isTRUE(overwrite)){
-      return_msg <- 'overwrote with new version'
-    } else {
-      return_msg <- 'complete'
-    }
-  } else {
-    return_msg <- 'exists'
+    sum_database[grepl('_id|^visit', names(sum_database))] <- sapply(sum_database[grepl('_id|^visit', names(sum_database))], function(x) as.character(x))
+    
+    write.table(sum_database, file.path(deriv_wd, 'task-spacegame_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+    
   }
   
-  ## Long Data ####
   
-  if (!file.exists(paste0(deriv_wd, 'task-spacegame-long_beh.tsv')) | isTRUE(overwrite)) {
-    
-    # generate summary database
-    sum_database_long <- do.call(rbind.data.frame, sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses = 'baseline', base_wd = base_wd, format = 'long'), simplify = FALSE, USE.NAMES = TRUE))
-    rownames(sum_database_long) <- NULL
-    
-    
-    write.table(sum_database_long, paste0(deriv_wd, 'task-spacegame-long_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
-    
-    if (isTRUE(overwrite)){
-      return_msg_long <- 'overwrote with new version'
-    } else {
-      return_msg_long <- 'complete'
-    }
-  } else {
-    return_msg_long <- 'exists'
+  #generate json file for derivative data
+  spacegame_json <- json_spacegame()
+  
+  spacegame_filename_json <- file.path(deriv_wd, 'task-spacegame_beh.json')
+  
+  if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    write(spacegame_json, spacegame_filename_json)
   }
   
-  return(list(return_msg, return_msg_long))
+  if (isTRUE(return_data)){
+    spacegame_data <- list(data = sum_database, meta = spacegame_json)
+    
+    return(spacegame_data)
+  }
 }

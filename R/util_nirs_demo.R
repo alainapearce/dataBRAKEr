@@ -5,9 +5,12 @@
 #' To use this function, util_redcap_*.R must be completed so all REDCap demographic information is available.
 #'
 #'
-#' @param v1_demo_homeloc demo data from generated from util_redcap_prepost1.R
-#' @param fnirs_info fnirs task information generated from util_redcap_child1.R
+#' @param demo_rurality demo data from generated from util_redcap_prepost1.R
+#' @param baseline_fnirs_cap fnirs task information generated from util_redcap_child1.R
+#' @param baseline_tasks fnirs task information generated from util_redcap_child1.R
 #' @param anthro_data anthropometric data from visit 1 generated from util_redcap_child1.R
+#' @param followup_fnirs_cap fnirs task information generated from util_redcap_child1.R
+#' @param followup_tasks fnirs task information generated from util_redcap_child1.R
 #' @param followup_anthro_data anthropometric data from visit 3 generated from util_redcap_child3.R
 #' @param demographics demographic data from visit 1 survey generated from util_redcap_parent1.R
 #' @param puberty parent-report puberty data visit 1 survey generated from util_redcap_parent1.R
@@ -16,7 +19,7 @@
 #' @param followup_cams double-entered follow-up CAMS generated from util_redcap_de.R
 #' @param fullness_tastetest double-entered freddy fullness for taste-test generated from util_redcap_de.R
 #' @param v3_date date from prepost_v3_data
-#' @inheritParams util_redcap_prepost1
+#' @inheritParams util_redcap_prepost
 #' 
 #' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 #'

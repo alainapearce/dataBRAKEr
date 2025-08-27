@@ -41,7 +41,7 @@
 #'
 #' @export
 
-util_redcap_parent3 <- function(data, return_data = TRUE) {
+util_redcap_parent3 <- function(data, date_data) {
   
   #### 1. Set up/initial checks #####
   
@@ -134,10 +134,7 @@ util_redcap_parent3 <- function(data, return_data = TRUE) {
   # process data
   names(puberty_data) <- gsub('pds_sex', 'sex', names(puberty_data))
   
-  #re-code sex to match demo_c_sex
-  puberty_data[['sex']] <- ifelse(puberty_data[['sex']] == 0, 1, 0)
-  
-  puberty_scored <- dataprepr::score_pds(puberty_data, base_zero = FALSE, respondent = 'parent', male = 0, female = 1, id = 'participant_id')
+  puberty_scored <- dataprepr::score_pds(puberty_data, base_zero = FALSE, respondent = 'parent', male = 'male', female = 'female', id = 'participant_id')
   
   puberty_json <- json_pds()
   

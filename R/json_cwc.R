@@ -8,7 +8,7 @@
 #' @export
 
 json_cwc <- function() {
-
+  
   cwc_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Child Weight Concerns Scale. Trained research assistants adminsiter the scale to children using the following instructions: "Okay, now I\'m going to ask you some questions about how you feel about your body. There are no right or wrong answers, I just want to know how you feel. I also won\'t talk to your parents about anything unless you want me to. Are you ready to start?"',
@@ -48,7 +48,7 @@ json_cwc <- function() {
                                 '5' = 'I was on a diet about 3 months ago',
                                 '6' = 'I was on a diet less than 1 month ago',
                                 '7' = 'I was on a diet less than 1 month ago',
-                                '99' = 'Prefer not to answer'),
+                                '99' = 'Prefer not to answer')),
     cwc4 = list( Description = 'Compared to other things in your life, how important is your weight to you?',
                  Levels = list ('1' = 'Compared to other things in your life, how important is your weight to you?',
                                 '2' = 'My weight is a little more important than some other things',
@@ -63,16 +63,16 @@ json_cwc <- function() {
                                 '5' = 'Always',
                                 '99' = 'Prefer not to answer')),
     cwc_total = list( Description = 'Total score',
-                     Derivative = TRUE)))
-
+                      Derivative = TRUE))
+  
   # convert formatting to JSON
   cwc_json <- RJSONIO::toJSON(cwc_list, pretty = TRUE)
-
+  
   # double check
   if (isFALSE(RJSONIO::isValidJSON(cwc_json, asText = TRUE))){
     print('CWC JSON file may be invalid')
   }
-
+  
   return(cwc_json)
-
+  
 }

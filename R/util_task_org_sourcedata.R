@@ -25,7 +25,7 @@
 
 util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, overwrite = FALSE) {
   
-  print(sub_str)
+  #print(sub_str)
   #### 1. Set up/initial checks #####
   
   # check that audit_data exist and is a data.frame
@@ -45,6 +45,8 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   if (task_str == 'nih'){
     raw_untouched_path <- file.path(base_wd,'raw_untouched', paste0(task_str, '_toolbox'))
     
+  } else if (task_str == 'pit'){
+    raw_untouched_path <- file.path(base_wd,'raw_untouched', paste0('friendsgame_', task_str))
   } else {
     raw_untouched_path <- file.path(base_wd,'raw_untouched', paste0(task_str, '_game'))
   }
@@ -88,6 +90,8 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
       }
       
       rename_files <- gsub(paste0('-', desc_str,'-meal_', task_str), paste0('_ses-', ses, '_task-taste_desc-', desc_str, '_events'), raw_files)
+    } else if (task_str == 'pit') {
+      rename_files <- gsub(paste0('friendsgame-', task_str), paste0('ses-', ses, '_task-', task_str, '_events'), raw_files)
     } else {
       rename_files <- gsub(paste0('_', task_str), paste0('_ses-', ses, '_task-', task_str, '_events'), raw_files)
       
@@ -97,8 +101,9 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   
   
   #### Save in sourcedata #####
+  
   # set paths for other directories
-  if (task_str == 'nih'){
+  if (task_cat == 'beh'){
     source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), task_cat)
   } else {
     source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), task_cat, task_str)

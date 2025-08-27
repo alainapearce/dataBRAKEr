@@ -4,7 +4,7 @@
 #'
 #' @param redcap_api (logical) execute REDCap API. Default = FALSE.
 #' @param redcap_de_data REDCap double-entry data from a prior API call
-#' @inheritParams util_redcap_parent_v1
+#' @inheritParams util_redcap_child1
 #'
 #' @return Will return a list including data that has been double-entered and checked along with the metadata for:
 #' \itemize{
@@ -91,21 +91,23 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   
   #split by visit
   bodpod_data_v1 <- bodpod_data[!grepl('v3', names(bodpod_data))]
+  bodpod_data_v1 <- merge(bodpod_data_v1, date_data[c('participant_id', 'v1_date')], by = 'participant_id')
+  names(bodpod_data_v1)[names(bodpod_data_v1) == 'v1_date'] <- 'visit_date'
   
   bodpod_data_v3 <- bodpod_data[grepl('_id|^visit|v3', names(bodpod_data))]
+  bodpod_data_v3 <- merge(bodpod_data_v3, date_data[c('participant_id', 'v3_date')], by = 'participant_id')
+  names(bodpod_data_v3)[names(bodpod_data_v3) == 'v3_date'] <- 'visit_date'
   names(bodpod_data_v3) <- gsub('_v3', '', names(bodpod_data_v3))
   
   #add session
   bodpod_data_v1['session_id'] <- 'baseline'
   bodpod_data_v3['session_id'] <- 'followup'
   
-  names(bodpod_data)[names(bodpod_data) == 'bodpod_date'] <- 'visit_date'
-  
   bodpod_data <- rbind.data.frame(bodpod_data_v1, bodpod_data_v3)
   
   bodpod_data <- bodpod_data[c('participant_id', 'session_id', 'visit_date', names(bodpod_data)[grepl('bodpod', names(bodpod_data))])]
   
-  bodpod_json <- bodpod_json()
+  bodpod_json <- json_bodpod()
   
   ## wasi ####
   wasi_data <- checked_data[grepl('_id|wasi', names(checked_data))]
@@ -244,12 +246,17 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   cams_json <- json_cams()
   
   ## NonWear Log data
-  nonwear_log_data <- data[, grepl('participant_id', names(data)) | grepl('nonwear', names(data))] 
+  nonwear_log_data <- checked_data[grepl('_id|nonwear', names(checked_data))]
+  
   nonwear_log_data <- nonwear_log_data[, !(grepl('complete', names(nonwear_log_data)))]
   
-  names(nonwear_log_data)[1] <- 'participant_id'
-
-    return(list(
+  nonwear_log_data['session_id'] <- 'baseline'
+  
+  nonwear_log_data <- nonwear_log_data[c('participant_id', 'session_id', names(nonwear_log_data)[grepl('nonwear', names(nonwear_log_data))])]
+  
+  nonwear_log_json <- json_nonwear()
+    
+  return(list(
       bodpod_data = list(data = bodpod_data, bodpod_json), 
       wasi_data = list(data = wasi_data, meta = wasi_json),
       dkefs_data = list(data = dkefs_data, meta = dkefs_json), 
@@ -257,7 +264,8 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
       fullness_baseline_data = list(data = ff_data_baseline, ff_baseline_json), 
       fullness_followup_data = list(data = ff_data_v3, ff_v3_json), 
       taste_test_data = list(data = tt_data, tt_json),
-      cams_data = list(data = cams_data, meta = cams_json)
+      cams_data = list(data = cams_data, meta = cams_json),
+      nonwear_data = list(data = nonwear_log_data, meta = nonwear_log_json)
       ))
 }
 

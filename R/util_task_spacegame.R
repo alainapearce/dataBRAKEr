@@ -1,6 +1,9 @@
 #' util_task_spacegame: Process raw data from the Space Game (2-stage reinforcement learning task)
 #'
-#' This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
+#' This function: \itemize{
+#' \item{1) cleans data to save in BIDS format in rawdata}
+#' \item{2) generates summary data that can be used to generate a database}
+#' }
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
@@ -65,13 +68,6 @@ util_task_spacegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   # rename
   names(dat) <- c('rewards1', 'rewards2', 'block', 'state_earth', 'state_planet', 'stim_left', 'stim_right', 'stake', 'choice_earth', 'rt_earth', 'rt_planet', 'score', 'points', 'timeout_earth', 'timeout_planet', 'sub', 'date')
   
-  # add trials by block
-  # dat[dat[['block']] == 1, 'trial'] <- seq(1, nrow(dat[dat[['block']] == 1, ]))
-  # dat[dat[['block']] == 2, 'trial'] <- seq(1, nrow(dat[dat[['block']] == 2, ]))
-  # dat[dat[['block']] == 3, 'trial'] <- seq(1, nrow(dat[dat[['block']] == 3, ]))
-  # dat[dat[['block']] == 4, 'trial'] <- seq(1, nrow(dat[dat[['block']] == 4, ]))
-  
-  # kool didn't consider blocks a reset
   dat[['trial']] <- seq(1, nrow(dat), 1)
   
   # get key press
@@ -83,27 +79,6 @@ util_task_spacegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   # reward dif
   dat[['reward_dif']] <- abs(dat[['rewards1']] -  dat[['rewards2']])
-  
-  # get stay for planet by block
-  # dat[dat[['block']] == 1, 'stay_planet'] <- sapply(dat[dat[['block']] == 1, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 1 & dat[['trial']] == x, 'state_planet'] == dat[dat[['block']] == 1 & dat[['trial']] == x-1, 'state_planet'], 1, 0)))
-  # 
-  # dat[dat[['block']] == 2, 'stay_planet'] <- sapply(dat[dat[['block']] == 2, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 2 & dat[['trial']] == x, 'state_planet'] == dat[dat[['block']] == 2 & dat[['trial']] == x-1, 'state_planet'], 1, 0)))
-  # 
-  # dat[dat[['block']] == 3, 'stay_planet'] <- sapply(dat[dat[['block']] == 3, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 3 & dat[['trial']] == x, 'state_planet'] == dat[dat[['block']] == 3 & dat[['trial']] == x-1, 'state_planet'], 1, 0)))
-  # 
-  # dat[dat[['block']] == 4, 'stay_planet'] <- sapply(dat[dat[['block']] == 4, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 4 & dat[['trial']] == x, 'state_planet'] == dat[dat[['block']] == 4 & dat[['trial']] == x-1, 'state_planet'], 1, 0)))
-  
-  # get earth same/different
-  # dat[dat[['block']] == 1, 'earth_same'] <- sapply(dat[dat[['block']] == 1, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 1 & dat[['trial']] == x, 'state_earth'] == dat[dat[['block']] == 1 & dat[['trial']] == x-1, 'state_earth'], 1, 0)))
-  # 
-  # dat[dat[['block']] == 2, 'earth_same'] <- sapply(dat[dat[['block']] == 2, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 2 & dat[['trial']] == x, 'state_earth'] == dat[dat[['block']] == 2 & dat[['trial']] == x-1, 'state_earth'], 1, 0)))
-  # 
-  # dat[dat[['block']] == 3, 'earth_same'] <- sapply(dat[dat[['block']] == 3, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 3 & dat[['trial']] == x, 'state_earth'] == dat[dat[['block']] == 3 & dat[['trial']] == x-1, 'state_earth'], 1, 0)))
-  # 
-  # dat[dat[['block']] == 4, 'earth_same'] <- sapply(dat[dat[['block']] == 4, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 4 & dat[['trial']] == x, 'state_earth'] == dat[dat[['block']] == 4 & dat[['trial']] == x-1, 'state_earth'], 1, 0)))
-  
-  
-  # kool didn't consider blocks a reset
   
   #get info for trial-by-trail analyses (stay probabilities)
   dat[['prev_reward_diff']] <- c(0, dat[2:nrow(dat), 'reward_dif'])
@@ -124,8 +99,8 @@ util_task_spacegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(paste0(raw_wd, sub_str, '_task-spacegame_beh.tsv')) | isTRUE(overwrite)) {
-    write.table(dat, paste0(raw_wd, sub_str, '_ses-', ses, '_task-spacegame_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_task-spacegame_events.tsv'))) | isTRUE(overwrite)) {
+    write.table(dat, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-spacegame_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
     
     if (isTRUE(overwrite)){
       return_msg <- 'overwrote with new version'

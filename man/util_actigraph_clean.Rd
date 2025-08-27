@@ -27,8 +27,6 @@ util_actigraph_clean(
 }}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
-
-\item{return_data}{return organized data (default = TRUE)}
 }
 \value{
 If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
