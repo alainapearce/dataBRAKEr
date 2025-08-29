@@ -7,6 +7,7 @@
 dataBRAKEr(
   base_wd,
   overwrite = FALSE,
+  fnirs_overwrite = FALSE,
   data_list = "all",
   data_type = "all",
   micro_protocols = "all",
@@ -20,71 +21,23 @@ dataBRAKEr(
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
 
+\item{fnirs_overwrite}{overwrite fNIRS data files - separate argument because the Matlab fNIRS processing writes onset values to the rawdata/*_events.tsv values. Overwriting will overwrite these values with NA.}
+
 \item{data_list}{list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 \itemize{
- \item{'participants' - BIDS specified participants.tsv file}
- \item{'actigraph' - activity and sleep data generated from GGIR and mMARCH.AC}
- \item{'microstructure' - coded meal microstructure data}
  \item{'foodview' - fMRI Food Viewing task}
  \item{'nihtoolbox' - NIH Toolbox data}
  \item{'pit' - Pavlovian Instrumental Transfer task data}
  \item{'rrv' - Relative Reinforcing Value of Food task}
  \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
  \item{'sst' - fMRI Stop-Signal Task data}
- \item{'anthropometrics' - height, weight, and computed anthropometric data}
- \item{'demographics' - compiled demographic data}
- \item{'dxa' - verified DXA data}
- \item{'household' - compiled demographicinformation about houshold}
- \item{'infancy' - compiled demographic information related to infancy}
- \item{'intake' - compiled intake data with computed intake values}
- \item{'mri_visit' - MRI visit information including Freddy and CAMS}
- \item{'parent_updates' - all visit updates}
- \item{'researcher_notes' - all visit notes}
- \item{'audit' - Alcohol Use Disorders Identification Test}
- \item{'bes' - Binge Eating Scale}
- \item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
- \item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
- \item{'cbq' - Child Behavior Questionnaire}
- \item{'cchip' - Community Childhood Hunger Identification Project}
- \item{'cebq' - Children's Eating Behavior Questionnaire}
- \item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
- \item{'cfq' - Child Feeding Questionnaire}
- \item{'chaos' - Confusion, Hubbub, and Order Scale}
- \item{'class' - *need*}
- \item{'cshq' - Children Sleep Habits Questionnaire}
- \item{'debq' - Dutch Eating Behavior Questionnaire}
- \item{'efcr' - External Food Cue Responsiveness Scale}
- \item{'ffbs' - Family Food Behavior Survey}
- \item{'fsq' - *need*}
- \item{'hfi' - Fulkerson Home Food Inventory}
- \item{'hfias' - Household Food Insecurity Access Scale}
- \item{'hfssm' - U.S. Household Food Security Survey Module}
- \item{'kbas' - Kid's Brand Awareness Scale}
- \item{'lbc' - Lifestyle Behavior Checklist}
- \item{'loc' - Loss of Control-Eating Questionnaire}
- \item{'pmum' - Problematic Media Use Measure *need*}
- \item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
- \item{'pss' - Perceived Stress Scale}
- \item{'pstca' - *need*}
- \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
- \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
- \item{'rank' - Parent ranking of foods sources? *need*}
- \item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
- \item{'sic' - Stress in Children Questionnaire *need*}
- \item{'sleeplog' - Week long sleep log}
- \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
- \item{'stq' - Screen Time Questionnaire *need*}
- \item{'tfeq' - Three Factor Eating Questionnaire}
 }}
 
 \item{micro_protocols}{(optional) list of strings matching the notes below to indicate the which microstructure data. Default = 'all' to export all data and metadata. Options include:
 \itemize{
- \item{'meal-boring' - meal microstructure behavior after boring commercials}
- \item{'meal-food' - meal microstructure behavior after food commercials}
- \item{'meal-toy' - meal microstructure behavior after toy commercials}
- \item{'eah-boring' - EAH microstructure behavior after boring commercials}
- \item{'eah-food' - EAH microstructure behavior after food commercials}
- \item{'eah-toy' - EAH microstructure behavior after toy commercials}
+ \item{'meal-baseline' - meal microstructure behavior at baseline}
+ \item{'meal-followup' - meal microstructure behavior at followup}
+ \item{'eah' - EAH microstructure behavior}
 }}
 
 \item{micro_data_type}{(optional) Type of data to process for meal microstructure - list of strings matching the data types listed below. Default = 'all' to export both:

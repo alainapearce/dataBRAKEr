@@ -125,7 +125,7 @@ util_group_shapegame <- function(data_list, ses, base_wd, overwrite = FALSE, ret
     
     shapegame_filename_json <- file.path(deriv_wd, 'task-shapegame_beh.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(shapegame_filename_json) ) {
       write(shapegame_json, shapegame_filename_json)
     }
     
@@ -149,7 +149,7 @@ util_group_shapegame <- function(data_list, ses, base_wd, overwrite = FALSE, ret
     
     shapegame_long_filename_json <- file.path(deriv_wd, 'task-shapegame_desc-long_beh.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(shapegame_long_filename_json) ) {
       write(shapegame_long_json, shapegame_long_filename_json)
     }
     

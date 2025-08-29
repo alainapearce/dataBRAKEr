@@ -185,6 +185,8 @@ util_redcap_child1 <- function(data, date_data) {
   
   hfi_data <- hfi_data[!grepl('qcheck', names(hfi_data))]
   
+  hfi_data <- hfi_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(hfi_data)[!grepl('_id|^visit', names(hfi_data))])]
+  
   # update names
   names(hfi_data) <- gsub('___', '', names(hfi_data))
   names(hfi_data) <- gsub('visible', 'accessible', names(hfi_data))

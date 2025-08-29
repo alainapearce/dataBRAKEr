@@ -93,7 +93,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     
     foodrating_filename_json <- file.path(bids_wd, 'ses-baseline_task-foodrating_events.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(foodrating_filename_json) ) {
       write(foodrating_json, foodrating_filename_json)
     }
     
@@ -125,7 +125,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     
     foodchoice_filename_json <- file.path(bids_wd, 'ses-baseline_task-foodchoice_events.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(foodchoice_filename_json) ) {
       write(foodchoice_json, foodchoice_filename_json)
     }
   }
@@ -153,7 +153,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     
     shapegame_filename_json <- file.path(bids_wd, 'ses-baseline_task-shapegame_events.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(shapegame_filename_json) ) {
       write(shapegame_json, shapegame_filename_json)
     }
     
@@ -183,7 +183,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     
     spacegame_filename_json <- file.path(bids_wd, 'ses-baseline_task-spacegame_events.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(spacegame_filename_json) ) {
       write(spacegame_json, spacegame_filename_json)
     }
     
@@ -222,7 +222,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     
     nihtoolbox_filename_json <- file.path(bids_wd, 'ses-baseline_task-nih_toolbox_events.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(nihtoolbox_filename_json) ) {
       write(nihtoolbox_json, nihtoolbox_filename_json)
     }
     
@@ -245,6 +245,18 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     
     #process raw data
     tastetest_list[['rawproc_done']] <- sapply(tastetest_list[['sub_str']], function(x) util_task_tastetest(sub_str = x, ses = 'followup', base_wd = base_wd, overwrite = fnirs_overwrite, return = FALSE), simplify = TRUE)
+    
+    #generate json file for rawdata
+    tastetest_json <- json_tastetest_events()
+    
+    tastetest_pre_filename_json <- file.path(bids_wd, 'ses-baseline_task-tastetest_desc-pre_events.json')
+    tastetest_post_filename_json <- file.path(bids_wd, 'ses-baseline_task-tastetest_desc-post_events.json')
+    
+    if ( isTRUE(overwrite) | !file.exists(tastetest_pre_filename_json) ) {
+      write(tastetest_json, tastetest_pre_filename_json)
+      write(tastetest_json, tastetest_post_filename_json)
+      
+    }
     
   }
   

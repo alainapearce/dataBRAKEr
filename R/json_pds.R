@@ -66,6 +66,7 @@ json_pds <- function() {
                     Levels = list ('1' = 'Yes',
                                    '0' = 'No',
                                    '99' = 'I don\'t know')),
+    pds_5fb = list( Description = 'How old was she when she started to menstruate (age in years)?'),
     pds_6 = list( Description = 'Do you think your childs development is any earlier or later than most other [boys/girls] at your childs age?',
                   Levels = list ('1' = 'Much earlier',
                                  '2' = 'Somewhat earlier',

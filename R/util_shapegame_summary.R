@@ -5,7 +5,7 @@
 #' @param ind_data Processed individual-level dataset from rawdata for the Food Choice task 
 #' @param format Which format to process the data in - options: 'wide' or 'long': \itemize{
 #' \item{wide: summary metrics computed across last 3 blocks to only average across established performance/remove learning}
-#' \itme{long: summary metrics computed for block data provided and then compiled in util_group_shapegame.R}
+#' \item{long: summary metrics computed for block data provided and then compiled in util_group_shapegame.R}
 #' }
 #'
 #' @return a data.frame with 1 row including summary performance and task metrics for a participant

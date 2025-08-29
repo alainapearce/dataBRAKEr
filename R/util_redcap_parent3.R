@@ -117,7 +117,7 @@ util_redcap_parent3 <- function(data, date_data) {
   
   # process data
   names(hfi_data) <- gsub('___', '', names(hfi_data))
-  names(hfi_data) <- gsub('visible', 'accesible', names(hfi_data))
+  names(hfi_data) <- gsub('visible', 'accessible', names(hfi_data))
   
   hfi_scored <- dataprepr::score_hfi(hfi_data, id = 'participant_id', base_zero = TRUE)
   

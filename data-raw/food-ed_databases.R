@@ -21,7 +21,7 @@
 #### Study BRAKE ####
 
 brake_ed <- data.frame(meal = c(rep('meal', 6), rep('eah', 10)),
-                     food = c("chkn_nug", "mac_cheese", "grapes", "carrot", "ketchup", "water", "brownies", "cornchips", "hersheys", "icecream", "oreos", "popcorn", "pretzels", "skittles", "starbursts", "water"),
+                     food = c("cknug", "mac", "grapes", "carrots", "ketchup", "water", "brownie", "fritos", "hershey", "icecream", "oreos", "popcorn", "pretzel", "skittles", "starburst", "eah_water"),
                      ed = c(2.500, 1.7, 0.695, 0.417, 1.167, 0, 4.364, 5.707, 5, 1.875, 4.712, 5.667, 3.923, 4, 4, 0))
 
 #write out to raw-data

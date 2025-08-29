@@ -1,8 +1,8 @@
-#' json_fmcb: Generates a json file for the External Food Cue Responsiveness Scale
+#' json_fmcb: Generates a json file for the Feeding to Manage Child Behavior
 #'
-#' This function generates a json file for the scored External Food Cue Responsiveness Scale and raw participant responses. This function provides accurate json files ONLY if data is processed using score_fmcb function in dataprepr and is only accurate for data collected in Study BRAKE.
+#' This function generates a json file for the scored Feeding to Manage Child Behavior Scale and raw participant responses. This function provides accurate json files ONLY if data is processed using score_fmcb function in dataprepr and is only accurate for data collected in Study BRAKE.
 #'
-#' @return A json file documenting the raw inputs and scored values for the External Food Cue Responsiveness Scale
+#' @return A json file documenting the raw inputs and scored values for the Feeding to Manage Child Behavior
 #'
 #'
 #' @export
@@ -11,9 +11,9 @@ json_fmcb <- function() {
   
   fmcb_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'External Food Cue Responsiveness Scale.',
-      Reference = 'Masterson TD, Gilbert-Diamond D, Lansigan RK, Kim SJ, Schiffelbein JE, Emond JA. Measurement of external food cue responsiveness in preschool-age children: Preliminary evidence for the use of the external food cue responsiveness scale. Appetite. 2019;139:119-126. doi:10.1016/j.appet.2019.04.024', 
-      TermURL = 'https://pubmed.ncbi.nlm.nih.gov/31047939/'),
+      Description = 'Feeding to Manage Child Behavior.',
+      Reference = 'Savage, J. S., Ruggiero, C. F., Eagleton, S. G., Marini, M. E., & Harris, H. A. (2022). The feeding to Manage Child Behavior Questionnaire: Development of a tool to measure’non-nutritive feeding practices in low income families with preschool-aged children. Appetite, 169, 105849. doi: 10.1016/j.appet.2021.105849', 
+      TermURL = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC8748389/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-baseline' = 'baseline',

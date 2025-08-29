@@ -25,7 +25,10 @@ util_task_foodchoice(
 If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 }
 \description{
-This function: 1) cleans data to save in BIDS format in rawdata and 2) generates summary data that can be used to generate a database
+This function: \itemize{
+\item{1) cleans data to save in BIDS format in rawdata}
+\item{2) generates summary data that can be used to generate a database}
+}
 }
 \details{
 To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.

@@ -1,4 +1,4 @@
-#' brake_ed: Reference tables for the energy densities of all foods in the Food and Brain Study
+#' ref_brake_ed: Reference tables for the energy densities of all foods in the Food and Brain Study
 #'
 #' Energy Density for each food served during the Food and Brain Study including the standard laboratory test meal (visits 1 and 7), eating in the absence of hunger (visits 1 and 7), portion size meals (visits 2-5), and snacks served during visit 6
 #'

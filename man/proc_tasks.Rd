@@ -4,30 +4,47 @@
 \alias{proc_tasks}
 \title{deriv_tasks: Generate derivative databases for all computer tasks used in Study BRAKE}
 \usage{
-proc_tasks(base_wd, overwrite = FALSE)
+proc_tasks(
+  base_wd,
+  overwrite = FALSE,
+  fnirs_overwrite = FALSE,
+  task_list = "all"
+)
 
-proc_tasks(base_wd, overwrite = FALSE)
+proc_tasks(
+  base_wd,
+  overwrite = FALSE,
+  fnirs_overwrite = FALSE,
+  task_list = "all"
+)
 }
 \arguments{
 \item{base_wd}{full path to directory containing both raw_untouched and bids directories}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
+
+\item{fnirs_overwrite}{overwrite fNIRS data files - separate argument because the Matlab fNIRS processing writes onset values to the rawdata/*_events.tsv values. Overwriting will overwrite these values with NA.}
+
+\item{task_list}{tasks to process. Options include 'all' to process all task data or a list of the following:\itemize{
+ \item{'foodrating' - fNIRS Food Rating task}
+ \item{'foodchoice' - fNIRS Food Choice task}
+ \item{'shapegame' - Shape Game data}
+ \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
+ \item{'nihtoolbox' - NIH Toolbox data}
+ \item{'tastetest' - fNIRS Taste-Test task}
+ \item{'pit' - Pavlovian Instrumental Transfer task data}
+}}
 }
 \value{
-data.frame for each task with status for each processing step
-
 data.frame for each task with status for each processing step
 }
 \description{
 To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 
-This function calls task scripts that:
-1) copies data from raw_untouched and saves it in sourcedata
-2) cleans data to save in BIDS format in rawdata
-3) processes rawdata to generate derivative or summary databases for each task
+This function: \itemize{
+\item{1) copies task data from raw_untouched into bids/sourcedata, using util_task_untouched_to_source}
+\item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata using task-specific util_task_{task-name} functions}
 }
-\details{
-To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 }
 \examples{
 
@@ -39,10 +56,10 @@ proc_tasks_pardat <- proc_tasks(base_wd, overwrite)
 
 
 
-# process task data for the Food Choice Task
-proc_tasks_pardat <- proc_tasks(base_wd, overwrite)
-
 \dontrun{
+# organize task data for space game and NIH toolbox in untouchedRaw into sourcedata and raw data
+proc_task(base_wd = base_wd, task_list = c('spacegame', 'nihtoolbox'))
+
 }
 
 

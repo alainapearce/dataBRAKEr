@@ -96,7 +96,7 @@ util_foodchoice_summary <- function(ind_data) {
   
   # choices - overall
   n_choice_missed <- nrow(ind_data[ind_data['choice'] == 'None', ])
-  p_choice_missed <- n_missed_choice/nrow(ind_data)
+  p_choice_missed <- n_choice_missed/nrow(ind_data)
   
   n_choice_healthy <-  nrow(ind_data[ind_data['choice_healthy'] == '1', ])
   p_choice_healthy <- n_choice_healthy/(nrow(ind_data) - n_choice_missed)

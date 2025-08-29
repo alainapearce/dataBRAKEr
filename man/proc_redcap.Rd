@@ -4,7 +4,12 @@
 \alias{proc_redcap}
 \title{proc_redcap: Process raw data downloaded from Study BRAKE REDCap}
 \usage{
-proc_redcap(redcap_api = FALSE, redcap_visit_data, redcap_de_data)
+proc_redcap(
+  redcap_api = FALSE,
+  redcap_visit_data,
+  redcap_de_data,
+  tastetest_data
+)
 }
 \arguments{
 \item{redcap_api}{(logical) execute REDCap API. Default = FALSE.}
@@ -12,66 +17,42 @@ proc_redcap(redcap_api = FALSE, redcap_visit_data, redcap_de_data)
 \item{redcap_visit_data}{REDCap visit data from a prior API call}
 
 \item{redcap_de_data}{REDCap double-entry data from a prior API call}
+
+\item{tastetest_data}{(optional - needed only for intake data) processed Taste-Test data from fNIRS task so can add liking data to intake data}
 }
 \value{
 Will return a list including data and metadata for:
-#' \itemize{
-#child v1
-   \item{'fnirs_cap'}
-   \item{'anthro_data'}
-   \item{'shapegame_info'}
-   \item{'fnirs_tasks_info'}
-   \item{'meal_info'}
-   \item{'sleep_wk_data'}
-   \item{'hfi_data'}
-
-
+\itemize{
  \item{'paticipants' - BIDS specified participants.tsv file}
  \item{'anthropometrics' - height, weight, and computed anthropometric data}
  \item{'demographics' - compiled demographic data}
- 
- 
- \item{'dxa' - verified DXA data}
+ \item{'bodpod' - verified BodPod data}
+ \item{'fnirs_info' - compiled fNIRS task-related information}
+ \item{'dkefs' - verified D-KEFS data}
+ \item{'wasi' - verified WASI data}
+ \item{'intake' - compiled verified intake data with computed intake values}
+ \item{'tasttest_samples' - verified Taste-Test sample weights}
  \item{'household' - compiled demographicinformation about houshold}
  \item{'infancy' - compiled demographic information related to infancy}
- \item{'intake' - compiled intake data with computed intake values}
- \item{'mri_visit' - MRI visit information including Freddy and CAMS}
- \item{'parent_updates' - all visit updates}
- \item{'researcher_notes' - all visit notes}
- \item{'audit' - Alcohol Use Disorders Identification Test}
  \item{'bes' - Binge Eating Scale}
- \item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
  \item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
  \item{'cbq' - Child Behavior Questionnaire}
- \item{'cchip' - Community Childhood Hunger Identification Project}
  \item{'cebq' - Children's Eating Behavior Questionnaire}
- \item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
  \item{'cfq' - Child Feeding Questionnaire}
- \item{'chaos' - Confusion, Hubbub, and Order Scale}
- \item{'class' - *need*}
  \item{'cshq' - Children Sleep Habits Questionnaire}
- \item{'debq' - Dutch Eating Behavior Questionnaire}
  \item{'efcr' - External Food Cue Responsiveness Scale}
  \item{'ffbs' - Family Food Behavior Survey}
- \item{'fsq' - *need*}
+ \item{'ffq' - HELIX cohort Food Frequency Questionnaire}
+ \item{'fmcb' - Feeding to Manage Child Behavior Questionnaire}
+ \item{'hfe' - Home Food Environment}
  \item{'hfi' - Fulkerson Home Food Inventory}
- \item{'hfias' - Household Food Insecurity Access Scale}
- \item{'hfssm' - U.S. Household Food Security Survey Module}
- \item{'kbas' - Kid's Brand Awareness Scale}
  \item{'lbc' - Lifestyle Behavior Checklist}
  \item{'loc' - Loss of Control-Eating Questionnaire}
- \item{'pmum' - Problematic Media Use Measure *need*}
- \item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
- \item{'pss' - Perceived Stress Scale}
- \item{'pstca' - *need*}
  \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
  \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
- \item{'rank' - Parent ranking of foods sources? *need*}
- \item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
- \item{'sic' - Stress in Children Questionnaire *need*}
+ \item{'sic' - Stress in Children Questionnaire}
  \item{'sleeplog' - Week long sleep log}
  \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
- \item{'stq' - Screen Time Questionnaire *need*}
  \item{'tfeq' - Three Factor Eating Questionnaire}
 }
 }

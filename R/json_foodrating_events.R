@@ -1,8 +1,8 @@
-#' json_foodrating_events: Generates a json file for the Food Choice Events file
+#' json_foodrating_events: Generates a json file for the Food Rating Events file
 #'
-#' This function generates a json file for the individual level Food Choice events files in rawdata
+#' This function generates a json file for the individual level Food Rating events files in rawdata
 #'
-#' @return A json file documenting the individual level Food Choice events files in rawdata
+#' @return A json file documenting the individual level Food Rating events files in rawdata
 #'
 #'
 #' @export

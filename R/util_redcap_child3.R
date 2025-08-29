@@ -130,7 +130,6 @@ util_redcap_child3 <- function(data, date_data) {
   
   meal_info_json <- json_meal_info_v3()
   
-  
   ## fNIRS information - NOTE: fready and CAMS values double entered ####
   tastetest_data <- data_all[!is.na(data_all[['redcap_repeat_instrument']]) & data_all[['redcap_repeat_instrument']] == 'tastetest_game', grepl('_id|^visit|tastetest', names(data_all))]
   

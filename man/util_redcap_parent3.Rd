@@ -4,7 +4,7 @@
 \alias{util_redcap_parent3}
 \title{#' util_redcap_parent3: Organize parent visit 3 data from REDCap}
 \usage{
-util_redcap_parent3(data, return_data = TRUE)
+util_redcap_parent3(data, date_data)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_3_arm_1}

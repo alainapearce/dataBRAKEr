@@ -57,7 +57,7 @@ json_child_anthro <- function() {
   
   # double check
   if (isFALSE(RJSONIO::isValidJSON(child_anthro_json, asText = TRUE))){
-    print('fNIRS cap fit info JSON file may be invalid')
+    print('child anthro info JSON file may be invalid')
   }
   
   return(child_anthro_json)

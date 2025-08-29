@@ -3,7 +3,7 @@
 \docType{data}
 \name{brake_ed}
 \alias{brake_ed}
-\title{brake_ed: Reference tables for the energy densities of all foods in the Food and Brain Study}
+\title{ref_brake_ed: Reference tables for the energy densities of all foods in the Food and Brain Study}
 \format{
 A data.frame with columns:
 \describe{

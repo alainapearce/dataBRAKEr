@@ -4,7 +4,13 @@
 \alias{util_group_shapegame}
 \title{util_group_shapegame: Get summary data from the Shape Game (Value-Modulated Attentional Capture Task)}
 \usage{
-util_group_shapegame(data_list, ses, base_wd, overwrite = FALSE)
+util_group_shapegame(
+  data_list,
+  ses,
+  base_wd,
+  overwrite = FALSE,
+  return_data = FALSE
+)
 }
 \arguments{
 \item{data_list}{A data frame with variable 'sub_str' that includes all participants}
@@ -19,7 +25,7 @@ util_group_shapegame(data_list, ses, base_wd, overwrite = FALSE)
 If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 }
 \description{
-This function calculates summary performance data for a participant and saves the output in a wide format (overall task) and long format (by block)
+This function calculates summary performance data and saves the output in a wide format (overall task) and long format (by block)
 }
 \details{
 To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
@@ -27,7 +33,7 @@ To use this function, the correct path must be used. The path must be the full p
 \examples{
 
 # process task data for the Food Choice Task
-util_group_shapegame <- util_task_shapegame(data_list, ses, data_path, return = TRUE)
+group_shapegame_dat <- util_group_shapegame(data_list, ses, base_wd, overwrite, return_data = TRUE)
 
 \dontrun{
 }

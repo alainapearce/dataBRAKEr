@@ -109,7 +109,7 @@ util_redcap_child2 <- function(data, date_data) {
   return(list(
     visit2_info = list(data = v2_info, meta = v2_info_json),
     loc_data = list(data = loc_data, meta = loc_json),
-    sic_data = list(data = sic_data, meta = sic_json)
+    sic_data = list(data = sic_scored, meta = sic_json)
   ))
 }
 

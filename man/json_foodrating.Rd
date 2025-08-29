@@ -2,13 +2,13 @@
 % Please edit documentation in R/json_foodrating.R
 \name{json_foodrating}
 \alias{json_foodrating}
-\title{json_foodrating: Generates a json file for the Food Rating Events file}
+\title{json_foodrating: Generates a json file for the Food Rating derivative database file}
 \usage{
 json_foodrating()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Binge Eating Scale
+A json file documenting the Food Rating derivative database
 }
 \description{
-This function generates a json file for the scored Binge Eating Scale and raw participant responses. This function provides accurate json files ONLY if data is processed using score_bes function in dataprepr and is only accurate for data collected in Study BRAKE.
+This function generates a json file for the sFood Rating derivative database
 }

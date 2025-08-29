@@ -2,13 +2,13 @@
 % Please edit documentation in R/json_fmcb.R
 \name{json_fmcb}
 \alias{json_fmcb}
-\title{json_fmcb: Generates a json file for the External Food Cue Responsiveness Scale}
+\title{json_fmcb: Generates a json file for the Feeding to Manage Child Behavior}
 \usage{
 json_fmcb()
 }
 \value{
-A json file documenting the raw inputs and scored values for the External Food Cue Responsiveness Scale
+A json file documenting the raw inputs and scored values for the Feeding to Manage Child Behavior
 }
 \description{
-This function generates a json file for the scored External Food Cue Responsiveness Scale and raw participant responses. This function provides accurate json files ONLY if data is processed using score_fmcb function in dataprepr and is only accurate for data collected in Study BRAKE.
+This function generates a json file for the scored Feeding to Manage Child Behavior Scale and raw participant responses. This function provides accurate json files ONLY if data is processed using score_fmcb function in dataprepr and is only accurate for data collected in Study BRAKE.
 }

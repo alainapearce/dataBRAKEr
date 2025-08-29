@@ -2,13 +2,13 @@
 % Please edit documentation in R/json_intake.R
 \name{json_intake}
 \alias{json_intake}
-\title{json_intake: Generates a json file for intake data}
+\title{json_intake: Generates a json file for intake data along with all associated meal, liking, and wanting information}
 \usage{
 json_intake()
 }
 \value{
-A string with data stored in JSON format containing meta-data for intake data
+A string with data stored in JSON format containing meta-data for intake along with all associated meal, liking, and wanting information data
 }
 \description{
-This function generates a json file for intake data
+This function generates a json file for intake data along with all associated meal, liking, and wanting information
 }

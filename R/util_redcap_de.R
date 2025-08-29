@@ -100,8 +100,8 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   names(bodpod_data_v3) <- gsub('_v3', '', names(bodpod_data_v3))
   
   #add session
-  bodpod_data_v1['session_id'] <- 'baseline'
-  bodpod_data_v3['session_id'] <- 'followup'
+  bodpod_data_v1['session_id'] <- 'ses-baseline'
+  bodpod_data_v3['session_id'] <- 'ses-followup'
   
   bodpod_data <- rbind.data.frame(bodpod_data_v1, bodpod_data_v3)
   
@@ -112,7 +112,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   ## wasi ####
   wasi_data <- checked_data[grepl('_id|wasi', names(checked_data))]
   wasi_data <- wasi_data[!grepl('other|complete', names(wasi_data))]
-  wasi_data['session_id'] <- 'baseline'
+  wasi_data['session_id'] <- 'ses-baseline'
   
   names(wasi_data) <- gsub('pcentile', 'p', names(wasi_data))
   
@@ -124,7 +124,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   dkefs_data <- checked_data[grepl('_id|dkefs', names(checked_data))]
   
   dkefs_data <- dkefs_data[!grepl('complete', names(dkefs_data))]
-  dkefs_data['session_id'] <- 'baseline'
+  dkefs_data['session_id'] <- 'ses-baseline'
   
   dkefs_data <- dkefs_data[c('participant_id', 'session_id', names(dkefs_data)[grepl('dkefs', names(dkefs_data))])]
 
@@ -157,13 +157,13 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   intake_data_v1_eah <- intake_data_v1[c('participant_id', names(intake_data_v1)[!names(intake_data_v1) %in% names(intake_data_v1_meal)])]
   
   #add session
-  intake_data_v1_meal['session_id'] <- 'baseline'
-  intake_data_v1_eah['session_id'] <- 'baseline'
-  intake_data_v3['session_id'] <- 'followup'
+  intake_data_v1_meal['session_id'] <- 'ses-baseline'
+  intake_data_v1_eah['session_id'] <- 'ses-baseline'
+  intake_data_v3['session_id'] <- 'ses-followup'
   
   # merge all together
   intake_data <- rbind.data.frame(intake_data_v1_meal, intake_data_v3)
-  intake_data <- merge(intake_data, intake_data_v1_eah, by = c('participant_id', 'session_id'))
+  intake_data <- merge(intake_data, intake_data_v1_eah, by = c('participant_id', 'session_id'), all.x = TRUE)
   
   # update/harmonize names
   names(intake_data) <- gsub('_pre_', '_pre_w_o_plate_', names(intake_data))
@@ -199,14 +199,14 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   #split by visit
   ff_data_baseline <- ff_data[!grepl('v3', names(ff_data))]
   ff_data_baseline <- merge(ff_data_baseline, date_data[c('participant_id', 'v1_date', 'v2_date')], by = 'participant_id')
-  ff_data_baseline['session_id'] <- 'baseline'
+  ff_data_baseline['session_id'] <- 'ses-baseline'
   
   ff_data_v3 <- ff_data[grepl('_id|v3', names(ff_data))]
   ff_data_v3 <- merge(ff_data_v3, date_data[c('participant_id', 'v3_date')], by = 'participant_id')
   
   names(ff_data_v3)[names(ff_data_v3) == 'v3_date'] <- 'visit_date'
   names(ff_data_v3) <- gsub('_v3', '', names(ff_data_v3))
-  ff_data_v3['session_id'] <- 'followup'
+  ff_data_v3['session_id'] <- 'ses-followup'
   ff_data_v3['visit_protocol'] <- 3
   
   # reorder
@@ -241,7 +241,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   names(cams_data)[names(cams_data) == 'cams_pre'] <- 'cams_pre_baseline'
   names(cams_data)[names(cams_data) == 'cams_post'] <- 'cams_post_baseline'
   
-  names(cams_data) <- gsub('_v3', 'followup',  names(cams_data))
+  names(cams_data) <- gsub('_v3', '_followup',  names(cams_data))
   
   cams_json <- json_cams()
   
@@ -257,13 +257,13 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   nonwear_log_json <- json_nonwear()
     
   return(list(
-      bodpod_data = list(data = bodpod_data, bodpod_json), 
+      bodpod_data = list(data = bodpod_data, meta = bodpod_json), 
       wasi_data = list(data = wasi_data, meta = wasi_json),
       dkefs_data = list(data = dkefs_data, meta = dkefs_json), 
-      intake_data = list(data = intake_data, intake_json), 
-      fullness_baseline_data = list(data = ff_data_baseline, ff_baseline_json), 
-      fullness_followup_data = list(data = ff_data_v3, ff_v3_json), 
-      taste_test_data = list(data = tt_data, tt_json),
+      intake_data = list(data = intake_data, meta = intake_json), 
+      fullness_baseline_data = list(data = ff_data_baseline, meta = ff_baseline_json),
+      fullness_followup_data = list(data = ff_data_v3, meta = ff_v3_json), 
+      taste_test_data = list(data = tt_data, meta = tt_json),
       cams_data = list(data = cams_data, meta = cams_json),
       nonwear_data = list(data = nonwear_log_data, meta = nonwear_log_json)
       ))

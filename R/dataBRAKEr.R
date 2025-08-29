@@ -11,17 +11,22 @@
 #'
 #' @inheritParams proc_tasks
 #' @inheritParams util_task_org_sourcedata
+#' @inheritParams proc_tasks
+#' @inheritParams proc_task_derivs
 #' @param data_list list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
-#'  \item{'participants' - BIDS specified participants.tsv file}
+#' \item{'participants' - BIDS specified participants.tsv file}
+#'  \{tasks:} \itemize{
+#'    \item{'foodrating' - fNIRS Food Rating task}
+#'    \item{'foodchoice' - fNIRS Food Choice task}
+#'    \item{'shapegame' - Shape Game data}
+#'    \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
+#'    \item{'nihtoolbox' - NIH Toolbox data}
+#'    \item{'tastetest' - fNIRS Taste-Test task}
+#'    \item{'pit' - Pavlovian Instrumental Transfer task data}
+#'  }
 #'  \item{'actigraph' - activity and sleep data generated from GGIR and mMARCH.AC}
 #'  \item{'microstructure' - coded meal microstructure data}
-#'  \item{'foodview' - fMRI Food Viewing task}
-#'  \item{'nihtoolbox' - NIH Toolbox data}
-#'  \item{'pit' - Pavlovian Instrumental Transfer task data}
-#'  \item{'rrv' - Relative Reinforcing Value of Food task}
-#'  \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
-#'  \item{'sst' - fMRI Stop-Signal Task data}
 #'  \item{'anthropometrics' - height, weight, and computed anthropometric data}
 #'  \item{'demographics' - compiled demographic data}
 #'  \item{'dxa' - verified DXA data}
@@ -69,12 +74,9 @@
 #' }
 #' @param micro_protocols (optional) list of strings matching the notes below to indicate the which microstructure data. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
-#'  \item{'meal-boring' - meal microstructure behavior after boring commercials}
-#'  \item{'meal-food' - meal microstructure behavior after food commercials}
-#'  \item{'meal-toy' - meal microstructure behavior after toy commercials}
-#'  \item{'eah-boring' - EAH microstructure behavior after boring commercials}
-#'  \item{'eah-food' - EAH microstructure behavior after food commercials}
-#'  \item{'eah-toy' - EAH microstructure behavior after toy commercials}
+#'  \item{'meal-baseline' - meal microstructure behavior at baseline}
+#'  \item{'meal-followup' - meal microstructure behavior at followup}
+#'  \item{'eah' - EAH microstructure behavior}
 #' }
 #' @param micro_data_type (optional) Type of data to process for meal microstructure - list of strings matching the data types listed below. Default = 'all' to export both:
 #'  \itemize{
@@ -99,7 +101,7 @@
 #'
 #' @export
 
-dataBRAKEr <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', overwrite_ggir_derivs = FALSE, return_data = FALSE) {
+dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', overwrite_ggir_derivs = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -129,11 +131,11 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type 
 
   # data for 'all' option - need to add actigraph eventually
 
-  # data from redcap
-  redcap_data_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
-
   # task data
-  task_data_options <- c('sst','foodview','spacegame','nih_toolbox','rrv','pit')
+  task_data_options <- c('foodrating', 'foodchoice','shapegame','spacegame','nihtoolbox','tastetest','pit')
+  
+  # data from redcap
+  redcap_data_options <- c('participants', 'anthropometrics', 'demographics', 'bodpod', 'fnirs_info', 'dkefs', 'wasi', 'intake', 'tasttest_samples', 'household', 'infancy',  'bes', 'brief2', 'cbq', 'cebq', 'cfq', 'cshq', 'efcr', 'ffbs', 'ffq', 'fmcb', 'hfe', 'hfi', 'lbc', 'loc', 'puberty', 'pwlb', 'sic', 'sleeplog', 'spsrq', 'tfeq')
 
   if (length(data_list) == 1) {
     if (data_list == 'all') {
@@ -145,17 +147,36 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type 
   if (('microstructure' %in% data_list) & !('intake' %in% data_list)) {
     data_list <- c(data_list, 'intake')
   }
+  
+  # ensure that taste-test data is processed if intake data is processed (to get followup meal VAS)
+  if (('intake' %in% data_list) & !('tastetest' %in% data_list)) {
+    data_list <- c(data_list, 'tastetest')
+  }
 
+  #### process task data ####
+  if (sum(data_list %in% task_data_options) > 0) {
+    
+    data_list_tasks = data_list[(data_list %in% task_data_options)]
+    
+    task_data <- proc_task_derivs(base_wd = base_wd, overwrite = overwrite, fnirs_overwrite = fnirs_overwrite, task_list = data_list_tasks, return_data = return_data)
+    
+    if ('intake' %in% data_list) {
+      tastetest_data <- task_data$tastetest_database$tastetest_beh
+    }
+  }
+  
   #process redcap data
   if (sum(data_list %in% redcap_data_options) > 0) {
     data_list_redcap = data_list[(data_list %in% redcap_data_options)]
 
     # return data?
     if (('microstructure' %in% data_list) | isTRUE(return_data)) {
-      proc_redcap_data <- write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, return_data = TRUE)
+      proc_redcap_data <- write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, tastetest_data = tastetest_data, return_data = TRUE)
 
       #get intake data
       intake_data <- proc_redcap_data$intake$data
+    } else if ('intake' %in% data_list) {
+      proc_redcap_data <- write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, tastetest_data = tastetest_data, return_data = TRUE)
     } else {
       write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, return_data = FALSE)
     }
@@ -166,15 +187,7 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type 
     micro_data <- write_microstructure(base_wd, intake_data = intake_data, data_list = micro_protocols, data_type = micro_data_type, overwrite = overwrite, return_data = return_data)
   }
 
-  #process task data
-  if (sum(data_list %in% task_data_options) > 0) {
-
-    data_list_tasks = data_list[(data_list %in% task_data_options)]
-
-    task_data <- write_tasks(base_wd, overwrite = overwrite, data_list = data_list_tasks, return_data = return_data)
-
-  }
-
+  
   #process actigraph data
   if ('actigraph' %in% data_list) {
     proc_actigraph(base_wd, overwrite = overwrite, overwrite_ggir_derivs = overwrite_ggir_derivs)

@@ -94,7 +94,7 @@ util_group_spacegame <- function(data_list, ses, base_wd, overwrite = FALSE, ret
   
   spacegame_filename_json <- file.path(deriv_wd, 'task-spacegame_beh.json')
   
-  if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+  if ( isTRUE(overwrite) | !file.exists(spacegame_filename_json) ) {
     write(spacegame_json, spacegame_filename_json)
   }
   

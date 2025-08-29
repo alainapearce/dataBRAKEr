@@ -64,6 +64,9 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   if (names(dat)[1] == 'trials.thisRepN') {
     
+    carrot_want <- NaN
+    carrot_like <- NaN
+    
     # adjust columns for initial participants missing RT information
     
     dat[['foodItem']] <- NaN
@@ -120,6 +123,10 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     dat[['trigger_sip']] <- 6
     
   } else {
+    # get carrot/practice ratings
+    carrot_want <- dat[!is.na(dat[['prac_want_rating']]), 'prac_want_rating']
+    carrot_like <- dat[!is.na(dat[['prac_like_rating']]), 'prac_like_rating']
+    
     # remove practice
     dat <- dat[!is.na(dat[['trigger_taste']]), ]
     dat[['onset']] <- NA
@@ -138,6 +145,14 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   # wanting
   want_dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_want', 'trial_index', 'want_slider_onset', 'want_rating', 'psychopy_ver', 'frame_rate')]
+  
+  # get practice data
+  want_prac_dat <- as.data.frame(t(c(NaN, NaN, dat[1, 'sub'], dat[1, 'date'], dat[1, 'exp_name'], dat[1, 'exp_cond_num'], dat[1, 'cond'], 'carrot', 'prac', dat[1, 'task_component'], NaN, NaN, NaN, carrot_want, dat[1, 'psychopy_ver'], dat[1, 'frame_rate'])))
+  
+  names(want_prac_dat) <- c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_want', 'trial_index', 'want_slider_onset', 'want_rating', 'psychopy_ver', 'frame_rate')
+  
+  # add practice data 
+  want_dat <- rbind.data.frame(want_prac_dat, want_dat)
   
   want_dat[['onset']] <- want_dat[['want_slider_onset']]
   want_dat[['duration']] <- 4
@@ -164,6 +179,14 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   # like
   like_dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_like', 'trial_index', 'like_slider_onset', 'like_rating', 'psychopy_ver', 'frame_rate')]
+  
+  # get practice data
+  like_prac_dat <- as.data.frame(t(c(NaN, NaN, dat[1, 'sub'], dat[1, 'date'], dat[1, 'exp_name'], dat[1, 'exp_cond_num'], dat[1, 'cond'], 'carrot', 'prac', dat[1, 'task_component'], NaN, NaN, NaN, carrot_like, dat[1, 'psychopy_ver'], dat[1, 'frame_rate'])))
+  
+  names(like_prac_dat) <- c('onset', 'duration', 'sub', 'date', 'exp_name', 'exp_cond_num', 'cond', 'food_item', 'trial_cond', 'task_component', 'trigger_like', 'trial_index', 'like_slider_onset', 'like_rating', 'psychopy_ver', 'frame_rate')
+  
+  # add practice data 
+  like_dat <- rbind.data.frame(like_prac_dat, like_dat)
   
   like_dat[['onset']] <- like_dat[['like_slider_onset']]
   like_dat[['duration']] <- 4
@@ -197,7 +220,7 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   dat_proc[['sub']] <- as.numeric(dat_proc[['sub']])
   
   # clean up date
-  print(sub_str)
+  #print(sub_str)
   dat_proc[['date']] <- lubridate::date(dat_proc[['date']])
 
   
@@ -207,8 +230,8 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_', desc_str, '_events.tsv'))) | isTRUE(overwrite)) {
-    write.table(dat_proc, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_', desc_str, '_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_desc-', desc_str, '_events.tsv'))) | isTRUE(overwrite)) {
+    write.table(dat_proc, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_desc-', desc_str, '_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')

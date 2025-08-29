@@ -50,8 +50,8 @@ util_task_nihtoolbox <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   untouched_raw_wd <- file.path(base_wd, 'raw_untouched', 'nih_toolbox')
   
   # get directory paths
-  source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, paste0('ses-', ses), 'beh')
-  raw_beh_wd <- file.path(bids_wd, 'rawdata', sub_str, paste0('ses-', ses), 'beh')
+  source_beh_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'beh')
+  raw_beh_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'beh')
   
   ses_str <- paste0('ses-', ses)
   

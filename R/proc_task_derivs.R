@@ -9,16 +9,8 @@
 #' @param base_wd full path to directory containing both raw_untouched and bids directories
 #' @inheritParams util_task_org_sourcedata
 #' @param proc_source whether to processes the raw data using proc_tasks.R. Default = FALSE because this takes a long time
-#' @param fnirs_overwrite (optional - only needed if proc_source = TRUE) overwrite fNIRS data files - separate argument because the Matlab fNIRS processing writes onset values to the rawdata/*_events.tsv values. Overwriting will overwrite these values with NA.
-#' @param task_list tasks to process. Options include 'all' to process all task data or a list of the following:\itemize{
-#'  \item{'foodrating' - fNIRS Food Rating task}
-#'  \item{'foodchoice' - fNIRS Food Choice task}
-#'  \item{'shapegame' - Shape Game data}
-#'  \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
-#'  \item{'nihtoolbox' - NIH Toolbox data}
-#'  \item{'tastetest' - fNIRS Taste-Test task}
-#'  \item{'pit' - Pavlovian Instrumental Transfer task data}
-#' }
+#' @inheritParams proc_tasks
+#' @inheritParams proc_tasks
 #' @inheritParams util_group_foodrating
 #'
 #' @examples
@@ -54,10 +46,16 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE
   task_list_arg <- methods::hasArg(task_list)
   
   if (isTRUE(task_list_arg)) {
-    if (task_list != 'all' & !is.vector(task_list)) {
+    
+    #hand task list
+    if (length(task_list) == 1) {
+      if (task_list == 'all') {
+        task_list <- c('foodrating', 'foodchoice','shapegame','spacegame','nihtoolbox','tastetest','pit')
+      }
+    } else if (!is.vector(task_list)) {
       stop('Input to task_list must entered as a \'all\' or be vector (e.g., task_list = c("foodrating"")')
     } else {
-      if (sum(!task_list %in% c('all', 'foodrating','foodchoice','shapegame', 'spacegame', 'nih_toolbox','tastetest','pit')) > 0) {
+      if (sum(!task_list %in% c('all', 'foodrating','foodchoice','shapegame', 'spacegame', 'nihtoolbox','tastetest','pit')) > 0) {
         stop(paste0('at least 1 item in tasks is not an option: ', task_list))
       }
     }
@@ -74,7 +72,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE
   
   # Food Rating ####
   
-  if (task_list == 'all' | 'foodrating' %in% task_list) {
+  if ('foodrating' %in% task_list) {
     
     if (isTRUE(proc_source)) {
       #organize data into BIDS sourcedata and rawdata
@@ -97,7 +95,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE
   
   # Food Choice ####
   
-  if (task_list == 'all' | 'foodchoice' %in% task_list) {
+  if ('foodchoice' %in% task_list) {
     
     if (isTRUE(proc_source)) {
       #organize data into BIDS sourcedata and rawdata
@@ -119,7 +117,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE
   
   # Shape Game ####
   
-  if (task_list == 'all' | 'shapegame' %in% task_list) {
+  if ('shapegame' %in% task_list) {
     
     if (isTRUE(proc_source)) {
       #organize data into BIDS sourcedata and rawdata
@@ -141,7 +139,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE
   
   # Space Game ####
   
-  if (task_list == 'all' | 'spacegame' %in% task_list) {
+  if ('spacegame' %in% task_list) {
     
     if (isTRUE(proc_source)) {
       #organize data into BIDS sourcedata and rawdata
@@ -163,7 +161,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE
   
   # NIH Toolbox ####
   
-  if (task_list == 'all' | 'nihtoolbox' %in% task_list) {
+  if ('nihtoolbox' %in% task_list) {
     
     if (isTRUE(proc_source)) {
       #organize data into BIDS sourcedata and rawdata
@@ -195,13 +193,44 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE
     
     nihtoolbox_filename_json <- file.path(phenotype_wd, 'nih_toolbox_scores.json')
     
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(nihtoolbox_filename_json) ) {
       write(nihtoolbox_json, nihtoolbox_filename_json)
     }
   }
   
+  # Taste-Test  ####
   
+  if ('tastetest' %in% task_list) {
+    
+    if (isTRUE(proc_source)) {
+      #organize data into BIDS sourcedata and rawdata
+      proc_tasks(base_wd = base_wd, overwrite = overwrite, fnirs_overwrite = fnirs_overwrite, task_list = 'tastetest')
+    }
+    
+    print('-- creating Taste-Test summary data')
+    
+    # get list of available subjects 
+    tastetest_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-followup', 'nirs', '*meal')), pattern = '*.tsv', recursive = TRUE))
+    names(tastetest_list) <- 'filename'
+    
+    #get list of subject IDs
+    tastetest_list[['sub_str']] <- sapply(tastetest_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+    
+    #get summary data -> produces derivative dataframe
+    tastetest_database <- util_group_tastetest(data_list = tastetest_list, ses = 'followup', base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
+  }
   
-  
+  if (isTRUE(return_data)){
+    task_data <- list(
+      foodrating_database = foodrating_database,
+      foodchoice_database = foodchoice_database,
+      shapegame_database = shapegame_database,
+      spacegame_database = spacegame_database,
+      nihtoolbox_database = nih_scores_dat,
+      tastetest_database = tastetest_database
+    )
+    
+    return(task_data)
+  }
 }
 

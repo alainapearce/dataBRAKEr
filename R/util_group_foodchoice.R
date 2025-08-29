@@ -90,7 +90,7 @@ util_group_foodchoice <- function(data_list, ses, base_wd, overwrite = FALSE, re
   
   foodchoice_filename_json <- file.path(deriv_wd, 'task-foodchoice_beh.json')
   
-  if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+  if ( isTRUE(overwrite) | !file.exists(foodchoice_filename_json) ) {
     write(foodchoice_json, foodchoice_filename_json)
   }
   
