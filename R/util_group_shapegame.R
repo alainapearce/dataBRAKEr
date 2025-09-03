@@ -118,7 +118,7 @@ util_group_shapegame <- function(data_list, ses, base_wd, overwrite = FALSE, ret
     
     sum_database[grepl('_id|^visit|color', names(sum_database))] <- sapply(sum_database[grepl('_id|^visit|color', names(sum_database))], function(x) as.character(x))
     
-    write.table(sum_database[1:12], file.path(deriv_wd, 'task-shapegame_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+    write.table(sum_database, file.path(deriv_wd, 'task-shapegame_beh.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
     
     #generate json file for derivative data
     shapegame_json <- json_shapegame()

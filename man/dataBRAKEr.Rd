@@ -8,6 +8,7 @@ dataBRAKEr(
   base_wd,
   overwrite = FALSE,
   fnirs_overwrite = FALSE,
+  proc_source = FALSE,
   data_list = "all",
   data_type = "all",
   micro_protocols = "all",
@@ -22,6 +23,8 @@ dataBRAKEr(
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
 
 \item{fnirs_overwrite}{overwrite fNIRS data files - separate argument because the Matlab fNIRS processing writes onset values to the rawdata/*_events.tsv values. Overwriting will overwrite these values with NA.}
+
+\item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE}
 
 \item{data_list}{list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 \itemize{

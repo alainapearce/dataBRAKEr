@@ -7,6 +7,7 @@
 proc_task_derivs(
   base_wd,
   overwrite = FALSE,
+  proc_source = proc_source,
   fnirs_overwrite = FALSE,
   task_list = "all",
   return_data = FALSE
@@ -16,6 +17,8 @@ proc_task_derivs(
 \item{base_wd}{full path to directory containing both raw_untouched and bids directories}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
+
+\item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE}
 
 \item{fnirs_overwrite}{overwrite fNIRS data files - separate argument because the Matlab fNIRS processing writes onset values to the rawdata/*_events.tsv values. Overwriting will overwrite these values with NA.}
 
@@ -28,8 +31,6 @@ proc_task_derivs(
  \item{'tastetest' - fNIRS Taste-Test task}
  \item{'pit' - Pavlovian Instrumental Transfer task data}
 }}
-
-\item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE because this takes a long time}
 }
 \description{
 This function: \itemize{

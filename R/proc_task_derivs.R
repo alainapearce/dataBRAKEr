@@ -8,7 +8,7 @@
 #'
 #' @param base_wd full path to directory containing both raw_untouched and bids directories
 #' @inheritParams util_task_org_sourcedata
-#' @param proc_source whether to processes the raw data using proc_tasks.R. Default = FALSE because this takes a long time
+#' @param proc_source whether to processes the raw data using proc_tasks.R. Default = FALSE
 #' @inheritParams proc_tasks
 #' @inheritParams proc_tasks
 #' @inheritParams util_group_foodrating
@@ -25,7 +25,7 @@
 #' @export
 #'
 
-proc_task_derivs <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task_list = 'all', return_data = FALSE) {
+proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_source, fnirs_overwrite = FALSE, task_list = 'all', return_data = FALSE) {
   
   #### 1. Set up/initial checks #####
   

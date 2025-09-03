@@ -5,7 +5,7 @@
 #' @param visit1_anthro measured anthropometrics at visit 1 from util_redcap_child1()
 #' @param visit3_anthro measured anthropometrics at visit 3 from util_redcap_child3()
 #' @param household_all merged household data.frame from merged_qs_list()
-#' @inheritParams util_redcap_parent_v1
+#' @inheritParams util_redcap_parent1
 #'
 #' @examples
 #'

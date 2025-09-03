@@ -211,14 +211,14 @@ util_redcap_parent2 <- function(data, date_data) {
   # process data
   tfeq_scored <- dataprepr::score_tfeq18(tfeq_data, base_zero = TRUE, id = 'participant_id')
   
-  tfeq_json <- json_tfeq
+  tfeq_json <- json_tfeq()
   
   return(list(
     cshq_data = list(data = cshq_scored, meta = cshq_json),
     bes_data = list(data = bes_scored, meta = bes_json),
     ffbs_data = list(data = ffbs_scored, meta = ffbs_json),
     hfe_data = list(data = hfe_scored, meta = hfe_json), 
-    spsrq_data = list(data = spsrq_data, meta = spsrq_json), 
+    spsrq_data = list(data = spsrq_scored, meta = spsrq_json), 
     cbq_data = list(data = cbq_scored, meta = cbq_json), 
     pwlb_data = list(data = pwlb_scored, meta = pwlb_json), 
     scpf_data = list(data = scpf_scored, meta = scpf_json), 

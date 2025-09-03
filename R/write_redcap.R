@@ -112,13 +112,12 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', tastetes
   proc_redcap_data <- proc_redcap(redcap_api = FALSE, redcap_visit_data, redcap_de_data, tastetest_data)
 
   # quick fixes for notes where /n formatting got saved
+  proc_redcap_data$anthropometrics$data[grepl('notes', names(proc_redcap_data$anthropometrics$data))] <- sapply(names(proc_redcap_data$anthropometrics$data)[grepl('notes', names(proc_redcap_data$anthropometrics$data))], function(x) gsub('\n', '', proc_redcap_data$anthropometrics$data[[x]]))
+  
   proc_redcap_data$intake$data[grepl('notes', names(proc_redcap_data$intake$data))] <- sapply(names(proc_redcap_data$intake$data)[grepl('notes', names(proc_redcap_data$intake$data))], function(x) gsub('\n', '', proc_redcap_data$intake$data[[x]]))
+  
+  proc_redcap_data$fnirs_info$data[grepl('notes', names(proc_redcap_data$fnirs_info$data))] <- sapply(names(proc_redcap_data$fnirs_info$data)[grepl('notes', names(proc_redcap_data$fnirs_info$data))], function(x) gsub('\n', '', proc_redcap_data$fnirs_info$data[[x]]))
 
-  proc_redcap_data$mri_visit$data[grepl('notes', names(proc_redcap_data$mri_visit$data))] <- sapply(names(proc_redcap_data$mri_visit$data)[grepl('notes', names(proc_redcap_data$mri_visit$data))], function(x) gsub('\n', '', proc_redcap_data$mri_visit$data[[x]]))
-
-  proc_redcap_data$pstca$data[grepl('response|pstca_29i', names(proc_redcap_data$pstca$data))] <- sapply(names(proc_redcap_data$pstca$data)[grepl('response|pstca_29i', names(proc_redcap_data$pstca$data))], function(x) gsub('\n|- ', ' ', proc_redcap_data$pstca$data[[x]]))
-
-  proc_redcap_data$fsq$data[grepl('resources|fsq_12', names(proc_redcap_data$fsq$data))] <- sapply(names(proc_redcap_data$fsq$data)[grepl('resources|fsq_12', names(proc_redcap_data$fsq$data))], function(x) gsub('\n|- ', ' ', proc_redcap_data$fsq$data[[x]]))
 
   #### function to export data and metadata ####
 
@@ -133,6 +132,8 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', tastetes
   # loop through data_to_export and export data and meta-data
   redcap_export <- function(data_str, overwrite){
 
+    print(data_str)
+    
     if (data_str %in% data_list_options){
 
       if (data_str == 'participants'){

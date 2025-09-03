@@ -13,6 +13,7 @@
 #' @inheritParams util_task_org_sourcedata
 #' @inheritParams proc_tasks
 #' @inheritParams proc_task_derivs
+#' @inheritParams proc_task_derivs
 #' @param data_list list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
 #' \item{'participants' - BIDS specified participants.tsv file}
@@ -101,7 +102,7 @@
 #'
 #' @export
 
-dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', overwrite_ggir_derivs = FALSE, return_data = FALSE) {
+dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc_source = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', overwrite_ggir_derivs = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -158,10 +159,10 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, data
     
     data_list_tasks = data_list[(data_list %in% task_data_options)]
     
-    task_data <- proc_task_derivs(base_wd = base_wd, overwrite = overwrite, fnirs_overwrite = fnirs_overwrite, task_list = data_list_tasks, return_data = return_data)
+    task_data <- proc_task_derivs(base_wd = base_wd, overwrite = overwrite, proc_source = proc_source, fnirs_overwrite = fnirs_overwrite, task_list = data_list_tasks, return_data = return_data)
     
     if ('intake' %in% data_list) {
-      tastetest_data <- task_data$tastetest_database$tastetest_beh
+      tastetest_data <- task_data$tastetest_database$tastetest_beh$data
     }
   }
   
@@ -170,13 +171,11 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, data
     data_list_redcap = data_list[(data_list %in% redcap_data_options)]
 
     # return data?
-    if (('microstructure' %in% data_list) | isTRUE(return_data)) {
+    if (sum(grepl('intake|micro',data_list) > 0) | isTRUE(return_data)) {
       proc_redcap_data <- write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, tastetest_data = tastetest_data, return_data = TRUE)
 
       #get intake data
       intake_data <- proc_redcap_data$intake$data
-    } else if ('intake' %in% data_list) {
-      proc_redcap_data <- write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, tastetest_data = tastetest_data, return_data = TRUE)
     } else {
       write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, return_data = FALSE)
     }
@@ -184,7 +183,7 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, data
 
   #process microstructure data
   if ('microstructure' %in% data_list) {
-    micro_data <- write_microstructure(base_wd, intake_data = intake_data, data_list = micro_protocols, data_type = micro_data_type, overwrite = overwrite, return_data = return_data)
+    micro_data <- write_microstructure(base_wd, intake_data = intake_data, micro_protocols = micro_protocols, data_type = micro_data_type, overwrite = overwrite, return_data = return_data)
   }
 
   

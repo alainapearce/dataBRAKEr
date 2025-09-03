@@ -6,7 +6,7 @@
 #' @param visit1_demo visit 1 demo data.frame
 #' @param household_all merged household data.frame
 #' @param merged_anthro merged anthro data.fram
-#' @inheritParams util_redcap_parent_v1
+#' @inheritParams util_redcap_parent1
 #'
 #' @examples
 #'

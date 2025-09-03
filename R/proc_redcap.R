@@ -181,10 +181,10 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data, t
   merged_fnirs <- util_merged_fnirs(child_v1_data, child_v3_data, proc_de_data)
   
   ## anthro
-  merged_anthro <- util_merged_anthro(visit1_anthro = child_v1_data$anthro_data$data, visit3_anthro = child_v3_data$anthro_data$data, household_all = merged_qs_list$household_all$data, date_data = date_data)
+  merged_anthro <- util_merged_anthro(visit1_anthro = child_v1_data$anthro_data$data, visit3_anthro = child_v3_data$anthro_data$data, household_all = merged_qs$household_all$data, date_data = date_data)
   
   #### Generate demographics dataframe  ####
-  merged_demo <- util_merged_demo(visit1_demo = parent_v1_data$demo_data$data, household_all = merged_qs_list$household_all$data, merged_anthro = merged_anthro$data, date_data = date_data)
+  merged_demo <- util_merged_demo(visit1_demo = parent_v1_data$demo_data$data, household_all = merged_qs$household_all$data, merged_anthro = merged_anthro$data, date_data = date_data)
   
   #### Generate participants dataframe ####
   participants_data <- util_merged_participants(merged_demo = merged_demo$data, date_data)
@@ -198,8 +198,8 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data, t
     demographics = merged_demo,
     bodpod = proc_de_data$bodpod_data,
     fnirs_info = merged_fnirs,
-    wasi_data = proc_de_data$wasi_data,
-    dkefs_data = proc_de_data$dkefs_data,
+    wasi = proc_de_data$wasi_data,
+    dkefs = proc_de_data$dkefs_data,
     intake = merged_intake,
     tasttest_samples = proc_de_data[['taste_test_data']],
     household = merged_qs[['household_all']],
