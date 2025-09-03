@@ -4,7 +4,7 @@
 #'
 #'
 #' @param merged_demo merged demo data.frame
-#' @inheritParams util_redcap_parent_v1
+#' @inheritParams util_redcap_parent1
 #'
 #' @examples
 #'

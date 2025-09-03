@@ -32,8 +32,6 @@ write_microstructure(
   \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
   \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 }}
-
-\item{return_data}{(logical) return data to working environment. Default = FALSE}
 }
 \value{
 Does not return anything

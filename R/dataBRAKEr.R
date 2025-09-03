@@ -17,7 +17,7 @@
 #' @param data_list list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
 #' \item{'participants' - BIDS specified participants.tsv file}
-#'  \{tasks:} \itemize{
+#'   \itemize{tasks:
 #'    \item{'foodrating' - fNIRS Food Rating task}
 #'    \item{'foodchoice' - fNIRS Food Choice task}
 #'    \item{'shapegame' - Shape Game data}
@@ -84,7 +84,7 @@
 #'    \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
 #'    \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 #'  }
-#' @inheritParams write_tasks
+#' @param overwrite_ggir_derivs (required if 'actigraph' is in data_list or data_list = 'all') overwrite GGIR derivatives. Defult = FLASE, this will take a LONG time. 
 #' @inheritParams proc_actigraph
 #'
 #'

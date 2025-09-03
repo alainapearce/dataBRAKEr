@@ -26,16 +26,6 @@ dataBRAKEr(
 
 \item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE}
 
-\item{data_list}{list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
-\itemize{
- \item{'foodview' - fMRI Food Viewing task}
- \item{'nihtoolbox' - NIH Toolbox data}
- \item{'pit' - Pavlovian Instrumental Transfer task data}
- \item{'rrv' - Relative Reinforcing Value of Food task}
- \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
- \item{'sst' - fMRI Stop-Signal Task data}
-}}
-
 \item{micro_protocols}{(optional) list of strings matching the notes below to indicate the which microstructure data. Default = 'all' to export all data and metadata. Options include:
 \itemize{
  \item{'meal-baseline' - meal microstructure behavior at baseline}
@@ -48,8 +38,6 @@ dataBRAKEr(
   \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
   \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 }}
-
-\item{return_data}{(logical) return data to working environment. Default = FALSE}
 }
 \value{
 Does not return anything
