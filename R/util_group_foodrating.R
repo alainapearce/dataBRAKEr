@@ -14,7 +14,7 @@
 #'
 #' @examples
 #'
-#' # process task data for the Food Choice Task
+#' # process task data for the Food Rating Task
 #' group_foodrating_data <- util_group_foodrating(data_list, ses, base_wd, return = TRUE)
 #'
 #' \dontrun{
@@ -65,7 +65,7 @@ util_group_foodrating <- function(data_list, ses, base_wd, overwrite = FALSE, re
   
   
   #### Save in derivatives #####
-  deriv_wd <- file.path(base_wd, 'bids', 'derivatives', 'nris-beh')
+  deriv_wd <- file.path(base_wd, 'bids', 'derivatives', 'nirs-beh')
   
   if (!dir.exists(deriv_wd)) {
     dir.create(deriv_wd, recursive = TRUE)

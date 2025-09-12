@@ -65,7 +65,7 @@ util_group_foodchoice <- function(data_list, ses, base_wd, overwrite = FALSE, re
   
   
   #### Save in derivatives #####
-  deriv_wd <- file.path(base_wd, 'bids', 'derivatives', 'nris-beh')
+  deriv_wd <- file.path(base_wd, 'bids', 'derivatives', 'nirs-beh')
   
   if (!dir.exists(deriv_wd)) {
     dir.create(deriv_wd, recursive = TRUE)

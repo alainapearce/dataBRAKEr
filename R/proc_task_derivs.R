@@ -11,7 +11,7 @@
 #' @param proc_source whether to processes the raw data using proc_tasks.R. Default = FALSE
 #' @inheritParams proc_tasks
 #' @inheritParams proc_tasks
-#' @inheritParams util_group_foodrating
+#' @inheritParams util_task_foodrating
 #'
 #' @examples
 #'
