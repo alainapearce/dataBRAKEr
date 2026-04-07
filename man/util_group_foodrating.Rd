@@ -32,7 +32,7 @@ To use this function, the correct path must be used. The path must be the full p
 }
 \examples{
 
-# process task data for the Food Choice Task
+# process task data for the Food Rating Task
 group_foodrating_data <- util_group_foodrating(data_list, ses, base_wd, return = TRUE)
 
 \dontrun{

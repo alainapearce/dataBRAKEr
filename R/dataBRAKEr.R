@@ -153,16 +153,20 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
   if (('intake' %in% data_list) & !('tastetest' %in% data_list)) {
     data_list <- c(data_list, 'tastetest')
   }
-
+  
   #### process task data ####
   if (sum(data_list %in% task_data_options) > 0) {
     
     data_list_tasks = data_list[(data_list %in% task_data_options)]
     
-    task_data <- proc_task_derivs(base_wd = base_wd, overwrite = overwrite, proc_source = proc_source, fnirs_overwrite = fnirs_overwrite, task_list = data_list_tasks, return_data = return_data)
-    
     if ('intake' %in% data_list) {
+      
+      task_data <- proc_task_derivs(base_wd = base_wd, overwrite = overwrite, proc_source = proc_source, fnirs_overwrite = fnirs_overwrite, task_list = data_list_tasks, return_data = TRUE)
+      
       tastetest_data <- task_data$tastetest_database$tastetest_beh$data
+      
+    } else {
+      task_data <- proc_task_derivs(base_wd = base_wd, overwrite = overwrite, proc_source = proc_source, fnirs_overwrite = fnirs_overwrite, task_list = data_list_tasks, return_data = return_data)
     }
   }
   

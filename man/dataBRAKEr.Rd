@@ -26,6 +26,66 @@ dataBRAKEr(
 
 \item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE}
 
+\item{data_list}{list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
+\itemize{
+\item{'participants' - BIDS specified participants.tsv file}
+  \itemize{tasks:
+   \item{'foodrating' - fNIRS Food Rating task}
+   \item{'foodchoice' - fNIRS Food Choice task}
+   \item{'shapegame' - Shape Game data}
+   \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
+   \item{'nihtoolbox' - NIH Toolbox data}
+   \item{'tastetest' - fNIRS Taste-Test task}
+   \item{'pit' - Pavlovian Instrumental Transfer task data}
+ }
+ \item{'actigraph' - activity and sleep data generated from GGIR and mMARCH.AC}
+ \item{'microstructure' - coded meal microstructure data}
+ \item{'anthropometrics' - height, weight, and computed anthropometric data}
+ \item{'demographics' - compiled demographic data}
+ \item{'dxa' - verified DXA data}
+ \item{'household' - compiled demographicinformation about houshold}
+ \item{'infancy' - compiled demographic information related to infancy}
+ \item{'intake' - compiled intake data with computed intake values}
+ \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+ \item{'parent_updates' - all visit updates}
+ \item{'researcher_notes' - all visit notes}
+ \item{'audit' - Alcohol Use Disorders Identification Test}
+ \item{'bes' - Binge Eating Scale}
+ \item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
+ \item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
+ \item{'cbq' - Child Behavior Questionnaire}
+ \item{'cchip' - Community Childhood Hunger Identification Project}
+ \item{'cebq' - Children's Eating Behavior Questionnaire}
+ \item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
+ \item{'cfq' - Child Feeding Questionnaire}
+ \item{'chaos' - Confusion, Hubbub, and Order Scale}
+ \item{'class' - *need*}
+ \item{'cshq' - Children Sleep Habits Questionnaire}
+ \item{'debq' - Dutch Eating Behavior Questionnaire}
+ \item{'efcr' - External Food Cue Responsiveness Scale}
+ \item{'ffbs' - Family Food Behavior Survey}
+ \item{'fsq' - *need*}
+ \item{'hfi' - Fulkerson Home Food Inventory}
+ \item{'hfias' - Household Food Insecurity Access Scale}
+ \item{'hfssm' - U.S. Household Food Security Survey Module}
+ \item{'kbas' - Kid's Brand Awareness Scale}
+ \item{'lbc' - Lifestyle Behavior Checklist}
+ \item{'loc' - Loss of Control-Eating Questionnaire}
+ \item{'pmum' - Problematic Media Use Measure *need*}
+ \item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
+ \item{'pss' - Perceived Stress Scale}
+ \item{'pstca' - *need*}
+ \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
+ \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+ \item{'rank' - Parent ranking of foods sources? *need*}
+ \item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
+ \item{'sic' - Stress in Children Questionnaire *need*}
+ \item{'sleeplog' - Week long sleep log}
+ \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
+ \item{'stq' - Screen Time Questionnaire *need*}
+ \item{'tfeq' - Three Factor Eating Questionnaire}
+}}
+
 \item{micro_protocols}{(optional) list of strings matching the notes below to indicate the which microstructure data. Default = 'all' to export all data and metadata. Options include:
 \itemize{
  \item{'meal-baseline' - meal microstructure behavior at baseline}
@@ -38,6 +98,8 @@ dataBRAKEr(
   \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
   \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 }}
+
+\item{overwrite_ggir_derivs}{(required if 'actigraph' is in data_list or data_list = 'all') overwrite GGIR derivatives. Defult = FLASE, this will take a LONG time.}
 }
 \value{
 Does not return anything
