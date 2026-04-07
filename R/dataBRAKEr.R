@@ -119,15 +119,6 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
     stop('base_wd must be entered as a string')
   }
 
-  ## dataset description - requried by BIDS ####
-  # export dataset_description.json
-  # json_dataset_desc <- json_phe_dataset_desc(visit_data_path, data_de_path)
-  # filename_dataset_json <- file.path(phenotype_wd, 'dataset_description.json')
-
-  # if ( isTRUE(overwrite) | !file.exists(filename_dataset_json) ) {
-  #   write(json_dataset_desc, filename_json)
-  # }
-
   #### function to export data and metadata ####
 
   # data for 'all' option - need to add actigraph eventually

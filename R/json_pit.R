@@ -16,8 +16,12 @@ json_pit <- function() {
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/31809989/'),
     sub = list( Description = 'Participant ID'),
     ses = list( Description = 'BIDS session ID indicating when data was collected',
+<<<<<<< HEAD
                              Levels = list ('ses-1' = 'session 1 / baseline',
                                             'ses-2' = 'session 2 / follow-up')),
+=======
+                             Levels = list ('followup' = '1 year follow-up')),
+>>>>>>> 0522186 (minor bug fixes)
     visit_date = list( Description = 'Date of visit',
                        Unit = 'YYYY-MM-DD'),
     cond = list( Description = 'Condition',
@@ -28,7 +32,10 @@ json_pit <- function() {
                                '5' = 'CS Child 1: neutral; CS Child 2: Food, left/k key; CS Child 3: Toy, right/j key',
                                '6' = 'CS Child 1: Toy, right/j key; CS Child 2: neutral; CS Child 3: Food, left/k key')),
     cs_img = list( Description = 'Conditioned stimulus image'),
+<<<<<<< HEAD
     stim_file_name = list( Description = 'stimulus file'),
+=======
+>>>>>>> 0522186 (minor bug fixes)
     pav_stim_img = list( Description = 'Pavlovian conditioning: Stimuli image file'),
     pav_side = list( Description = 'Pavlovian conditioning:Side of screen stimuli image was presented',
                      Levels = list ('L' = 'left',

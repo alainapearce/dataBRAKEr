@@ -235,7 +235,11 @@ util_pit_summary <- function(ind_dat) {
 
   # Summarize data ----
   inst_sum_dat <- inst_sum_stats(inst_dat <- ind_dat)
+<<<<<<< HEAD
   pit_sum_dat <- pit_sum_stats(ind_dat)
+=======
+  pit_sum_dat <- pit_sum_stats(pit_dat <- ind_dat)
+>>>>>>> 0522186 (minor bug fixes)
 
   sum_dat <- merge(inst_sum_dat, pit_sum_dat[!grepl('cond|session', names(pit_sum_dat))], by = 'participant_id', all = TRUE)
 

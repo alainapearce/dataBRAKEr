@@ -8,7 +8,6 @@
 #'
 #' @return a dataframe with eye-tracking related summary behavior for a trial of the Shape Game
 #'
-#' @examples
 #'
 #'
 #' @export

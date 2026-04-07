@@ -232,5 +232,41 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
     
     return(task_data)
   }
+  
+  # PIT  ####
+  
+  if ('pit' %in% task_list) {
+    
+    if (isTRUE(proc_source)) {
+      #organize data into BIDS sourcedata and rawdata
+      proc_tasks(base_wd = base_wd, overwrite = overwrite, task_list = 'pit')
+    }
+    
+    print('-- creating PIT summary data')
+    
+    # get list of available subjects 
+    pit_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-followup', 'beh')), pattern = '*pit_events.tsv', recursive = TRUE))
+    names(pit_list) <- 'filename'
+    
+    #get list of subject IDs
+    pit_list[['sub_str']] <- sapply(pit_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+    
+    #get summary data -> produces derivative dataframe
+    pit_list_database <- util_group_pit(data_list = pit_list, base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
+  }
+  
+  if (isTRUE(return_data)){
+    task_data <- list(
+      foodrating_database = foodrating_database,
+      foodchoice_database = foodchoice_database,
+      shapegame_database = shapegame_database,
+      spacegame_database = spacegame_database,
+      nihtoolbox_database = nih_scores_dat,
+      tastetest_database = tastetest_database,
+      pit_list_database = pit_list_database
+    )
+    
+    return(task_data)
+  }
 }
 

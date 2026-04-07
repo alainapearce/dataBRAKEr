@@ -22,7 +22,7 @@
 #'    \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
 #'    \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 #'  }
-#' @inheritParams write_tasks
+#' @inheritParams util_task_foodrating
 #'
 #' @return Does not return anything
 #'

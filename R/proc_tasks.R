@@ -275,7 +275,17 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     pit_list[['sourcedata_done']] <- sapply(pit_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'pit', sub_str = x, ses = 'followup', base_wd = base_wd, task_cat = 'beh', overwrite = overwrite), simplify = TRUE)
     
     #process raw data
-    # pit_list[['rawproc_done']] <- sapply(pit_list[['sub_str']], function(x) util_task_pit(sub_str = x, ses = 'followup', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
+    pit_list[['rawproc_done']] <- sapply(pit_list[['sub_str']], function(x) util_task_pit(sub_str = x, ses = 'followup', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
+    
+    #generate json file for rawdata
+    pit_json <- json_pit()
+    
+    pit_filename_json <- file.path(bids_wd, 'ses-followup_task-pit_events.json')
+    
+    if ( isTRUE(overwrite) | !file.exists(pit_filename_json) ) {
+      write(pit_json, pit_filename_json)
+
+    }
     
   }
 }

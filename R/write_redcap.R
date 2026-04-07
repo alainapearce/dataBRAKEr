@@ -45,7 +45,7 @@
 #'  \item{'tfeq' - Three Factor Eating Questionnaire}
 #' }
 #' @inheritParams util_merged_intake
-#' @inheritParams util_group_foodrating
+#' @inheritParams util_task_foodrating
 #'
 #' @return Does not return anything
 #'

@@ -4,9 +4,11 @@
 \alias{util_task_pit}
 \title{util_task_pit: Clean and organize PIT data into BIDS rawdata}
 \usage{
-util_task_pit(ub_str, ses, base_wd, overwrite = FALSE, return_data = FALSE)
+util_task_pit(sub_str, ses, base_wd, overwrite = FALSE, return_data = FALSE)
 }
 \arguments{
+\item{sub_str}{participant string (i.e., sub_###) as character}
+
 \item{ses}{session name (i.e., 'baseline', 'followup')}
 
 \item{base_wd}{absolute path to the data directory}
