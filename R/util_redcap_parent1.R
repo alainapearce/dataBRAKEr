@@ -90,7 +90,7 @@ util_redcap_parent1 <- function(data, date_data) {
   demo_data_all <- data[grepl('_id|^visit|demo', names(data))]
   
   # remove extra columns, add columns, and re-order
-  demo_data_all <- demo_data_all[!grepl('missingcheck', names(demo_data_all))]
+  demo_data_all <- demo_data_all[!grepl('missingcheck|_complete$', names(demo_data_all))]
   names(demo_data_all)[names(demo_data_all) == 'demo_mod_ed'] <- 'demo_mom_ed'
   
   demo_data_all <- demo_data_all[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(demo_data_all)[grepl('demo', names(demo_data_all))])]
@@ -140,7 +140,7 @@ util_redcap_parent1 <- function(data, date_data) {
   cfq_data <- data[grepl('_id|^visit|cfq', names(data))]
   
   # remove extra columns, add columns, and re-order
-  cfq_data <- cfq_data[!grepl('missingcheck', names(cfq_data))]
+  cfq_data <- cfq_data[!grepl('missingcheck|_complete$', names(cfq_data))]
   
   cfq_data <- cfq_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(cfq_data)[grepl('cfq', names(cfq_data))])]
   
@@ -188,7 +188,7 @@ util_redcap_parent1 <- function(data, date_data) {
   brief_data <- data[grepl('_id|^visit|brief|c_dob|sex', names(data))]
   
   # remove extra columns, add columns, and re-order
-  brief_data <- brief_data[!grepl('missing_check', names(brief_data))]
+  brief_data <- brief_data[!grepl('missing_check|_complete$', names(brief_data))]
   
   # merge and calculate age
   brief_data['demo_c_dob'] <- lubridate::as_date(brief_data[['demo_c_dob']])
@@ -209,7 +209,7 @@ util_redcap_parent1 <- function(data, date_data) {
   ffq_data <- data[grepl('_id|^visit|ffq', names(data))]
   
   # remove extra columns, add columns, and re-order
-  ffq_data <- ffq_data[!grepl('check', names(ffq_data))]
+  ffq_data <- ffq_data[!grepl('check|_complete$', names(ffq_data))]
   
   ffq_data <- ffq_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(ffq_data)[grepl('ffq', names(ffq_data))])]
   

@@ -18,7 +18,7 @@
 #'
 
 
-util_merged_anthro <- function(visit1_anthro, visit3_anthro, household_all, date_data) {
+util_merge_anthro <- function(visit1_anthro, visit3_anthro, household_all, date_data) {
 
   anthro_merge <- rbind.data.frame(visit1_anthro, visit3_anthro)
   

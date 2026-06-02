@@ -17,7 +17,7 @@
 #'  \item{'meal-followup' - meal microstructure behavior at followup}
 #'  \item{'eah' - EAH microstructure behavior}
 #' }
-#' @param data_type Type of data to process for meal microstructure - list of strings matching the data types listed below. Default = 'all' to export both:
+#' @param micro_data_type Type of data to process for meal microstructure - list of strings matching the data types listed below. Default = 'all' to export both:
 #'  \itemize{
 #'    \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
 #'    \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
@@ -36,7 +36,7 @@
 #'
 #' @export
 
-write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, micro_protocols = 'all', data_type = 'all', return_data = FALSE) {
+write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, micro_protocols = 'all', micro_data_type = 'all', return_data = FALSE) {
   
   #### Set up/initial checks #####
   
@@ -108,7 +108,7 @@ write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, micro_
         meal_dat_save <- proc_micro_data[[meal_dat_name1]]$data
       } 
       
-      s <- proc_micro_data[[meal_dat_name1]]$meta
+      meal_json_beh <- proc_micro_data[[meal_dat_name1]]$meta
       
       meal_filename_tsv <- file.path(phenotype_wd, 'microstructure.tsv')
       meal_filename_json <- file.path(phenotype_wd, 'microstructure.json')
@@ -175,7 +175,9 @@ write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, micro_
       
       if (isFALSE(file_exists) || isTRUE(overwrite)){
         data <- micro_data[micro_data['participant_id'] == id, ]
-        print(save_file_path)
+        
+        #print(save_file_path)
+        
         write.table(data, file = save_file_path, sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
         
         return(paste0(id, ' raw saved'))

@@ -111,7 +111,7 @@ util_redcap_child1 <- function(data, date_data) {
   ## Shape Game information ####
   shapegame_info <- data[grepl('_id|^visit|shape', names(data))]
   
-  shapegame_info <- shapegame_info[!grepl('ffcheck|prize_check', names(shapegame_info))]
+  shapegame_info <- shapegame_info[!grepl('ffcheck|prize_check|_complete', names(shapegame_info))]
   
   # update names
   names(shapegame_info) <- gsub('_snack_hungry', '_postsnack_hungry', names(shapegame_info))
@@ -129,7 +129,7 @@ util_redcap_child1 <- function(data, date_data) {
   ## fNIRS task information ####
   fnirs_info <- data[grepl('_id|^visit|pre_fnirs|rating|choice', names(data))]
   
-  fnirs_info <- fnirs_info[!grepl('ffcheck', names(fnirs_info))]
+  fnirs_info <- fnirs_info[!grepl('ffcheck|_complete', names(fnirs_info))]
   
   # update names
   names(fnirs_info) <- gsub('_snack_hungry', '_postsnack_hungry', names(fnirs_info))
@@ -144,7 +144,7 @@ util_redcap_child1 <- function(data, date_data) {
   ## meal information - NOTE: meal intake and freddy data are double entered ####
   meal_info <- data[grepl('_id|^visit|ff|vas|test_meal|want|wan|eah', names(data))]
   
-  meal_info <- meal_info[!grepl('ffcheck|fnirs|ff_check|min_check|record|prac|freddy_check', names(meal_info))]
+  meal_info <- meal_info[!grepl('ffcheck|fnirs|ff_check|min_check|record|prac|freddy_check|complete$', names(meal_info))]
   
   # update names
   names(meal_info) <- gsub('wan_', 'want_', names(meal_info))
@@ -168,11 +168,12 @@ util_redcap_child1 <- function(data, date_data) {
   
   ## Toolbox info ####
   toolbox_data <- data[grepl('_id|^visit|toolbox', names(data))]
+  toolbox_data <- toolbox_data[!grepl('_complete', names(toolbox_data))]
   
   ## Sleep Week data ####
   sleep_data <- data[grepl('_id|^visit|_mon|_tu|_wed|_th|_fri|_sat|_sun', names(data))]
   
-  sleep_data <- sleep_data[!grepl('hfi', names(sleep_data))]
+  sleep_data <- sleep_data[!grepl('hfi|_complete', names(sleep_data))]
   
   # score data
   library(lubridate)

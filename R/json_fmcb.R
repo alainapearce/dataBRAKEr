@@ -102,3 +102,97 @@ json_fmcb <- function() {
   return(fmcb_json)
   
 }
+
+json_fmcb_deid <- function() {
+  
+  fmcb_deid_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'Feeding to Manage Child Behavior.',
+      Reference = 'Savage, J. S., Ruggiero, C. F., Eagleton, S. G., Marini, M. E., & Harris, H. A. (2022). The feeding to Manage Child Behavior Questionnaire: Development of a tool to measure’non-nutritive feeding practices in low income families with preschool-aged children. Appetite, 169, 105849. doi: 10.1016/j.appet.2021.105849', 
+      TermURL = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC8748389/'),
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
+                           Levels = list ('1' =	'Child visit protocol 1 (baseline)',
+                                          '2' =	'Child visit protocol 2 (baseline)',
+                                          '3'	= 'Child visit protocol 3 (follow-up')),
+    fmcb1 = list( Description = 'I give snacks or drinks to distract or keep my child quiet when my child is acting out (throwing a tantrum, whining, etc).',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb2 = list( Description = 'I offer my child his/her favorite foods as a reward for good behavior.',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb3 = list( Description = 'I withhold sweets/desserts from my child in response to bad behavior.',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb4 = list( Description = 'I give snacks or drinks as a way to distract and keep my child quiet when my child is sad or upset.',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb5 = list( Description = 'I offer food to get my child to do certain things I want him/her to do.',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb6 = list( Description = 'I give snacks or drinks to distract or keep my child busy when I am trying to get something done at home (example: on the phone, cleaning the house, preparing dinner, getting dressed, etc).',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb7 = list( Description = 'I offer my child a \'treat\' or \'dessert\' for eating everything on his/her plate.',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb8 = list( Description = 'I offer my child a \'treat\' or \'dessert\' to get my child to eat his/her vegetables.',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb9 = list( Description = 'I give snacks or drinks as a way to distract and keep my child quiet when we are in public settings (examples: church, shopping, doctor\'s office, theater, etc).',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb9 = list( Description = 'I give snacks or drinks to distract or keep my child quiet when I am feeling frustrated, stressed, or tired.',
+                  Levels = list ('0' = 'Never',
+                                 '1' = 'Rarely',
+                                 '2' = 'Sometimes',
+                                 '3' = 'Often',
+                                 '4' = 'Always')),
+    fmcb_score = list( Description = 'Feeding to manage child behavior total score.', 
+                       Derivative = TRUE),
+    fmcb_fts = list( Description = 'Food to soothe score.', 
+                     Derivative = TRUE),
+    fmcb_far = list( Description = 'Food as reward score.', 
+                     Derivative = TRUE))
+  
+  # convert formatting to JSON
+  fmcb_deid_json <- RJSONIO::toJSON(fmcb_deid_list, pretty = TRUE)
+  
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(fmcb_deid_json, asText = TRUE))){
+    print('fmcb JSON file may be invalid')
+  }
+  
+  return(fmcb_deid_json)
+  
+}

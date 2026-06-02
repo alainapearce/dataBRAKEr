@@ -168,7 +168,7 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data, t
   proc_de_data <- util_redcap_de(redcap_api = FALSE, redcap_de_data, date_data)
   
   #### Combine data across visits ####
- 
+  
   ## Merge intake-related data
   # merge intake-related data (paradigm info, liking data, wanting data, intake data, fullness data)
   merged_intake <- util_merged_intake(child_v1_data, child_v3_data, proc_de_data, tastetest_data)
@@ -181,7 +181,7 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data, t
   merged_fnirs <- util_merged_fnirs(child_v1_data, child_v3_data, proc_de_data)
   
   ## anthro
-  merged_anthro <- util_merged_anthro(visit1_anthro = child_v1_data$anthro_data$data, visit3_anthro = child_v3_data$anthro_data$data, household_all = merged_qs$household_all$data, date_data = date_data)
+  merged_anthro <- util_merge_anthro(visit1_anthro = child_v1_data$anthro_data$data, visit3_anthro = child_v3_data$anthro_data$data, household_all = merged_qs$household_all$data, date_data = date_data)
   
   #### Generate demographics dataframe  ####
   merged_demo <- util_merged_demo(visit1_demo = parent_v1_data$demo_data$data, household_all = merged_qs$household_all$data, merged_anthro = merged_anthro$data, date_data = date_data)
@@ -213,6 +213,8 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data, t
                 meta = parent_v1_data[['cebq_data']]$meta),
     cfq = merged_qs[['cfq_all']],
     cshq = merged_qs[['cshq_all']],
+    cwc = list(data = child_v3_data[['cwc']]$data$bids_phenotype,
+               meta = child_v3_data[['cwc']]$meta),
     efcr = merged_qs[['efcr_all']],
     ffbs = list(data = parent_v2_data[['ffbs_data']]$data$bids_phenotype,
                 meta = parent_v2_data[['ffbs_data']]$meta),

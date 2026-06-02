@@ -9,7 +9,7 @@ write_microstructure(
   intake_data,
   overwrite = FALSE,
   micro_protocols = "all",
-  data_type = "all",
+  micro_data_type = "all",
   return_data = FALSE
 )
 }
@@ -27,7 +27,7 @@ write_microstructure(
  \item{'eah' - EAH microstructure behavior}
 }}
 
-\item{data_type}{Type of data to process for meal microstructure - list of strings matching the data types listed below. Default = 'all' to export both:
+\item{micro_data_type}{Type of data to process for meal microstructure - list of strings matching the data types listed below. Default = 'all' to export both:
 \itemize{
   \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
   \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}

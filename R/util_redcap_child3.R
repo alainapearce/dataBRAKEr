@@ -100,11 +100,11 @@ util_redcap_child3 <- function(data, date_data) {
   child_anthro <- data[grepl('_id|^visit|weight|height|notes|relationship', names(data))]
   
   #reduce columns and reorder
-  child_anthro <- child_anthro[!grepl('grapes|cknug|intake|meal|game|general|status', names(child_anthro))]
+  child_anthro <- child_anthro[!grepl('grapes|cknug|ketchup|intake|meal|game|general|status', names(child_anthro))]
   
   names(child_anthro) <- gsub('v3_|_v3', '', names(child_anthro))
   
-  child_anthro <- child_anthro[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'relationship', names(child_anthro)[grepl('c_', names(child_anthro))], names(child_anthro)[grepl('p_', names(child_anthro))], 'heightweight_notes')]
+  child_anthro <- child_anthro[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'relationship', names(child_anthro)[grepl('c_', names(child_anthro))], names(child_anthro)[grepl('^p_', names(child_anthro))], 'heightweight_notes')]
   
   #update names
   names(child_anthro) <- gsub('avg', 'mean', names(child_anthro))
@@ -117,7 +117,7 @@ util_redcap_child3 <- function(data, date_data) {
   ## meal information - NOTE: meal intake and freddy data are double entered ####
   meal_info <- data[grepl('_id|^visit|ff|test_meal', names(data))]
   
-  meal_info <- meal_info[!grepl('fnirs|ff_check|min_check|record', names(meal_info))]
+  meal_info <- meal_info[!grepl('fnirs|ff_check|min_check|record|complete', names(meal_info))]
   
   # update names
   names(meal_info) <- gsub('ff', 'fullness', names(meal_info))
@@ -138,6 +138,8 @@ util_redcap_child3 <- function(data, date_data) {
   
   #premeal
   fnirs_info <- tastetest_data[tastetest_data[['tastetest_timing']] == 0, ]
+  
+  fnirs_info <- fnirs_info[!grepl('_complete', names(fnirs_info))]
   
   names(fnirs_info) <- gsub('tastetest', 'premeal_tastetest', names(fnirs_info))
   

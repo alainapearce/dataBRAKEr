@@ -29,6 +29,7 @@
 #'  \item{'cebq' - Children's Eating Behavior Questionnaire}
 #'  \item{'cfq' - Child Feeding Questionnaire}
 #'  \item{'cshq' - Children Sleep Habits Questionnaire}
+#'  \item{'cwc' - Child Weight Concerns Questionnaire}
 #'  \item{'efcr' - External Food Cue Responsiveness Scale}
 #'  \item{'ffbs' - Family Food Behavior Survey}
 #'  \item{'ffq' - HELIX cohort Food Frequency Questionnaire}
@@ -39,6 +40,7 @@
 #'  \item{'loc' - Loss of Control-Eating Questionnaire}
 #'  \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
 #'  \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+#'  \item{'scpf' - Structure and Control of Parent Feeding Questionnaire}
 #'  \item{'sic' - Stress in Children Questionnaire}
 #'  \item{'sleeplog' - Week long sleep log}
 #'  \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
@@ -121,7 +123,7 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', tastetes
 
   #### function to export data and metadata ####
 
-  data_list_options <- c('participants', 'anthropometrics', 'demographics', 'bodpod', 'fnirs_info', 'dkefs', 'wasi', 'intake', 'tasttest_samples', 'household', 'infancy',  'bes', 'brief2', 'cbq', 'cebq', 'cfq', 'cshq', 'efcr', 'ffbs', 'ffq', 'fmcb', 'hfe', 'hfi', 'lbc', 'loc', 'puberty', 'pwlb', 'sic', 'sleeplog', 'spsrq', 'tfeq')
+  data_list_options <- c('participants', 'anthropometrics', 'demographics', 'bodpod', 'fnirs_info', 'dkefs', 'wasi', 'intake', 'tasttest_samples', 'household', 'infancy',  'bes', 'brief2', 'cbq', 'cebq', 'cfq', 'cshq', 'cwc', 'efcr', 'ffbs', 'ffq', 'fmcb', 'hfe', 'hfi', 'lbc', 'loc', 'puberty', 'scpf', 'pwlb', 'sic', 'sleeplog', 'spsrq', 'tfeq')
 
   if (length(data_list) == 1) {
     if (data_list == 'all'){

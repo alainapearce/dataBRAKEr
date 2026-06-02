@@ -74,7 +74,7 @@ util_merge_questionnaires <- function(child_v1_data, child_v2_data, child_v3_dat
               sic_all = list(data = sic_all, meta = child_v2_data$sic_data$meta),
               household_all = list(data = household_all, meta = parent_v1_data$household_data$meta),
               puberty_all = list(data = puberty_all, meta = parent_v1_data$puberty_data$meta),
-              cfq_all = list(data = cshq_all, meta = parent_v1_data$cfq_data$meta),
+              cfq_all = list(data = cfq_all, meta = parent_v1_data$cfq_data$meta),
               cshq_all = list(data = cshq_all, meta = parent_v2_data$cshq_data$meta),
               efcr_all = list(data = efcr_all, meta = parent_v1_data$efcr_data$meta),
               ffq_all = list(data = ffq_all, meta = parent_v1_data$ffq_data$meta),

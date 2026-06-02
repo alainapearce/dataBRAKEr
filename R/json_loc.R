@@ -114,3 +114,34 @@ usual?',
   
   return(loc_json)
 }
+
+json_loc_deid <- function() {
+  
+  loc_deid_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'Loss of Control-Eating Questionniare. Note: for deidentification purposes, sensitive data for questions 2-19 were removed as they are only answered by those endorsing LOC-Eating. Contact azp271@psu.edu for more detailed data.',
+      Reference = 'Tanofsky-Kraff, M., Marcus, M. D., Yanovski, S. Z., and Yanovski, J. A. (2008). Loss of control eating disorder in children age 12 years and younger: Proposed research criteria. Eating Behaviors 9, 360–365. doi: 10.1016/j.eatbeh.2008.03.002.', 
+      TermURL = 'https://pubmed.ncbi.nlm.nih.gov/18549996/'),
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
+                           Levels = list ('1' =	'Child visit protocol 1 (baseline)',
+                                          '2' =	'Child visit protocol 2 (baseline)',
+                                          '3'	= 'Child visit protocol 3 (follow-up')),
+    loc_1 = list( Description = 'During the past 3 months have you ever felt that you were not able to stop eating, or not able to control the type of food or amount of food that you ate?  For example, can you remember a time over the last 3 months that you were eating something so yummy that you couldn’t stop eating, even if you really wanted to?', 
+                  Levels = list ('0' = 'No',
+                                 '1' = 'Yes',
+                                 '2' = 'Skip')))
+  
+  # convert formatting to JSON
+  loc_deid_json <- RJSONIO::toJSON(loc_deid_list, pretty = TRUE)
+  
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(loc_deid_json, asText = TRUE))){
+    print('LOC-eating JSON file may be invalid')
+  }
+  
+  return(loc_deid_json)
+}

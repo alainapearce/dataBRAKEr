@@ -92,3 +92,38 @@ json_pds <- function() {
   
   return(pds_json)
 }
+
+json_pds_deid <- function() {
+  
+  pds_deid_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'Pubertal Development Scale. Note: for deidentification purposes, all individual questions have been removed and only the sum/category scores remain. Contact azp271@psu.edu for more detailed information.',
+      Reference = 'Carskadon, Mary A., and Christine Acebo. A self-administered rating scale for pubertal development. Journal of Adolescent Health 14, no. 3 (1993): 190-195. https://doi.org/10.1016/1054-139X(93)90004-9', 
+      TermURL = 'https://pubmed.ncbi.nlm.nih.gov/8323929/'),
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
+                           Levels = list ('1' =	'Child visit protocol 1 (baseline)',
+                                          '2' =	'Child visit protocol 2 (baseline)',
+                                          '3'	= 'Child visit protocol 3 (follow-up')),
+    pds_score_na = list( Description = 'Number of responses parents marked "I don\'t know" or choose not to respond to.', 
+                         Derivative = TRUE),
+    pds_score = list( Description = 'Pubertal Development Scale score: average of all responses for each sex with menarche yes = 4 points and menarche no = 1 point.', 
+                      Derivative = TRUE),
+    pds_tanner_sum = list( Description = 'Sum of scored values for pubertal rating.', 
+                           Derivative = TRUE),
+    pds_tanner_cat = list( Description = 'Tanner equivaluent category.', 
+                           Derivative = TRUE))
+  
+  # convert formatting to JSON
+  pds_deid_json <- RJSONIO::toJSON(pds_deid_list, pretty = TRUE)
+  
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(pds_deid_json, asText = TRUE))){
+    print('PDS JSON file may be invalid')
+  }
+  
+  return(pds_json)
+}

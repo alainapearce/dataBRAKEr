@@ -11,7 +11,7 @@ json_household <- function() {
 
   household_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'A collection of items to assess parent demographics and household environment. This questionnaire was developed within the Keller Lab for Study REACH. Participants were provided the following instructions: "Please answer the following questions:"'),
+      Description = 'A collection of items to assess parent demographics and household environment. This questionnaire was developed within the lab for this study. Participants were provided the following instructions: "Please answer the following questions:"'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-baseline' = 'baseline',
@@ -26,7 +26,7 @@ json_household <- function() {
                                                    '4' = 'Other')),
     demo_nchildren = list( Description = 'How many children do you have? (Enter a number)'),
     demo_birth_order = list( Description = 'What is the birth number of the child in the study (E.g. If the child is first born, enter 1)'),
-    demo_child_grade = list( Description = 'What is your child\'s current grade? For summer break, please select the grade your child just completed.',
+    demo_grade = list( Description = 'What is your child\'s current grade? For summer break, please select the grade your child just completed.',
                            Levels = list ('0' = 'Kindergarten',
                                           '1' = '1st grade',
                                           '2' = '2nd grade',
@@ -116,8 +116,8 @@ json_household <- function() {
                                 Levels = list ('0' = 'No',
                                                '1' = 'Yes')),
     demo_assist_program_no = list( Description = 'Have you or anyone in your household used any of the following programs in the past 12 months?: I have not used assistance programs',
-                                   Levels = list ('0' = 'No',
-                                                  '1' = 'Yes')),
+                                   Levels = list ('0' = 'Used assistance programs',
+                                                  '1' = 'Not used assistance programs')),
     demo_assist_program_snap = list( Description = 'Have you or anyone in your household used any of the following programs in the past 12 months?: SNAP (food stamps)',
                                      Levels = list ('0' = 'No',
                                                     '1' = 'Yes')),
@@ -177,4 +177,98 @@ json_household <- function() {
 
   return(household_json)
 
+}
+
+json_deid_household <- function() {
+  
+  household_deid_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'A collection of items to assess parent demographics and household environment. This questionnaire was developed within the lab for this study. Participants were provided the following instructions: "Please answer the following questions:"'),
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    demo_relationship = list( Description = 'What is your relationship to the child in the study?',
+                              Levels = list ('0' = 'Biological mother',
+                                             '1' = 'Biological father',
+                                             '2' = 'Non-biological mother',
+                                             '3' = 'Non-biological father',
+                                             '4' = 'Other')),
+    demo_nchildren = list( Description = 'How many children do you have? (Enter a number). Changed to categorical for deidentification purposes. Contact azp271@psu.edu for more detailed data.',
+                             Levels = list ('0' = '1 child',
+                                            '1' = '2 children',
+                                            '2' = '3 children',
+                                            '3' = '4 or more children')),
+    demo_birth_order = list( Description = 'What is the birth number of the child in the study (E.g. If the child is first born, enter 1). Changed to categorical for deidentification purposes. Contact azp271@psu.edu for more detailed data.',
+                             Levels = list ('0' = '1st born',
+                                            '1' = '2nd born',
+                                            '2' = '3rd or later born')),
+    demo_grade = list( Description = 'What is your child\'s current grade? For summer break, please select the grade your child just completed. Changed to categorical for deidentification purposes. Contact azp271@psu.edu for more detailed data.',
+                             Levels = list ('0' = '1st or 2nd grade',
+                                            '1' = '3rd grade',
+                                            '2' = '4th grade',
+                                            '3' = '5th grade or higher')),
+    demo_parent_ethnicity = list( Description = 'What is your ethnicity?',
+                                  Levels = list ('0' = 'Hispanic or Latino',
+                                                 '1' = 'Not Hispanic or Latino')),
+    demo_parent_race = list( Description = 'What is your race?',
+                             Levels = list ('0' = 'Race other than white',
+                                            '1' = 'White')),
+    demo_partner = list( Description = 'Do you have a spouse, partner, or significant other?',
+                         Levels = list ('0' = 'No',
+                                        '1' = 'Yes')),
+    demo_partner_relationship = list( Description = 'What is your spouse, partner, or significant other\'s relationship to the child?',
+                                      Levels = list ('0' = 'Biological mother',
+                                                     '1' = 'Biological father',
+                                                     '2' = 'Non-biological relationship')),
+    demo_employed = list( Description = 'Are you currently employed?',
+                          Levels = list ('0' = 'No',
+                                         '1' = 'Yes')),
+    demo_workhours = list( Description = 'How many hours per week are you at work (not traveling to and from)?'),
+    demo_partner_employment = list( Description = 'Is your spouse, partner, or significant other currently employed?'),
+    demo_partner_workhours = list( Description = 'How many hours per week is your spouse, partner, or significant other at work (not traveling to and from)?'),
+    demo_feeding_child = list( Description = 'Who is primarily responsible for feeding your child?',
+                               Levels = list ('0' = 'You',
+                                              '1' = 'Your partner',
+                                              '2' = 'Both',
+                                              '3' = 'School',
+                                              '4' = 'Other')),
+    demo_buys_food = list( Description = 'Who is primarily responsible for buying food in your household?',
+                           Levels = list ('0' = 'You',
+                                          '1' = 'Your partner',
+                                          '2' = 'Both',
+                                          '3' = 'Other')),
+    demo_eat_out = list( Description = 'On average, how frequently does your family eat out or get delivery/take out for dinner?',
+                         Levels = list ('0' = 'Once a month or less',
+                                        '1' = 'Twice a month',
+                                        '2' = 'Once a week',
+                                        '3' = 'Two times a week',
+                                        '4' = 'Three times a week',
+                                        '5' = 'Four or more times a week')),
+    demo_dinner_together = list( Description = 'On average, how many nights a week does your family eat dinner together as a group (with most family members present)?'),
+    demo_prepared_lunch = list( Description = 'On average, how many times per week does your child eat lunch that he/she brings from home?'),
+    demo_food_condition = list( Description = 'Does anyone in your household have a condition that affects the food they eat?',
+                                Levels = list ('0' = 'No',
+                                               '1' = 'Yes')),
+    demo_assist_program_no = list( Description = 'Have you or anyone in your household used any financial assistance programs in the past 12 months?: I have not used assistance programs. For deidentification, I included use of food pantry in here and removed the exact programs used where removed. Contact azp271@psu.edu for more detailed informaiton.',
+                                   Levels = list ('0' = 'Used assistance programs',
+                                                  '1' = 'Not used assistance programs')),
+    demo_food_costs = list( Description = 'In a typical month, how much money do you spend on food for your household, including food you buy at any stores and restaurants?',
+                            Levels = list ('0' = 'Less than $100 a month',
+                                           '1' = '$100 - $200 a month',
+                                           '2' = '$200 - $300 a month',
+                                           '3' = '$300 - $400 a month',
+                                           '4' = '$400 - $500 a month',
+                                           '5' = 'More than $500 a month')))
+  
+  # convert formatting to JSON
+  household_deid_json <- RJSONIO::toJSON(household_deid_list, pretty = TRUE)
+  
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(household_deid_json, asText = TRUE))){
+    print('household demo JSON file may be invalid')
+  }
+  
+  return(household_deid_json)
+  
 }

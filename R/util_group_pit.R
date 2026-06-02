@@ -5,16 +5,11 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #'
 #' @param data_list A data frame with variable 'sub_str' that includes all participants that have task data in rawdata
-<<<<<<< HEAD
-#' @inheritParams util_copy_to_source
-#' @inheritParams util_copy_to_source
-#' @inheritParams util_group_foodview
-=======
+
 #' @inheritParams util_task_org_sourcedata
 #' @inheritParams util_task_org_sourcedata
 #' @inheritParams util_task_org_sourcedata
 #' @inheritParams util_task_foodrating
->>>>>>> 0522186 (minor bug fixes)
 #'
 #' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 #'
@@ -78,11 +73,7 @@ util_group_pit <- function(data_list, base_wd, overwrite = FALSE, return_data = 
   if (!file.exists(file.path(deriv_wd, 'task-pit.tsv')) | isTRUE(overwrite)) {
 
     # generate summary database
-<<<<<<< HEAD
-    sum_database <- do.call(rbind.data.frame, t(mapply(sum_database_fn, sub_str = data_list[['sub_str']], ses_str = data_list[['ses_str']], MoreArgs = list(base_wd = base_wd), SIMPLIFY = FALSE)))
-=======
     sum_database <- do.call(rbind.data.frame, t(mapply(sum_database_fn, sub_str = data_list[['sub_str']], MoreArgs = list(base_wd = base_wd, ses_str = 'ses-followup'), SIMPLIFY = FALSE)))
->>>>>>> 0522186 (minor bug fixes)
 
     sum_database[!grepl('_id|cond|resp_type', names(sum_database))] <- sapply(sum_database[!grepl('_id|cond|resp_type', names(sum_database))], function(x) round(as.numeric(x), 3))
 

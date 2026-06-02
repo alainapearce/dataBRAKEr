@@ -92,3 +92,87 @@ json_efcr <- function() {
   return(efcr_json)
   
 }
+
+json_efcr_dedi <- function() {
+  
+  efcr_dedi_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'External Food Cue Responsiveness Scale.',
+      Reference = 'Masterson TD, Gilbert-Diamond D, Lansigan RK, Kim SJ, Schiffelbein JE, Emond JA. Measurement of external food cue responsiveness in preschool-age children: Preliminary evidence for the use of the external food cue responsiveness scale. Appetite. 2019;139:119-126. doi:10.1016/j.appet.2019.04.024', 
+      TermURL = 'https://pubmed.ncbi.nlm.nih.gov/31047939/'),
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-baseline' = 'baseline',
+                                      'ses-followup' = '1-year follow-up')),
+    visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
+                           Levels = list ('1' =	'Child visit protocol 1 (baseline)',
+                                          '2' =	'Child visit protocol 2 (baseline)',
+                                          '3'	= 'Child visit protocol 3 (follow-up')),
+    efcr1 = list( Description = 'My child asks for food or drinks that other kids eat',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr2 = list( Description = 'My child points out snack or drink vending machines',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr3 = list( Description = 'My child wants to eat when people talk about food',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr4 = list( Description = 'My child gets excited when he/she sees restaurant logos',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr5 = list( Description = 'My child wants snacks at check-out aisles',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr6 = list( Description = 'My child likes certain snacks because of the packaging',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr7 = list( Description = 'My child gets excited by the sound of food cooking',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr8 = list( Description = 'My child wants to eat if he/she hears a snack being opened',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr9 = list( Description = 'My child expects a snack when in the car',
+                  Levels = list ('1' = 'Never',
+                                 '2' = 'Rarely',
+                                 '3' = 'Sometimes',
+                                 '4' = 'Often',
+                                 '5' = 'Always')),
+    efcr_score = list( Description = 'External food cue responsivness.', 
+                       Derivative = TRUE))
+  
+  # convert formatting to JSON
+  efcr_dedi_json <- RJSONIO::toJSON(efcr_dedi_list, pretty = TRUE)
+  
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(efcr_dedi_json, asText = TRUE))){
+    print('EFCR JSON file may be invalid')
+  }
+  
+  return(efcr_dedi_json)
+  
+}

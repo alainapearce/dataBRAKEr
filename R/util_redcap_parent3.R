@@ -82,7 +82,7 @@ util_redcap_parent3 <- function(data, date_data) {
   demo_data_all <- data[grepl('_id|^visit|demo', names(data))]
   
   # remove extra columns, add columns, and re-order
-  demo_data_all <- demo_data_all[!grepl('missingcheck', names(demo_data_all))]
+  demo_data_all <- demo_data_all[!grepl('missingcheck|_complete$', names(demo_data_all))]
   names(demo_data_all)[names(demo_data_all) == 'demo_mod_ed'] <- 'demo_mom_ed'
   
   demo_data_all <- demo_data_all[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(demo_data_all)[grepl('demo', names(demo_data_all))])]
@@ -111,7 +111,7 @@ util_redcap_parent3 <- function(data, date_data) {
   hfi_data <- data[grepl('_id|^visit|hfi', names(data))]
   
   # remove extra columns, add columns, and re-order
-  hfi_data <- hfi_data[!grepl('check', names(hfi_data))]
+  hfi_data <- hfi_data[!grepl('check|_complete$', names(hfi_data))]
   
   hfi_data <- hfi_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(hfi_data)[!grepl('_id|^visit', names(hfi_data))])]
   
@@ -142,7 +142,7 @@ util_redcap_parent3 <- function(data, date_data) {
   cfq_data <- data[grepl('_id|^visit|cfq', names(data))]
   
   # remove extra columns, add columns, and re-order
-  cfq_data <- cfq_data[!grepl('check', names(cfq_data))]
+  cfq_data <- cfq_data[!grepl('check|_complete$', names(cfq_data))]
   
   cfq_data <- cfq_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(cfq_data)[!grepl('_id|^visit', names(cfq_data))])]
   
@@ -155,7 +155,7 @@ util_redcap_parent3 <- function(data, date_data) {
   efcr_data <- data[grepl('_id|^visit|efcr', names(data))]
   
   # remove extra columns, add columns, and re-order
-  efcr_data <- efcr_data[!grepl('check', names(efcr_data))]
+  efcr_data <- efcr_data[!grepl('check|_complete$', names(efcr_data))]
   
   efcr_data <- efcr_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(efcr_data)[!grepl('_id|^visit', names(efcr_data))])]
   
@@ -168,7 +168,7 @@ util_redcap_parent3 <- function(data, date_data) {
   ffq_data <- data[grepl('_id|^visit|ffq', names(data))]
   
   # remove extra columns, add columns, and re-order
-  ffq_data <- ffq_data[!grepl('check', names(ffq_data))]
+  ffq_data <- ffq_data[!grepl('check|_complete$', names(ffq_data))]
   
   ffq_data <- ffq_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(ffq_data)[!grepl('_id|^visit', names(ffq_data))])]
   
@@ -183,7 +183,7 @@ util_redcap_parent3 <- function(data, date_data) {
   cshq_data <- data[grepl('_id|^visit|cshq', names(data))]
   
   # remove extra columns, add columns, and re-order
-  cshq_data <- cshq_data[!grepl('check', names(cshq_data))]
+  cshq_data <- cshq_data[!grepl('check|_complete$', names(cshq_data))]
   
   cshq_data <- cshq_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(cshq_data)[!grepl('_id|^visit', names(cshq_data))])]
   
@@ -207,7 +207,7 @@ util_redcap_parent3 <- function(data, date_data) {
   hfe_data <- data[grepl('_id|^visit|hfe', names(data))]
   
   # remove extra columns, add columns, and re-order
-  hfe_data <- hfe_data[!grepl('check', names(hfe_data))]
+  hfe_data <- hfe_data[!grepl('check|_complete$', names(hfe_data))]
   
   hfe_data <- hfe_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(hfe_data)[!grepl('_id|^visit', names(hfe_data))])]
   
@@ -220,7 +220,7 @@ util_redcap_parent3 <- function(data, date_data) {
   pwlb_data <- data[grepl('_id|^visit|pwlb', names(data))]
   
   # remove extra columns, add columns, and re-order
-  pwlb_data <- pwlb_data[!grepl('check', names(pwlb_data))]
+  pwlb_data <- pwlb_data[!grepl('check|_complete$', names(pwlb_data))]
   
   pwlb_data <- pwlb_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(pwlb_data)[!grepl('_id|^visit', names(pwlb_data))])]
   
