@@ -57,7 +57,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
 
     # new file name
     if (sum(grepl('events', raw_files)) > 0){
-      rename_files <- paste0(sub_str, '_ses-', ses, '_task-nih_toolbox_events.tsv')
+      rename_files <- paste0(sub_str, '_ses-', ses, '_task-nihtoolbox_events.tsv')
       
       data_list_events <- do.call('rbind', sapply(raw_files[grepl('-events', raw_files)], function(x) suppressWarnings(read.csv(file.path(raw_untouched_path, x), header = TRUE, sep = ',')), simplify = FALSE))
     } 
@@ -66,9 +66,9 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
       data_list_scores <- do.call('rbind', sapply(raw_files[grepl('-scores', raw_files)], function(x) suppressWarnings(read.csv(file.path(raw_untouched_path, x), header = TRUE, sep = ',')), simplify = FALSE))
       
       if (exists('rename_files')) {
-        rename_files[2] <- paste0(sub_str, '_ses-', ses, '_task-nih_toolbox_scores.tsv')
+        rename_files[2] <- paste0(sub_str, '_ses-', ses, '_task-nihtoolbox_scores.tsv')
       } else {
-        rename_files <- paste0(sub_str, '_ses-', ses, '_task-nih_toolbox_scores.tsv')
+        rename_files <- paste0(sub_str, '_ses-', ses, '_task-nihtoolbox_scores.tsv')
       }
     }
 
@@ -89,7 +89,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
         desc_str <- 'pre'
       }
       
-      rename_files <- gsub(paste0('-', desc_str,'-meal_', task_str), paste0('_ses-', ses, '_task-taste_desc-', desc_str, '_events'), raw_files)
+      rename_files <- gsub(paste0('-', desc_str,'-meal_', task_str), paste0('_ses-', ses, '_task-taste_acq-', desc_str, 'meal_events'), raw_files)
     } else if (task_str == 'pit') {
       rename_files <- gsub(paste0('friendsgame-', task_str), paste0('ses-', ses, '_task-', task_str, '_events'), raw_files)
     } else {

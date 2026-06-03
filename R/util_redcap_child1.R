@@ -179,6 +179,8 @@ util_redcap_child1 <- function(data, date_data) {
   library(lubridate)
   sleep_wk_scored <- dataprepr::score_sleeplog(sleep_data, id = 'participant_id', summer_start = '2023-06-06', summer_end = '2023-08-23')
   
+  sleep_wk_scored$bids_phenotype <- sleep_wk_scored$bids_phenotype[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(sleep_wk_scored$bids_phenotype)[!grepl('_id|^visit', names(sleep_wk_scored$bids_phenotype))])]
+  
   child_sleep_json <- json_sleeplog()
   
   ## HFI data ####

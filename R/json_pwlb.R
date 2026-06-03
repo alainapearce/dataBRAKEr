@@ -210,7 +210,7 @@ json_pwlb <- function() {
 
 }
 
-json_deid_pwlb <- function() {
+json_pwlb_deid <- function() {
   
   pwlb_deid_list <- list(
     'MeasurementToolMetadata' = list(
@@ -225,6 +225,8 @@ json_deid_pwlb <- function() {
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '2' =	'Child visit protocol 2 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     pwlb1 = list( Description = 'Increase Exercise',
                   Levels = list ('0' =	'Never',
                                  '1'	= 'Rarely',

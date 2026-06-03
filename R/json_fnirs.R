@@ -88,7 +88,7 @@ json_fnirs <- function() {
   
 }
 
-json_fnirs_dedi <- function() {
+json_fnirs_deid <- function() {
   
   fnirs_dedi_list <- list(
     participant_id = list( Description = 'participant id number'),
@@ -98,6 +98,8 @@ json_fnirs_dedi <- function() {
     visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     fnirs_frontback_cm = list( Description = 'measurement from nassion to inion of the head',
                                Units = 'cm'),
     fnirs_ears_cm = list( Description = 'measurement from ear to ear of the head',

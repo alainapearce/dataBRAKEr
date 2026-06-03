@@ -177,6 +177,8 @@ util_redcap_parent3 <- function(data, date_data) {
   
   ffq_scored <- dataprepr::score_ffq_helix(ffq_data, base_zero = TRUE, id = 'participant_id')
   
+  ffq_scored$bids_phenotype <- merge(ffq_data[c('participant_id', 'session_id', 'visit_protocol')], ffq_scored$bids_phenotype, by = 'participant_id')
+  
   ffq_json <- json_ffq_helix()
   
   ## CSHQ ####

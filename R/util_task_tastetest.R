@@ -47,15 +47,17 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   # get version
   if (grepl('post', sub_str)){
-    desc_str <- 'post'
+    desc_str <- 'postmeal'
+    desc_str_sub <- 'post'
   } else {
-    desc_str <- 'pre'
+    desc_str <- 'premeal'
+    desc_str_sub <- 'pre'
   }
   
-  sub_str <- gsub(paste0('-', desc_str, '-meal'), '', sub_str)
+  sub_str <- gsub(paste0('-', desc_str_sub, '-meal'), '', sub_str)
   
-  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'nirs', paste0(desc_str, 'meal'))
-  data_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'nirs', paste0(desc_str, 'meal'), paste0(sub_str, '_ses-', ses, '_task-taste_desc-', desc_str, '_events.tsv'))
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'nirs', desc_str)
+  data_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'nirs', desc_str, paste0(sub_str, '_ses-', ses, '_task-taste_acq-', desc_str, '_events.tsv'))
   
   #### Organize Data #####
   dat <- read.table(data_file, sep = '\t', header = TRUE, na.strings = c('n/a', 'NA'))
@@ -230,8 +232,8 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
     dir.create(raw_wd, recursive = TRUE)
   }
   
-  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_desc-', desc_str, '_events.tsv'))) | isTRUE(overwrite)) {
-    write.table(dat_proc, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_desc-', desc_str, '_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+  if (!file.exists(file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_acq-', desc_str, '_events.tsv'))) | isTRUE(overwrite)) {
+    write.table(dat_proc, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-taste_acq-', desc_str, '_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
     
     if (isTRUE(overwrite)){
       return('overwrote with new version')

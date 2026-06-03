@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_scholarsphere.R
 \name{util_scholarsphere}
 \alias{util_scholarsphere}
-\title{util_scholarsphere: Copy BIDS data files and de-identify for the purpose of sharing publically.}
+\title{util_scholarsphere: Copy BIDS data files and de-identify for the purpose of sharing publicly.}
 \usage{
 util_scholarsphere(base_wd, overwrite = FALSE, data_list = "all")
 }
@@ -11,15 +11,17 @@ util_scholarsphere(base_wd, overwrite = FALSE, data_list = "all")
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
 
-\item{data_list}{data to process. Options include 'all' to process all data that will be put on ScholarSphere or a list of the following:\itemize{
+\item{data_list}{data to process. Options include 'all' to process all data that will be put on ScholarSphere or a list of the following:
+\itemize{
  \item{'phenotype' - all phenotype informaiton}
- \item{'shapegame' - Shape Game data}
- \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
- \item{'pit' - Pavlovian Instrumental Transfer task data}
+ \item{'derivatives' - all derivative and processed individual task data}
 }}
 }
 \description{
-
+This function: \itemize{
+\item{1) copies data from data/bids to data/scholarsphere}
+\item{2) ensures data are de-identified and json files are updated}
+}
 }
 \examples{
 

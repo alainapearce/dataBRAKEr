@@ -88,7 +88,7 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', tastetes
   redcap_visit <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/', token = Sys.getenv('brake_redcap_key'))
   
   
-  Sys.setenv(brake_de_redcap_key = keyring::key_get('brake-de_redcap_key'))
+  Sys.setenv(brake_de_redcap_key = keyring::key_get('brake_de_redcap_key'))
   redcap_de <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/',
                                      token = Sys.getenv('brake_de_redcap_key'))
   

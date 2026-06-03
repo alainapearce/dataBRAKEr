@@ -47,7 +47,7 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
     if (!is.character(dir_name)) {
       stop("dir_name must be entered as a string")
     } else {
-      raw_untouched_path <- file.path(base_wd,'raw_untouched', dir_name)
+      raw_untouched_path <- file.path(base_wd, 'raw_untouched', dir_name)
     }
   }
   
@@ -59,7 +59,7 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
   raw_files <- list.files(path = raw_untouched_path, pattern = sub_str)
   
   # new file name
-  rename_files <- gsub('_actigraph', paste0('_ses-', ses, '_tracksys-ActiGraph_motion'), raw_files)
+  rename_files <- gsub('_actigraph', paste0('_ses-', ses, '_tracksys-actigraph_motion'), raw_files)
   
   #### Save in sourcedata #####
   # set paths for other directories
@@ -78,8 +78,7 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
   } 
   
   # copy files
-  if (!file.exists(file.path(source_wd, rename_files[1])) | isTRUE(overwrite)) {  
-    
+  if (!file.exists(file.path(raw_wd, rename_files[1])) | isTRUE(overwrite)) {  
     file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(source_wd, rename_files), overwrite = overwrite)
     
     file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(raw_wd, rename_files), overwrite = overwrite)

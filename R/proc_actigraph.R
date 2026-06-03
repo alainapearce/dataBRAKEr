@@ -22,15 +22,17 @@
 #'
 #'
 #' @inheritParams proc_tasks
-#' @param session string indicating 'baseline' (default) or 'followup' actigraph data
 #' @inheritParams util_task_org_sourcedata
+#' @param proc_ggir (logical) run the GGIR and mMARCH processing step. Default = FALSE
+#' @param overwrite_ggir_derivs (required if 'actigraph' is in data_list or data_list = 'all') overwrite GGIR derivatives. Defult = FLASE, this will take a LONG time. 
+#' 
 #'
 #' @return data.frame for each task with status for each processing step
 #'
 #' @examples
 #'
 #' # process task data for the Food Choice Task
-#' proc_tasks_pardat <- proc_tasks(data_path, overwrite)
+#' proc_tasks_pardat <- proc_tasks(base_wd, overwrite)
 #'
 #' \dontrun{
 #' }
@@ -38,135 +40,106 @@
 #'
 #' @export
 
-proc_actigraph <- function(data_path, session = 'baseline', overwrite = FALSE) {
+proc_actigraph <- function(base_wd, overwrite = FALSE, proc_ggir = FALSE, overwrite_ggir_derivs = FASLE) {
   
   #### 1. Set up/initial checks #####
   
-  # check that data_path exist and is a data.frame
-  path_arg <- methods::hasArg(data_path)
+  # check that base_wd exist and is a data.frame
+  path_arg <- methods::hasArg(base_wd)
   
   if (isTRUE(path_arg)) {
-    if (!is.character(data_path)) {
-      stop("data_path must be entered as a string")
-    } else if (!file.exists(data_path)) {
-      stop("data_path entered, but file does not exist. Check data_path string.")
+    if (!is.character(base_wd)) {
+      stop("base_wd must be entered as a string")
+    } else if (!file.exists(base_wd)) {
+      stop("base_wd entered, but file does not exist. Check base_wd string.")
     }
   } else if (isFALSE(path_arg)) {
-    stop("data_path must be entered as a string")
+    stop("base_wd must be entered as a string")
   }
   
-  # check that session exist and is a string
-  ses_arg <- methods::hasArg(session)
-  
-  if (isTRUE(ses_arg)) {
-    if (!is.character(session)) {
-      stop("session must be entered as a string")
-    } else {
-      session <- tolower(session)
-      
-      if (!(session %in% c('baseline', 'followup'))) {
-        print("session argument must be either 'baseline' or 'followup'")
-      } else {
-        if (sesion == 'baseline'){
-          dir_name <- 'actigraphy'
-        } else {
-          dir_name <- 'actigraphy_v3'
-        }
-      }
-    }
-  } else if (isFALSE(ses_arg)) {
-    print("no session argument - defult is 'baseline'")
-    session = 'baseline'
-    dir_name <- 'actigraphy'
-  }
-  
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The proc_actigraph.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
-  }
-  
-  # find location of slashes so can decompose filepaths
-  slash_loc <- unlist(gregexpr('/', data_path))
-  
-  # set paths for other directories
-  if (substr(data_path, nchar(data_path), nchar(data_path)) == slash){
-    base_wd <- substr(data_path, 1, tail(slash_loc, 2))
-  } else {
-    base_wd <- substr(data_path, 1, tail(slash_loc, 1))
-  }
-  
-  
-  # Processing Steps ####
-  # get list of available subjects 
-  actigraph_list <- as.data.frame(list.files(path = paste0(data_path, slash, dir_name, slash), pattern = '.gt3x'))
-  names(actigraph_list) <- 'filename'
-  
-  #get list of subject IDs
-  actigraph_list[['sub_str']] <- sapply(actigraph_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
-  actigraph_list <- actigraph_list[actigraph_list[['sub_str']] != 'pilot', ]
-  
-  #organize data into BIDS sourcedata
-  actigraph_list[['sourcedata_done']] <- sapply(actigraph_list[['sub_str']], function(x) util_actigraph_org_sourcedata(sub_str = x, ses = session, dir_name = dir_name, base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
-  
-  #process raw data - GGIR
-  actigraph_path <- paste0(data_path, slash, dir_name, slash)
-  deriv_dir_ggir <- paste0(base_wd, slash, 'bids', slash, 'derivatives', slash, 'motion', slash, session, slash)
-  
-  # get list of files
-  data_list <- c(paste0(actigraph_path, slash, actigraph_list[['filename']]))
-  
-  #make directory if needed
-  if (!dir.exists(deriv_dir_ggir)) {
-    dir.create(deriv_dir_ggir, recursive = TRUE)
-  } 
-  
-  ggir_data <- GGIR::GGIR(datadir = data_list,
-                          outputdir = deriv_dir_ggir,
-                          configfile = 'config_files/util_ggir_config.csv',
-                          studyname = 'brake',
-                          mode = 1:6,
-                          overwrite = overwrite, 
-                          part5_agg2_60seconds = TRUE,
-                          part6CR = TRUE)
-  
-  # rename ouput file
-  if (!dir.exists(paste0(deriv_dir_ggir, slash, 'ggir_output'))) {
-    file.rename(paste0(deriv_dir_ggir, slash, 'output_brake'), paste0(deriv_dir_ggir, slash, 'ggir_output'))
-  } else {
-    print(paste0(deriv_dir_ggir, slash, 'ggir_output already exisits. Could not rename output_actigraphy to ggir_output. Do manually or remove old ggir_output file and re-process data.'))
-  }
-  
-  #post-processing - mMRACH.AC
-  deriv_dir_mMARCH <- paste0(base_wd, slash, 'bids', slash, 'derivatives', slash, 'motion', slash, session, slash, 'mMARCH')
-  
-  #make directory if needed
-  if (!dir.exists(deriv_dir_mMARCH)) {
-    dir.create(deriv_dir_mMARCH, recursive = TRUE)
-  } 
-  
-  ggir_path <- paste0(deriv_dir_ggir, slash, 'ggir_output')
-  
-  filename2id <- function(filename) {
-    newID <- substr(filename, 1, unlist(gregexpr('_', filename))-1)
-    return(as.character(newID))
-  }
-  
-  
-  #run set-up call
-  sapply(0:4, function(x) util_actigraph_mMARCH(mode = x, deriv_dir = deriv_dir_mMARCH, study_name = 'brake', 
-                          actigraph_path = actigraph_path, 
-                          ggir_path = ggir_path, 
-                          filename2id = filename2id))
-  
+  #### Define paths ####
+  bids_wd <- file.path(base_wd, 'bids')
+  sourcedata_wd <- file.path(base_wd, 'bids', 'sourcedata')
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata')
+  phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
 
-  #organize data
-  save_path <- paste0(base_wd, slash, 'bids', slash, 'derivatives', slash, 'motion', slash, session, slash, 'clean')
-  
-  util_actigraph_clean(save_path, ggir_path, mMARCH_path = deriv_dir_mMARCH, metrics = c('SL', 'PA', 'CR'), overwrite)
-  
-  
-  
+  # Processing Steps ####
+  for (session in c('baseline', 'followup')){
+    
+    if (session == 'baseline'){
+      dir_name <- 'actigraphy'
+    } else {
+      dir_name <- 'actigraphy_v3'
+    }
+    
+    # get list of available subjects 
+    actigraph_list <- as.data.frame(list.files(path = file.path(base_wd, 'raw_untouched', dir_name), pattern = '.gt3x'))
+    names(actigraph_list) <- 'filename'
+    
+    #get list of subject IDs
+    actigraph_list[['sub_str']] <- sapply(actigraph_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+    actigraph_list <- actigraph_list[actigraph_list[['sub_str']] != 'pilot', ]
+    
+    #organize data into BIDS sourcedata
+    actigraph_list[['sourcedata_done']] <- sapply(actigraph_list[['sub_str']], function(x) util_actigraph_org_sourcedata(sub_str = x, ses = session, dir_name = dir_name, base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
+    
+    if (isTRUE(proc_ggir)){
+      #process raw data - GGIR
+      actigraph_path <- file.path(base_wd, dir_name)
+      deriv_dir_ggir <- file.path(bids_wd, 'derivatives', 'motion', session)
+      
+      # get list of files
+      data_list <- c(file.path(actigraph_path, actigraph_list[['filename']]))
+      
+      #make directory if needed
+      if (!dir.exists(deriv_dir_ggir)) {
+        dir.create(deriv_dir_ggir, recursive = TRUE)
+      } 
+      
+      ggir_data <- GGIR::GGIR(datadir = data_list,
+                              outputdir = deriv_dir_ggir,
+                              configfile = 'config_files/util_ggir_config.csv',
+                              studyname = 'brake',
+                              mode = 1:6,
+                              overwrite = overwrite_ggir_derivs, 
+                              part5_agg2_60seconds = TRUE,
+                              part6CR = TRUE)
+      
+      # rename ouput file
+      if (!dir.exists(file.path(deriv_dir_ggir, 'ggir_output'))) {
+        file.rename(file.path(deriv_dir_ggir, 'output_brake'), file.path(deriv_dir_ggir, 'ggir_output'))
+      } else {
+        print(paste0(deriv_dir_ggir, '/ggir_output already exisits. Could not rename output_actigraphy to ggir_output. Do manually or remove old ggir_output file and re-process data.'))
+      }
+      
+      #post-processing - mMRACH.AC
+      deriv_dir_mMARCH <- file.path(bids_wd, 'derivatives', 'motion', session, 'mMARCH')
+      
+      #make directory if needed
+      if (!dir.exists(deriv_dir_mMARCH)) {
+        dir.create(deriv_dir_mMARCH, recursive = TRUE)
+      } 
+      
+      ggir_path <- file.path(deriv_dir_ggir, 'ggir_output')
+      
+      filename2id <- function(filename) {
+        newID <- substr(filename, 1, unlist(gregexpr('_', filename))-1)
+        return(as.character(newID))
+      }
+      
+      
+      #run set-up call
+      sapply(0:4, function(x) util_actigraph_mMARCH(mode = x, deriv_dir = deriv_dir_mMARCH, study_name = 'brake', 
+                                                    actigraph_path = actigraph_path, 
+                                                    ggir_path = ggir_path, 
+                                                    filename2id = filename2id))
+      
+      
+      #organize data
+      save_path <- file.path(bids_wd, 'derivatives', 'motion', session, 'clean')
+      
+      util_actigraph_clean(save_path, ggir_path, mMARCH_path = deriv_dir_mMARCH, metrics = c('SL', 'PA', 'CR'), overwrite)
+      
+    }
+  }
 }

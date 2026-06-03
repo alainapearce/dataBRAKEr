@@ -171,7 +171,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
     print('-- creating NIH Toolbox summary data')
     
     # get list of available subjects 
-    nihtoolbox_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-baseline', 'beh')), pattern = '*nih_toolbox_events.tsv', recursive = TRUE))
+    nihtoolbox_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-baseline', 'beh')), pattern = '*nihtoolbox_events.tsv', recursive = TRUE))
     names(nihtoolbox_list) <- 'filename'
     
     #get list of subject IDs
@@ -184,14 +184,14 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
       dir.create(phenotype_wd, recursive = TRUE)
     }
     
-    nih_scores_dat <- do.call('rbind', sapply(nihtoolbox_list[['sub_str']], function(x) read.table(file.path(raw_wd, x, 'ses-baseline', 'beh', paste0(x, '_ses-baseline_task-nih_toolbox_scores.tsv')), sep = '\t', header = TRUE), simplify = FALSE))
+    nih_scores_dat <- do.call('rbind', sapply(nihtoolbox_list[['sub_str']], function(x) read.table(file.path(raw_wd, x, 'ses-baseline', 'beh', paste0(x, '_ses-baseline_task-nihtoolbox_scores.tsv')), sep = '\t', header = TRUE), simplify = FALSE))
     
-    write.table(nih_scores_dat, file.path(phenotype_wd, 'nih_toolbox_scores.tsv'), sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
+    write.table(nih_scores_dat, file.path(phenotype_wd, 'nihtoolbox_scores.tsv'), sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
     
     #generate json file for derivative data
     nihtoolbox_json <- json_nihtoolbox_scores()
     
-    nihtoolbox_filename_json <- file.path(phenotype_wd, 'nih_toolbox_scores.json')
+    nihtoolbox_filename_json <- file.path(phenotype_wd, 'nihtoolbox_scores.json')
     
     if ( isTRUE(overwrite) | !file.exists(nihtoolbox_filename_json) ) {
       write(nihtoolbox_json, nihtoolbox_filename_json)
@@ -218,19 +218,6 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
     
     #get summary data -> produces derivative dataframe
     tastetest_database <- util_group_tastetest(data_list = tastetest_list, ses = 'followup', base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
-  }
-  
-  if (isTRUE(return_data)){
-    task_data <- list(
-      foodrating_database = foodrating_database,
-      foodchoice_database = foodchoice_database,
-      shapegame_database = shapegame_database,
-      spacegame_database = spacegame_database,
-      nihtoolbox_database = nih_scores_dat,
-      tastetest_database = tastetest_database
-    )
-    
-    return(task_data)
   }
   
   # PIT  ####
@@ -268,5 +255,6 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
     
     return(task_data)
   }
+  
 }
 

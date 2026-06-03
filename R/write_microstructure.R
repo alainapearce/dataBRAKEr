@@ -126,30 +126,30 @@ write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, micro_
       }
     }
     
-    if (sum(grepl('eah', micro_protocols_use)) == 1){
-      eah_dat_name1 <- micro_protocols_use[grepl('eah', micro_protocols_use)]
-      eah_dat_name1 <- paste0(eah_dat_name1, '_beh')
-      
-      eah_dat_save <- proc_micro_data[[eah_dat_name1]]$data
-      
-      eah_json_beh <- proc_micro_data[[eah_dat_name1]]$meta
-      
-      eah_filename_tsv <- file.path(phenotype_wd, 'eah_bites.tsv')
-      eah_filename_json <- file.path(phenotype_wd, 'eah_bites.json')
-      
-      # write tsv
-      if ( isTRUE(overwrite) | !file.exists(eah_filename_tsv) ) {
-        # use 'n/a' for missing values for BIDS compliance
-        
-        write.table(eah_dat_save, eah_filename_tsv, quote = FALSE, sep = '\t', col.names = TRUE, row.names = FALSE, na = 'n/a')
-      }
-      
-      # write json
-      if ( isTRUE(overwrite) | !file.exists(eah_filename_json) ) {
-        write(eah_json_beh, eah_filename_json)
-      }
-      
-    }
+  #   if (sum(grepl('eah', micro_protocols_use)) == 1){
+  #     eah_dat_name1 <- micro_protocols_use[grepl('eah', micro_protocols_use)]
+  #     eah_dat_name1 <- paste0(eah_dat_name1, '_beh')
+  #     
+  #     eah_dat_save <- proc_micro_data[[eah_dat_name1]]$data
+  #     
+  #     eah_json_beh <- proc_micro_data[[eah_dat_name1]]$meta
+  #     
+  #     eah_filename_tsv <- file.path(phenotype_wd, 'eah_bites.tsv')
+  #     eah_filename_json <- file.path(phenotype_wd, 'eah_bites.json')
+  #     
+  #     # write tsv
+  #     if ( isTRUE(overwrite) | !file.exists(eah_filename_tsv) ) {
+  #       # use 'n/a' for missing values for BIDS compliance
+  #       
+  #       write.table(eah_dat_save, eah_filename_tsv, quote = FALSE, sep = '\t', col.names = TRUE, row.names = FALSE, na = 'n/a')
+  #     }
+  #     
+  #     # write json
+  #     if ( isTRUE(overwrite) | !file.exists(eah_filename_json) ) {
+  #       write(eah_json_beh, eah_filename_json)
+  #     }
+  #     
+  #   }
   }
   
   

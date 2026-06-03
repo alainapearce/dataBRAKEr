@@ -73,8 +73,15 @@
 #'    \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
 #'    \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 #'  }
-#' @param overwrite_ggir_derivs (required if 'actigraph' is in data_list or data_list = 'all') overwrite GGIR derivatives. Defult = FLASE, this will take a LONG time. 
 #' @inheritParams proc_actigraph
+#' @inheritParams proc_actigraph
+#' @inheritParams util_task_foodrating
+#' @param deid (logical) generate de-identified data into scholar-sphere directory. Do not include data_list argument to run this funciton.
+#' @param deid_list data to process. Options include 'all' to process all data that will be put on ScholarSphere or a list of the following:
+#' \itemize{
+#'  \item{'phenotype' - all phenotype informaiton}
+#'  \item{'derivatives' - all derivative and processed individual task data}
+#' }
 #'
 #'
 #' @return Does not return anything
@@ -91,7 +98,7 @@
 #'
 #' @export
 
-dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc_source = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', overwrite_ggir_derivs = FALSE, return_data = FALSE) {
+dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc_source = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', proc_ggir = FALSE, overwrite_ggir_derivs = FALSE, return_data = FALSE, deid = FALSE, deid_list = 'all') {
 
   #### Set up/initial checks #####
 
@@ -107,7 +114,6 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
   } else if (isFALSE(data_arg)) {
     stop('base_wd must be entered as a string')
   }
-
   #### function to export data and metadata ####
 
   # data for 'all' option - need to add actigraph eventually
@@ -118,12 +124,19 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
   # data from redcap
   redcap_data_options <- c('participants', 'anthropometrics', 'demographics', 'bodpod', 'fnirs_info', 'dkefs', 'wasi', 'intake', 'tasttest_samples', 'household', 'infancy',  'bes', 'brief2', 'cbq', 'cebq', 'cfq', 'cshq', 'cwc', 'efcr', 'ffbs', 'ffq', 'fmcb', 'hfe', 'hfi', 'lbc', 'loc', 'puberty', 'pwlb', 'scpf', 'sic', 'sleeplog', 'spsrq', 'tfeq')
 
-  if (length(data_list) == 1) {
-    if (data_list == 'all') {
-      data_list = c(redcap_data_options, 'microstructure', task_data_options)
+  if (isFALSE(hasArg(data_list))){
+    ## ScholarSphere de-id data ####
+    if (isTRUE(deid)){
+      util_scholarsphere(base_wd, overwrite = overwrite, data_list = deid_list)
+      return('de-identified data creatd')
     }
-  }
-
+    return('no data list')
+  } else if (length(data_list) == 1) {
+    if (data_list == 'all') {
+      data_list = c(redcap_data_options, 'microstructure', task_data_options, 'actigraph')
+    }
+  } 
+  
   # ensure that intake data is processed if microstructure data is requested
   if (('microstructure' %in% data_list) & !('intake' %in% data_list)) {
     data_list <- c(data_list, 'intake')
@@ -150,7 +163,7 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
     }
   }
   
-  #process redcap data
+  # process redcap data ####
   if (sum(data_list %in% redcap_data_options) > 0) {
     data_list_redcap = data_list[(data_list %in% redcap_data_options)]
 
@@ -165,15 +178,15 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
     }
   }
 
-  #process microstructure data
+  # process microstructure data ####
   if ('microstructure' %in% data_list) {
     micro_data <- write_microstructure(base_wd, intake_data = intake_data, micro_protocols = micro_protocols, micro_data_type = micro_data_type, overwrite = overwrite, return_data = return_data)
   }
 
   
-  #process actigraph data
+  # process actigraph data ####
   if ('actigraph' %in% data_list) {
-    proc_actigraph(base_wd, overwrite = overwrite, overwrite_ggir_derivs = overwrite_ggir_derivs)
+    proc_actigraph(base_wd, overwrite = overwrite, proc_ggir = proc_ggir, overwrite_ggir_derivs = overwrite_ggir_derivs)
   }
 
   #### Return Data ####
@@ -182,9 +195,5 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
                     microstructure_data = micro_data,
                     task_data = task_data))
   }
-  
-  ## OSF de-id data ####
-  
-  
 }
 

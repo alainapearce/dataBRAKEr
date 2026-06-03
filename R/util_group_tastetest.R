@@ -150,7 +150,7 @@ util_group_tastetest <- function(data_list, ses, base_wd, overwrite = FALSE, ret
   #generate json file for derivative data
   tastetest_long_json <- json_tastetest_long()
   
-  tastetest_long_filename_json <- file.path(deriv_wd, 'task-tastetest_long_beh.json')
+  tastetest_long_filename_json <- file.path(deriv_wd, 'task-tastetest_desc-long_beh.json')
   
   if ( isTRUE(overwrite) | !file.exists(tastetest_long_filename_json) ) {
     write(tastetest_long_json, tastetest_long_filename_json)

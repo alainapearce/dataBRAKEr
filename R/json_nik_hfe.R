@@ -739,7 +739,7 @@ json_nki_hfe <- function() {
   
 }
 
-json_hfe_dedi <- function() {
+json_hfe_deid <- function() {
   
   nki_hfe_dedi_list <- list(
     'MeasurementToolMetadata' = list(
@@ -754,6 +754,8 @@ json_hfe_dedi <- function() {
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '2' =	'Child visit protocol 2 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     hfe_fam1 = list( Description = 'I eat food I want my child to eat',
                      Levels = list ('1' = 'Never',
                                     '2' = 'Rarely',

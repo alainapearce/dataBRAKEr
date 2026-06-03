@@ -179,7 +179,7 @@ json_household <- function() {
 
 }
 
-json_deid_household <- function() {
+json_household_deid <- function() {
   
   household_deid_list <- list(
     'MeasurementToolMetadata' = list(
@@ -188,6 +188,8 @@ json_deid_household <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-baseline' = 'baseline',
                                       'ses-followup' = '1-year follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     demo_relationship = list( Description = 'What is your relationship to the child in the study?',
                               Levels = list ('0' = 'Biological mother',
                                              '1' = 'Biological father',

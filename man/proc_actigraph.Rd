@@ -4,12 +4,21 @@
 \alias{proc_actigraph}
 \title{proc_actigraph: Process raw data actigraph data}
 \usage{
-proc_actigraph(data_path, session = "baseline", overwrite = FALSE)
+proc_actigraph(
+  base_wd,
+  overwrite = FALSE,
+  proc_ggir = FALSE,
+  overwrite_ggir_derivs = FASLE
+)
 }
 \arguments{
-\item{session}{string indicating 'baseline' (default) or 'followup' actigraph data}
+\item{base_wd}{full path to directory containing both raw_untouched and bids directories}
 
 \item{overwrite}{logical indicating if data should be overwritten. Default = FALSE}
+
+\item{proc_ggir}{(logical) run the GGIR and mMARCH processing step. Default = FALSE}
+
+\item{overwrite_ggir_derivs}{(required if 'actigraph' is in data_list or data_list = 'all') overwrite GGIR derivatives. Defult = FLASE, this will take a LONG time.}
 }
 \value{
 data.frame for each task with status for each processing step
@@ -39,7 +48,7 @@ To use this function, the correct path must be used. The path must be the full p
 \examples{
 
 # process task data for the Food Choice Task
-proc_tasks_pardat <- proc_tasks(data_path, overwrite)
+proc_tasks_pardat <- proc_tasks(base_wd, overwrite)
 
 \dontrun{
 }

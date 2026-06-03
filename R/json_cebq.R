@@ -276,7 +276,7 @@ json_cebq <- function() {
   
 }
 
-json_deid_cebq <- function() {
+json_cebq_deid <- function() {
   
   cebq_deid_list <- list(
     'MeasurementToolMetadata' = list(

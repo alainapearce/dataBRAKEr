@@ -56,3 +56,48 @@ json_participants <- function() {
   return(participants_json)
   
 }
+
+json_participants_deid <- function() {
+  
+  participants_deid_list <- list(
+    participant_id = list( Description = 'participant id number'),
+    sex = list( Description = 'Parent-reported child sex',
+                Levels = list ('female' = 'female',
+                               'male' = 'male')),
+    ethnicity = list( Description = 'Parent-reported child ethnicity',
+                      Levels = list ('0' = 'Not Hispanic or Latino',
+                                     '1' = 'Hispanic or Latino')),
+    race = list( Description = 'Parent-reported child race. Collected at ses-baseline only but values applied to ses-baseline and ses-followup. Note: for deidentification purposes, reduced to categories white and non-white.',
+                 Levels = list ('0' = 'Race other than white',
+                                '1' = 'White')),
+    child_weight_status = list( Description = 'Child weight status based on CDC cutoffs by child BMI percential',
+                                Levels = list ('obese' = 'has obesity; child_bmi_p >= 95 ',
+                                               'overweight' = 'has overwegiht; child_bmi_p >= 85 and < 95',
+                                               'healthy weight' = 'does not have overweight/obesity; child_bmi_p < 85')),
+    child_protocol_1_age = list( Description = 'Child age at child visit protocol 1. Child age rounded down to the nearest half year for deidentification purposes. Contact azp271@psu.edu if want access to full data.',
+                                 Unit = 'years',
+                                 Derivative = TRUE),
+    child_protocol_2_age = list( Description = 'Child age at child visit protocol 2. Child age rounded down to the nearest half year for deidentification purposes. Contact azp271@psu.edu if want access to full data.',
+                                 Unit = 'years',
+                                 Derivative = TRUE),
+    child_protocol_3_age = list( Description = 'Child age at child visit protocol 3. Child age rounded down to the nearest half year for deidentification purposes. Contact azp271@psu.edu if want access to full data.',
+                                 Unit = 'years',
+                                 Derivative = TRUE),
+    protocol_visits_order = list( Description = 'Child protocol visit order based on child_protocol dates',
+                                  Derivative = TRUE),
+    child_protocol_1_date = list( Description = 'Date of child visit protocol 1 (YYYY-MM)'),
+    child_protocol_2_date = list( Description = 'Date of child visit protocol 2 (YYYY-MM)'),
+    child_protocol_3_date = list( Description = 'Date of child visit protocol 3 (YYYY-MM)')
+  )
+  
+  # convert formatting to JSON
+  participants_deid_json <- RJSONIO::toJSON(participants_deid_list, pretty = TRUE)
+  
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(participants_deid_json, asText = TRUE))){
+    print('Participants de-identified JSON file may be invalid')
+  }
+  
+  return(participants_deid_json)
+  
+}

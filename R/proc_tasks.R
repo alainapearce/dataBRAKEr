@@ -249,8 +249,8 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     #generate json file for rawdata
     tastetest_json <- json_tastetest_events()
     
-    tastetest_pre_filename_json <- file.path(bids_wd, 'ses-baseline_task-tastetest_desc-pre_events.json')
-    tastetest_post_filename_json <- file.path(bids_wd, 'ses-baseline_task-tastetest_desc-post_events.json')
+    tastetest_pre_filename_json <- file.path(bids_wd, 'ses-followup_task-tastetest_acq-premeal_events.json')
+    tastetest_post_filename_json <- file.path(bids_wd, 'ses-followup_task-tastetest_acq-postmeal_events.json')
     
     if ( isTRUE(overwrite) | !file.exists(tastetest_pre_filename_json) ) {
       write(tastetest_json, tastetest_pre_filename_json)

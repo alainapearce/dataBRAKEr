@@ -246,6 +246,8 @@ json_cfq_deid <- function() {
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '2' =	'Child visit protocol 2 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     cfq1 = list( Description = 'When your child is home, how often are you responsible for feeding him/her?',
                  Levels = list ('0' = 'Never',
                                 '1' = 'Seldom',

@@ -123,6 +123,8 @@ json_anthro_deid <- function() {
     visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     child_relationship = list( Description = 'What is your relationship to the child in the study?',
                                Levels = list ('0' = 'Biological mother',
                                               '1' = 'Biological father',

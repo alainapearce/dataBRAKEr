@@ -73,6 +73,7 @@ json_pds <- function() {
                                  '3' = 'Somewhat later',
                                  '4' = 'Much later',
                                  '99' = 'I don\'t know')),
+    tanner_choice = list( Description = 'Parent Tanner Stage Choice based on image scale.'),
     pds_score_na = list( Description = 'Number of responses parents marked "I don\'t know" or choose not to respond to.', 
                          Derivative = TRUE),
     pds_score = list( Description = 'Pubertal Development Scale score: average of all responses for each sex with menarche yes = 4 points and menarche no = 1 point.', 
@@ -108,6 +109,9 @@ json_pds_deid <- function() {
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '2' =	'Child visit protocol 2 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
+    tanner_choice = list( Description = 'Parent Tanner Stage choice based on image scale'),
     pds_score_na = list( Description = 'Number of responses parents marked "I don\'t know" or choose not to respond to.', 
                          Derivative = TRUE),
     pds_score = list( Description = 'Pubertal Development Scale score: average of all responses for each sex with menarche yes = 4 points and menarche no = 1 point.', 
@@ -125,5 +129,5 @@ json_pds_deid <- function() {
     print('PDS JSON file may be invalid')
   }
   
-  return(pds_json)
+  return(pds_deid_json)
 }

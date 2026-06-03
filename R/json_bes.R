@@ -145,6 +145,8 @@ json_bes_deid <- function() {
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '2' =	'Child visit protocol 2 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     bes1 = list( Description = 'Read all of the statements and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior',
                  Levels = list ('0' = 'My child doesn\'t feel self-conscious about his/her weight or body size when he/she is with others',
                                 '0' = 'My child feels concerned about how he/she looks to others, but it normally does not make him/her feel disappointed with him/herself',

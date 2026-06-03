@@ -88,8 +88,8 @@ util_task_nihtoolbox <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   }
   
   
-  if (length(list.files(path = source_beh_wd, pattern = 'nih_toolbox_events')) > 0){
-    events_file <- list.files(path = source_beh_wd, pattern = 'nih_toolbox_events')
+  if (length(list.files(path = source_beh_wd, pattern = 'nihtoolbox_events')) > 0){
+    events_file <- list.files(path = source_beh_wd, pattern = 'nihtoolbox_events')
     
     data <- read.table(file.path(source_beh_wd, events_file), sep = '\t', header = TRUE)
     
@@ -121,8 +121,8 @@ util_task_nihtoolbox <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     print(paste(sub_str, 'has no sst assessment data file'))
   }
   
-  if (length(list.files(path = source_beh_wd, pattern = 'nih_toolbox_scores')) > 0){
-    scores_file <- list.files(path = source_beh_wd, pattern = 'nih_toolbox_scores')
+  if (length(list.files(path = source_beh_wd, pattern = 'nihtoolbox_scores')) > 0){
+    scores_file <- list.files(path = source_beh_wd, pattern = 'nihtoolbox_scores')
     
     scores <- read.table(file.path(source_beh_wd, scores_file), sep = '\t', header = TRUE)
     
@@ -167,7 +167,7 @@ util_task_nihtoolbox <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     # define output file with path
     if (isTRUE(events_data)){
       
-      outfile_events <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_events.tsv'))
+      outfile_events <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-nihtoolbox_events.tsv'))
       
       if (!file.exists(outfile_events) | isTRUE(overwrite)){
         write.table(data, outfile_events, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
@@ -176,7 +176,7 @@ util_task_nihtoolbox <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
     
     if (isTRUE(scores_data)){
       
-      outfile_scores <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_scores.tsv'))
+      outfile_scores <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-nihtoolbox_scores.tsv'))
       
       if (!file.exists(outfile_scores) | isTRUE(overwrite)){
         write.table(scores, outfile_scores, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )

@@ -446,6 +446,8 @@ json_intake_deid <- function() {
     visit_protocol = list( Description = 'child visit protocol number (does not necessarilty reflect visit order. See participants.tsv for child visit protocol dates)',
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     
     # liking variables ----
     pre_liking_fullness_time = list( Description = 'Pre-liking (i.e., before VAS liking ratings) fullness rating time',

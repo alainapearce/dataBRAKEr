@@ -36,6 +36,7 @@ write_redcap(
  \item{'cebq' - Children's Eating Behavior Questionnaire}
  \item{'cfq' - Child Feeding Questionnaire}
  \item{'cshq' - Children Sleep Habits Questionnaire}
+ \item{'cwc' - Child Weight Concerns Questionnaire}
  \item{'efcr' - External Food Cue Responsiveness Scale}
  \item{'ffbs' - Family Food Behavior Survey}
  \item{'ffq' - HELIX cohort Food Frequency Questionnaire}
@@ -46,6 +47,7 @@ write_redcap(
  \item{'loc' - Loss of Control-Eating Questionnaire}
  \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
  \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+ \item{'scpf' - Structure and Control of Parent Feeding Questionnaire}
  \item{'sic' - Stress in Children Questionnaire}
  \item{'sleeplog' - Week long sleep log}
  \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}

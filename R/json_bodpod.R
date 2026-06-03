@@ -54,6 +54,8 @@ json_bodpod_deid <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-baseline' = 'baseline',
                                       'ses-followup' = '1-year follow-up')),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM'),
     bodpod_collect = list( Description = 'Was the BodPod completed?',
                            Levels = list( '0' = 'No',
                                           '1' = 'Yes')),

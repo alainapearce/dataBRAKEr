@@ -202,6 +202,7 @@ util_redcap_child3 <- function(data, date_data) {
   
   #update names
   names(cwc_data) <- gsub('wcs', 'cwc', names(cwc_data))
+  cwc_data <- cwc_data[!grepl('complete', names(cwc_data))]
   
   cwc_data <- util_format_cwc_data(cwc_data)
   

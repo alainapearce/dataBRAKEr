@@ -23,8 +23,14 @@ util_merged_fnirs <- function(child_v1_data, child_v3_data, proc_de_data) {
   fnirs_v1 <- merge(child_v1_data$fnirs_cap$data, child_v1_data$fnirs_tasks_info$data[!grepl('session_id|^visit', names(child_v1_data$fnirs_tasks_info$data))], by = 'participant_id', all = TRUE)
   fnirs_v1 <- merge(fnirs_v1, proc_de_data$cams_data$data[grep('id|baseline', names(proc_de_data$cams_data$data))], by = 'participant_id', all = TRUE)
   
+  child_v3_data$fnirs_tasks_info$data <- child_v3_data$fnirs_tasks_info$data[!is.na(child_v3_data$fnirs_tasks_info$data['participant_id']), ]
+  
   fnirs_v3 <- merge(child_v3_data$fnirs_cap$data, child_v3_data$fnirs_tasks_info$data[!grepl('session_id|^visit', names(child_v3_data$fnirs_tasks_info$data))], by = 'participant_id', all = TRUE)
-  fnirs_v3 <- merge(fnirs_v3, proc_de_data$cams_data$data[grep('id|followup', names(proc_de_data$cams_data$data))], by = 'participant_id', all = TRUE)
+  
+  followup_cams <- proc_de_data$cams_data$data[grep('id|followup', names(proc_de_data$cams_data$data))]
+  followup_cams <- followup_cams[rowSums(is.na(followup_cams)) < 4, ]
+  
+  fnirs_v3 <- merge(fnirs_v3, followup_cams, by = 'participant_id', all = TRUE)
   
   fnirs_all <- rbind(data.table::setDT(fnirs_v1), data.table::setDT(fnirs_v3), fill=TRUE)
   fnirs_all <- as.data.frame(fnirs_all)

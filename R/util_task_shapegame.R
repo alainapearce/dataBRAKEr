@@ -121,7 +121,7 @@ util_task_shapegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   }
   
   if (!file.exists(file.path(raw_wd, paste0(sub_str, '_task-shapegame_events.tsv'))) | isTRUE(overwrite)) {
-    write.table(dat, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-shapegame_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'NaN')
+    write.table(dat, file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-shapegame_events.tsv')), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
     
     
     if (isTRUE(overwrite)){

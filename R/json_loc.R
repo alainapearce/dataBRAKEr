@@ -130,6 +130,8 @@ json_loc_deid <- function() {
                            Levels = list ('1' =	'Child visit protocol 1 (baseline)',
                                           '2' =	'Child visit protocol 2 (baseline)',
                                           '3'	= 'Child visit protocol 3 (follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM'),
     loc_1 = list( Description = 'During the past 3 months have you ever felt that you were not able to stop eating, or not able to control the type of food or amount of food that you ate?  For example, can you remember a time over the last 3 months that you were eating something so yummy that you couldn’t stop eating, even if you really wanted to?', 
                   Levels = list ('0' = 'No',
                                  '1' = 'Yes',
