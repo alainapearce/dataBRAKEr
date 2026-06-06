@@ -93,6 +93,8 @@ util_task_spacegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   # re-order columns
   dat <- dat[c('sub', 'date', 'block', 'trial', 'timeout_earth', 'timeout_planet', 'state_earth', 'state_planet', 'stim_left', 'stim_right', 'rt_earth', 'rt_planet', 'choice_earth', 'response', 'points', 'stake', 'score', 'rewards1', 'rewards2', 'missed_earth', 'missed', 'prev_missed', 'prev_reward_diff', 'prev_points', 'prev_stake', 'earth_same', 'stay_planet')]
     
+  dat[['date']] <- format(ymd(dat[['date']]), "%Y-%m")
+  
   #### Save in rawdata #####
   
   if (!dir.exists(raw_wd)) {

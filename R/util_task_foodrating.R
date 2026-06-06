@@ -88,6 +88,8 @@ util_task_foodrating <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   # re-order columns
   dat <- dat[c('onset', 'duration', 'sub', 'date', 'exp_name', 'cond', 'exp_cond_num', 'stim_file', 'image_ed', 'fix', 'cond_trial', 'trial_index', 'food_onset', 'slider_onset', 'prompt_onset', 'rating', 'jitter_fix_onset', 'jitter_prompt_onset', 'jitter_fix_offset', 'jitter_prompt_offset', 'psychopy_ver', 'frame_rate')]
   
+  dat[['date']] <- format(ymd(dat[['date']]), "%Y-%m")
+  
   
   #### Save in rawdata #####
   

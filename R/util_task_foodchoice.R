@@ -158,6 +158,7 @@ util_task_foodchoice <- function(sub_str, ses, base_wd, overwrite = FALSE, retur
   
   # clean up date
   dat[['date']] <- lubridate::date(dat[['date']])
+  dat[['date']] <- format(ymd(dat[['date']]), "%Y-%m")
   
   # add healthy eating rt
   dat[['healthyeating_time']] <- healthy_rt

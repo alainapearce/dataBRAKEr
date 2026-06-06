@@ -224,7 +224,7 @@ util_task_tastetest <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   # clean up date
   #print(sub_str)
   dat_proc[['date']] <- lubridate::date(dat_proc[['date']])
-
+  dat_proc[['date']] <- format(ymd(dat_proc[['date']]), "%Y-%m")
   
   #### Save in rawdata #####
   

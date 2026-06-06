@@ -117,6 +117,10 @@ util_task_pit <- function(sub_str, ses, base_wd, overwrite = FALSE, return_data 
   # code correct responses
   pit_data['rectest_correct'] <- ifelse(pit_data[['rectest_key']] == pit_data[['rectest_correct']], 1, 0)
 
+  # clean up date
+  pit_data[['visit_date']] <- lubridate::date(pit_data[['visit_date']])
+  pit_data[['visit_date']] <- format(ymd(pit_data[['visit_date']]), "%Y-%m")
+  
   #### Export Data  #####
 
   # make raw beh directory if it doesn't exist

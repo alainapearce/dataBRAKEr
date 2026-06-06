@@ -60,12 +60,14 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
   
   # new file name
   rename_files <- gsub('_actigraph', paste0('_ses-', ses, '_tracksys-actigraph_motion'), raw_files)
+  rename_files <- gsub('.gt3x', '.tsv.gz', rename_files)
+  rename_files <- gsub('.agd', '.tsv.gz', rename_files)
   
   #### Save in sourcedata #####
   # set paths for other directories
   source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), 'beh')
   
-  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'beh')
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, paste0('ses-', ses), 'motion')
   
   #make directory if needed
   if (!dir.exists(source_wd)) {
@@ -77,11 +79,53 @@ util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overw
     dir.create(raw_wd, recursive = TRUE)
   } 
   
+  sub_num <- as.numeric(substr(sub_str, unlist(gregexpr('-', sub_str))+1, nchar(sub_str)))
+  # convert to open format for rawdata
+  raw_file_gt3x <- raw_files[grepl('gt3x', raw_files)]
+  
+  print(paste0('-- reading ', raw_file_gt3x))
+  raw_data_gt3x <- as.data.frame(read.gt3x::read.gt3x(file.path(raw_untouched_path, raw_file_gt3x), asDataFrame = TRUE))
+  
+  raw_data_gt3x['time'] <- format(raw_data_gt3x[['time']], format = "%H:%M:%S")
+  raw_data_gt3x['sub'] <- sub_num
+  
+  raw_data_gt3x <- raw_data_gt3x[c('sub', 'time', 'X', 'Y', 'Z')]
+  
+  
+  raw_file_agd <- raw_files[grepl('agd', raw_files)]
+  
+  print(paste0('-- reading ', raw_file_agd))
+  
+  # SQL driver connection
+  con_agd <- RSQLite::dbConnect(SQLite(), dbname = file.path(raw_untouched_path, raw_file_agd))
+  
+  # get epoch vector counts
+  agd_epoch_data <- dbGetQuery(con_agd, "SELECT * FROM data;")
+  RSQLite::dbDisconnect(con_agd)
+  
+  # convert to unit seconds
+  unix_seconds <- (agd_epoch_data[['dataTimestamp']] / 1e7) - 62135596800
+  datetime_agd <- as.POSIXct(unix_seconds, origin = "1970-01-01", tz = "UTC")
+  
+  agd_epoch_data['time'] <- format(datetime_agd, format = "%H:%M:%S")
+  agd_epoch_data['sub'] <- sub_num
+  
+  agd_epoch_data <- agd_epoch_data[c('sub', 'time', 'axis1', 'axis2', 'axis3', 'steps', 'lux', 'inclineOff', 'inclineSitting', 'inclineLying')]
+  
+  # open filenames
+  open_file_gt3x <- rename_files[grepl('motion.tsv.gz', rename_files)]
+  open_file_agd <- rename_files[grepl('10sec.tsv.gz', rename_files)]
+  
   # copy files
   if (!file.exists(file.path(raw_wd, rename_files[1])) | isTRUE(overwrite)) {  
     file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(source_wd, rename_files), overwrite = overwrite)
     
-    file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(raw_wd, rename_files), overwrite = overwrite)
+    
+    print(paste0('-- writing ', open_file_gt3x))
+    readr::write_tsv(raw_data_gt3x, file = file.path(raw_wd, open_file_gt3x))
+    
+    print(paste0('-- writing ', open_file_agd))
+    readr::write_tsv(agd_epoch_data, file = file.path(raw_wd, open_file_agd))
     
     #return message
     if (isTRUE(overwrite)){

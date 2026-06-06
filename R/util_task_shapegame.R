@@ -113,6 +113,7 @@ util_task_shapegame <- function(sub_str, ses, base_wd, overwrite = FALSE, return
   
   # clean up date
   dat[['date']] <- lubridate::date(dat[['date']])
+  dat[['date']] <- format(ymd(dat[['date']]), "%Y-%m")
   
   #### Save in rawdata #####
   

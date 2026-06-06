@@ -28,7 +28,10 @@ Imports:
     digest,
     reshape,
     GGIR,
-    REDCapDM
+    REDCapDM,
+    RSQLite,
+    read.gt3x,
+    readr
 Remotes:
     alainapearce/dataprepr
 Suggests: 

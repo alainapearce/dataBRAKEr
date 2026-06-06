@@ -17,7 +17,8 @@ dataBRAKEr(
   overwrite_ggir_derivs = FALSE,
   return_data = FALSE,
   deid = FALSE,
-  deid_list = "all"
+  deid_list = "all",
+  openneuro_org = FALSE
 )
 }
 \arguments{
@@ -102,6 +103,8 @@ dataBRAKEr(
  \item{'phenotype' - all phenotype informaiton}
  \item{'derivatives' - all derivative and processed individual task data}
 }}
+
+\item{openneuro_org}{(logical) organize and copy over fNIRS data for open-neuro directory organizaiton and upload}
 }
 \value{
 Does not return anything

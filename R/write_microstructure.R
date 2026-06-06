@@ -201,7 +201,7 @@ write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, micro_
       # export dataset_description.json
       name_str <- ifelse(grepl('meal', data_str), 'micro', 'bites')
       
-      filename_json <- file.path(bids_wd, paste0(paradigm, '-', name_str, '_events.json'))
+      filename_json <- file.path(bids_wd, paste0(ses_str, '_', paradigm, '-', name_str, '_events.json'))
       
       json_events <- micro_protocols_subset[[data_str]]$meta
       

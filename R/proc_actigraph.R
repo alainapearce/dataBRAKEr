@@ -65,7 +65,6 @@ proc_actigraph <- function(base_wd, overwrite = FALSE, proc_ggir = FALSE, overwr
 
   # Processing Steps ####
   for (session in c('baseline', 'followup')){
-    
     if (session == 'baseline'){
       dir_name <- 'actigraphy'
     } else {

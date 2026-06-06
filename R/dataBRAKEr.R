@@ -82,6 +82,7 @@
 #'  \item{'phenotype' - all phenotype informaiton}
 #'  \item{'derivatives' - all derivative and processed individual task data}
 #' }
+#' @param openneuro_org (logical) organize and copy over fNIRS data for open-neuro directory organizaiton and upload
 #'
 #'
 #' @return Does not return anything
@@ -98,13 +99,13 @@
 #'
 #' @export
 
-dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc_source = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', proc_ggir = FALSE, overwrite_ggir_derivs = FALSE, return_data = FALSE, deid = FALSE, deid_list = 'all') {
-
+dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc_source = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', proc_ggir = FALSE, overwrite_ggir_derivs = FALSE, return_data = FALSE, deid = FALSE, deid_list = 'all', openneuro_org = FALSE) {
+  
   #### Set up/initial checks #####
-
+  
   # check that base_wd exist and is a string
   data_arg <- methods::hasArg(base_wd)
-
+  
   if (isTRUE(data_arg)) {
     if (!is.character(base_wd)) {
       stop('base_wd must be entered as a string')
@@ -115,22 +116,29 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
     stop('base_wd must be entered as a string')
   }
   #### function to export data and metadata ####
-
+  
   # data for 'all' option - need to add actigraph eventually
-
+  
   # task data
   task_data_options <- c('foodrating', 'foodchoice','shapegame','spacegame','nihtoolbox','tastetest','pit')
   
   # data from redcap
   redcap_data_options <- c('participants', 'anthropometrics', 'demographics', 'bodpod', 'fnirs_info', 'dkefs', 'wasi', 'intake', 'tasttest_samples', 'household', 'infancy',  'bes', 'brief2', 'cbq', 'cebq', 'cfq', 'cshq', 'cwc', 'efcr', 'ffbs', 'ffq', 'fmcb', 'hfe', 'hfi', 'lbc', 'loc', 'puberty', 'pwlb', 'scpf', 'sic', 'sleeplog', 'spsrq', 'tfeq')
-
+  
   if (isFALSE(hasArg(data_list))){
     ## ScholarSphere de-id data ####
     if (isTRUE(deid)){
       util_scholarsphere(base_wd, overwrite = overwrite, data_list = deid_list)
-      return('de-identified data creatd')
+      print('de-identified data creatd')
     }
+    
+    if (isTRUE(openneuro_org)){
+      util_openneuro(base_wd, overwrite = overwrite)
+      print('data organized for open-neuro')
+    } 
+      
     return('no data list')
+    
   } else if (length(data_list) == 1) {
     if (data_list == 'all') {
       data_list = c(redcap_data_options, 'microstructure', task_data_options, 'actigraph')
@@ -166,29 +174,29 @@ dataBRAKEr <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, proc
   # process redcap data ####
   if (sum(data_list %in% redcap_data_options) > 0) {
     data_list_redcap = data_list[(data_list %in% redcap_data_options)]
-
+    
     # return data?
     if (sum(grepl('intake|micro',data_list) > 0) | isTRUE(return_data)) {
       proc_redcap_data <- write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, tastetest_data = tastetest_data, return_data = TRUE)
-
+      
       #get intake data
       intake_data <- proc_redcap_data$intake$data
     } else {
       write_redcap(base_wd, overwrite = overwrite, data_list = data_list_redcap, return_data = FALSE)
     }
   }
-
+  
   # process microstructure data ####
   if ('microstructure' %in% data_list) {
     micro_data <- write_microstructure(base_wd, intake_data = intake_data, micro_protocols = micro_protocols, micro_data_type = micro_data_type, overwrite = overwrite, return_data = return_data)
   }
-
+  
   
   # process actigraph data ####
   if ('actigraph' %in% data_list) {
     proc_actigraph(base_wd, overwrite = overwrite, proc_ggir = proc_ggir, overwrite_ggir_derivs = overwrite_ggir_derivs)
   }
-
+  
   #### Return Data ####
   if (isTRUE(return_data)) {
     return(list = c(redcap_data = proc_redcap_data,

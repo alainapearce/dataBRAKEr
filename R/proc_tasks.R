@@ -244,7 +244,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     tastetest_list[['sourcedata_done']] <- sapply(tastetest_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'tastetest', sub_str = x, ses = 'followup', base_wd = base_wd, task_cat = 'nirs', overwrite = fnirs_overwrite), simplify = TRUE)
     
     #process raw data
-    tastetest_list[['rawproc_done']] <- sapply(tastetest_list[['sub_str']], function(x) util_task_tastetest(sub_str = x, ses = 'followup', base_wd = base_wd, overwrite = fnirs_overwrite, return = FALSE), simplify = TRUE)
+    tastetest_list[['rawproc_done']] <- sapply(tastetest_list[['sub_str']], function(x) util_task_tastetest(sub_str = x, ses = 'followup', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
     
     #generate json file for rawdata
     tastetest_json <- json_tastetest_events()
