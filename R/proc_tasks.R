@@ -128,6 +128,29 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
     if ( isTRUE(overwrite) | !file.exists(foodchoice_filename_json) ) {
       write(foodchoice_json, foodchoice_filename_json)
     }
+    
+    # get list of available eye-tracking subjects 
+    foodchoice_eye_list <- list.files(path = file.path(data_path, 'foodchoice_game'), pattern = '.hdf5')
+    
+    foodchoice_eye_list <- as.data.frame(foodchoice_eye_list[!grepl('999', foodchoice_eye_list)])
+    names(foodchoice_eye_list) <- 'filename'
+    
+    #get list of subject IDs
+    foodchoice_eye_list['sub_str'] <- sapply(foodchoice_eye_list['filename'], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+    
+    #organize data into BIDS sourcedata
+    foodchoice_eye_list[['sourcedata_done']] <- sapply(foodchoice_eye_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'foodchoice', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'eyetrack', overwrite = fnirs_overwrite), simplify = TRUE)
+    
+    foodchoice_eye_list[['hdf5_done']] <- sapply(foodchoice_eye_list[['sub_str']], function(x) util_task_eyetrack(task_str = 'foodchoice', sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = fnirs_overwrite), simplify = TRUE)
+    
+    #generate json file for rawdata
+    eyetrack_raw_json <- json_eyetrack_raw_events()
+    
+    eyetrack_raw_filename_json <- file.path(bids_wd, 'ses-baseline_task-eyetrack_raw_events.json')
+    
+    if ( isTRUE(overwrite) | !file.exists(eyetrack_raw_filename_json) ) {
+      write(eyetrack_raw_json, eyetrack_raw_filename_json)
+    }
   }
   
   # Shape Game ####
@@ -157,6 +180,28 @@ proc_tasks <- function(base_wd, overwrite = FALSE, fnirs_overwrite = FALSE, task
       write(shapegame_json, shapegame_filename_json)
     }
     
+    # get list of available eye-tracking subjects 
+    shape_eye_list <- list.files(path = file.path(data_path, 'shape_game'), pattern = '.hdf5')
+    
+    shape_eye_list <- as.data.frame(shape_eye_list[!grepl('999', shape_eye_list)])
+    names(shape_eye_list) <- 'filename'
+    
+    #get list of subject IDs
+    shape_eye_list['sub_str'] <- sapply(shape_eye_list['filename'], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+    
+    #organize data into BIDS sourcedata
+    shape_eye_list[['sourcedata_done']] <- sapply(shape_eye_list[['sub_str']], function(x) util_task_org_sourcedata(task_str = 'shape', sub_str = x, ses = 'baseline', base_wd = base_wd, task_cat = 'eyetrack', overwrite = fnirs_overwrite), simplify = TRUE)
+    
+    shape_eye_list[['hdf5_done']] <- sapply(shape_eye_list[['sub_str']], function(x) util_task_eyetrack(task_str = 'shapegame', sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = fnirs_overwrite), simplify = TRUE)
+    
+    #generate json file for rawdata
+    eyetrack_raw_json <- json_eyetrack_raw_events()
+    
+    eyetrack_raw_filename_json <- file.path(bids_wd, 'ses-baseline_recording-eyetrack_physioevents.json')
+    
+    if ( isTRUE(overwrite) | !file.exists(eyetrack_raw_filename_json) ) {
+      write(eyetrack_raw_json, eyetrack_raw_filename_json)
+    }
   }
   
   

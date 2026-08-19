@@ -16,6 +16,7 @@ export(json_cwc)
 export(json_demo)
 export(json_dkefs)
 export(json_efcr)
+export(json_eyetrack_raw_events)
 export(json_ff_baseline)
 export(json_ff_v3)
 export(json_ffbs)
@@ -118,6 +119,7 @@ export(util_scholarsphere)
 export(util_shapegame_eyetrack_beh)
 export(util_shapegame_summary)
 export(util_spacegame_summary)
+export(util_task_eyetrack)
 export(util_task_foodchoice)
 export(util_task_foodrating)
 export(util_task_nihtoolbox)
@@ -129,9 +131,12 @@ export(util_task_tastetest)
 export(util_tastetest_summary)
 export(write_microstructure)
 export(write_redcap)
+import(data.table)
 importFrom(rlang,.data)
-importFrom(utils,head)
-importFrom(utils,read.csv)
-importFrom(utils,read.table)
-importFrom(utils,tail)
-importFrom(utils,write.table)
+importFrom(utils,
+  head,
+  read.csv,
+  read.table,
+  tail,
+  write.table
+)

@@ -336,6 +336,21 @@ util_scholarsphere <- function(base_wd, overwrite = FALSE, data_list = 'all') {
   #organize data into BIDS sourcedata
   mapply(cp_scholarsphere, data_path = beh_tsv_list[['data_path']], file_name = beh_tsv_list[['filename']], MoreArgs = list(overwrite = overwrite))
   
+  
+  #  beh get list of available subjects  ####
+  print('-- copying individual eyetracking files to scholarsphere')
+  
+  baseline_eye_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-baseline', 'eyetrack')), pattern = '*.tsv.gz$', recursive = TRUE))
+  names(baseline_eye_list) <- 'filename'
+  
+  #get list of subject IDs
+  baseline_eye_list[['sub_str']] <- sapply(baseline_eye_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+  
+  baseline_eye_list[['data_path']] <- file.path(baseline_eye_list[['sub_str']], 'ses-baseline', 'eyetrack')
+  
+  #organize data into BIDS sourcedata
+  mapply(cp_scholarsphere, data_path = baseline_eye_list[['data_path']], file_name = baseline_eye_list[['filename']], MoreArgs = list(overwrite = overwrite))
+  
   #  beh get list of available subjects  ####
   print('-- copying individual microstrucutre meal files to scholarsphere')
   
@@ -359,9 +374,9 @@ util_scholarsphere <- function(base_wd, overwrite = FALSE, data_list = 'all') {
   mapply(cp_scholarsphere, data_path = micro_list[['data_path']], file_name = micro_list[['filename']], MoreArgs = list(overwrite = overwrite))
   
   #copy over individual *_event.json files
-  print('-- copying global *_events.json files')
+  print('-- copying global *events.json files')
   
-  event_json_list <- list.files(path = bids_wd, pattern = '_events.json', recursive = FALSE)
+  event_json_list <- list.files(path = bids_wd, pattern = 'events.json', recursive = FALSE)
 
   file.copy(from = file.path(bids_wd, event_json_list), to = file.path(scholarsphere_wd, event_json_list), overwrite = overwrite)
   

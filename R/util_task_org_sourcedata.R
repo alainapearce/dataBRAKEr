@@ -54,7 +54,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   # get all files for sub in raw_untouched
   if (task_str == 'nih'){
     raw_files <- list.files(path = raw_untouched_path, pattern = sub_str)
-
+    
     # new file name
     if (sum(grepl('events', raw_files)) > 0){
       rename_files <- paste0(sub_str, '_ses-', ses, '_task-nihtoolbox_events.tsv')
@@ -71,7 +71,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
         rename_files <- paste0(sub_str, '_ses-', ses, '_task-nihtoolbox_scores.tsv')
       }
     }
-
+    
   } else {
     raw_files <- list.files(path = raw_untouched_path, pattern = sub_str)
     
@@ -103,7 +103,7 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   #### Save in sourcedata #####
   
   # set paths for other directories
-  if (task_cat == 'beh'){
+  if (task_cat == 'beh' || task_cat == 'eyetrack' ){
     source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), task_cat)
   } else {
     source_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, paste0('ses-', ses), task_cat, task_str)
@@ -121,50 +121,54 @@ util_task_org_sourcedata <- function(task_str, sub_str, ses, base_wd, task_cat, 
   } 
   
   # copy files
-  if (!file.exists(gsub('csv', 'tsv', paste0(source_wd, rename_files[1]))) | isTRUE(overwrite)) {  
-    
-    if (task_str != 'space'){
+  if (task_cat == 'eyetrack') {
+    #copy .hdf5 files over
+    file.copy(from = file.path(raw_untouched_path, raw_files[grepl('.hdf5', raw_files)]), to = file.path(source_wd, rename_files[grepl('.hdf5', rename_files)]), overwrite = TRUE)
+  } else {
+    if (!file.exists(gsub('csv', 'tsv', paste0(source_wd, rename_files[1]))) | isTRUE(overwrite)) {  
       
-      if (sum(!grepl('.csv', raw_files)) > 0) {
-        #copy non .csv  files over
-        file.copy(from = file.path(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = file.path(source_wd, rename_files[!grepl('.csv', rename_files)]))
-      }
-      
-      #change data file to .tsv
-      rename_tsv <- gsub('.csv', '.tsv', rename_files[grepl('.csv', rename_files)])
-      
-      if (task_str == 'nih'){
-        if (sum(grepl('events', raw_files)) > 0 ){
-          write.table(data_list_events, file.path(source_wd, rename_files[1]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
-          if (sum(grepl('scores', raw_files)) > 0 ){
-            write.table(data_list_scores, file.path(source_wd, rename_files[2]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
-          }
-        } else {
-          if (sum(grepl('scores', raw_files)) > 0 ){
-            write.table(data_list_scores, file.path(source_wd, rename_files), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
-          }
+      if (task_str != 'space'){
+        
+        if (sum(!grepl('.csv', raw_files)) > 0) {
+          #copy non .csv  files over
+          file.copy(from = file.path(raw_untouched_path, raw_files[!grepl('.csv', raw_files)]), to = file.path(source_wd, rename_files[!grepl('.csv', rename_files)]), overwrite = TRUE)
         }
         
+        #change data file to .tsv
+        rename_tsv <- gsub('.csv', '.tsv', rename_files[grepl('.csv', rename_files)])
+        
+        if (task_str == 'nih'){
+          if (sum(grepl('events', raw_files)) > 0 ){
+            write.table(data_list_events, file.path(source_wd, rename_files[1]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+            if (sum(grepl('scores', raw_files)) > 0 ){
+              write.table(data_list_scores, file.path(source_wd, rename_files[2]), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+            }
+          } else {
+            if (sum(grepl('scores', raw_files)) > 0 ){
+              write.table(data_list_scores, file.path(source_wd, rename_files), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+            }
+          }
+          
+        } else {
+          dat <- read.csv(file.path(raw_untouched_path, raw_files[grepl('.csv', raw_files)]), header = TRUE)
+          write.table(dat, file.path(source_wd, rename_tsv), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+        }
+        
+        
       } else {
-        dat <- read.csv(file.path(raw_untouched_path, raw_files[grepl('.csv', raw_files)]), header = TRUE)
-        write.table(dat, file.path(source_wd, rename_tsv), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+        file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(source_wd, rename_files), overwrite = TRUE)
+        
       }
       
+      #return message
+      if (isTRUE(overwrite)){
+        return('overwrote with new version')
+      } else {
+        return('complete')
+      }
       
     } else {
-      file.copy(from = file.path(raw_untouched_path, raw_files), to = file.path(source_wd, rename_files))
-      
+      return('exists')
     }
-    
-    #return message
-    if (isTRUE(overwrite)){
-      return('overwrote with new version')
-    } else {
-      return('complete')
-    }
-    
-  } else {
-    return('exists')
   }
-  
 }

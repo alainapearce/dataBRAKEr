@@ -101,7 +101,20 @@ util_openneuro <- function(base_wd, overwrite = FALSE) {
   #organize data into BIDS sourcedata
   mapply(cp_openneuro, data_path = baseline_fnirs_list[['data_path']], file_name = baseline_fnirs_list[['filename']], MoreArgs = list(overwrite = overwrite))
  
-  # Follow fNIRS get list of available subjects  ####
+  # Baseline eye-tracking get list of available subjects  ####
+  print('-- copying individual eye-trakcing baseline files to open-neuro')
+  
+  baseline_eyetrack_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-baseline', 'eyetrack')), pattern = '*.tsv.gz', recursive = TRUE))
+  names(baseline_eyetrack_list) <- 'filename'
+  
+  #get list of subject IDs
+  baseline_eyetrack_list[['sub_str']] <- sapply(baseline_eyetrack_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+  
+  baseline_eyetrack_list[['data_path']] <- file.path(baseline_eyetrack_list[['sub_str']], 'ses-baseline', 'eyetrack')
+  
+  mapply(cp_openneuro, data_path = baseline_eyetrack_list[['data_path']], file_name = baseline_eyetrack_list[['filename']], MoreArgs = list(overwrite = overwrite))
+  
+  # Follow-up fNIRS get list of available subjects  ####
   print('-- copying individual nirs followup files to open-neuro')
   
   followup_tsv_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-followup', 'nirs')), pattern = '*.tsv$', recursive = FALSE))
@@ -132,10 +145,10 @@ util_openneuro <- function(base_wd, overwrite = FALSE) {
   mapply(cp_openneuro, data_path = followup_fnirs_list[['data_path']], file_name = followup_fnirs_list[['filename']], meal_desc = followup_fnirs_list[['meal_dir']], MoreArgs = list(overwrite = overwrite))
   
   # copy json files
-  #copy over individual *_event.json files
-  print('-- copying global *_events.json files')
-  event_json_list <- list.files(path = bids_wd, pattern = '_events.json', recursive = TRUE)
-  event_json_list <- event_json_list[grepl('tastetest|foodrating|foodchoice', event_json_list)]
+  #copy over individual *event.json files
+  print('-- copying global *events.json files')
+  event_json_list <- list.files(path = bids_wd, pattern = 'events.json', recursive = TRUE)
+  event_json_list <- event_json_list[grepl('tastetest|foodrating|foodchoice|eyetrack', event_json_list)]
   
   file.copy(from = file.path(bids_wd, event_json_list), to = file.path(base_wd, 'open-neuro', event_json_list), overwrite = overwrite)
 }
