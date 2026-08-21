@@ -19,7 +19,7 @@
 #' \dontrun{
 #' }
 #'
-#'
+#' @import RSQLite
 #' @export
 
 util_actigraph_org_sourcedata <- function(sub_str, ses, dir_name, base_wd, overwrite = FALSE) {

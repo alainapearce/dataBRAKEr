@@ -131,6 +131,7 @@ export(util_task_tastetest)
 export(util_tastetest_summary)
 export(write_microstructure)
 export(write_redcap)
+import(RSQLite)
 import(data.table)
 importFrom(rlang,.data)
 importFrom(utils,

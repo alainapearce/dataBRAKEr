@@ -37,5 +37,4 @@ org_actigraph <- util_actigraph_org_sourcedata(tsub_str = 'sub_001', ses = 'base
 \dontrun{
 }
 
-
 }
